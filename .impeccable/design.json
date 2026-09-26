@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-26T20:34:40Z",
+  "title": "Design System: Traders at Carolina",
+  "extensions": {
+    "colorMeta": {
+      "navy": {
+        "role": "primary",
+        "displayName": "Deep Carolina Navy",
+        "canonical": "#081f33",
+        "tonalRamp": ["oklch(15% 0.048 247.8)", "oklch(27% 0.048 247.8)", "oklch(39% 0.048 247.8)", "oklch(51% 0.048 247.8)", "oklch(63% 0.048 247.8)", "oklch(75% 0.048 247.8)", "oklch(87% 0.048 247.8)", "oklch(95% 0.048 247.8)"]
+      },
+      "navy-deep": {
+        "role": "primary",
+        "displayName": "After Midnight",
+        "canonical": "#041522",
+        "tonalRamp": ["oklch(15% 0.036 242.6)", "oklch(27% 0.036 242.6)", "oklch(39% 0.036 242.6)", "oklch(51% 0.036 242.6)", "oklch(63% 0.036 242.6)", "oklch(75% 0.036 242.6)", "oklch(87% 0.036 242.6)", "oklch(95% 0.036 242.6)"]
+      },
+      "carolina-blue": {
+        "role": "primary",
+        "displayName": "Carolina Signal",
+        "canonical": "#7bafd4",
+        "tonalRamp": ["oklch(15% 0.077 240.1)", "oklch(27% 0.077 240.1)", "oklch(39% 0.077 240.1)", "oklch(51% 0.077 240.1)", "oklch(63% 0.077 240.1)", "oklch(75% 0.077 240.1)", "oklch(87% 0.077 240.1)", "oklch(95% 0.077 240.1)"]
+      },
+      "carolina-blue-hover": {
+        "role": "primary",
+        "displayName": "Signal Lift",
+        "canonical": "#9bc7e6",
+        "tonalRamp": ["oklch(15% 0.064 239.3)", "oklch(27% 0.064 239.3)", "oklch(39% 0.064 239.3)", "oklch(51% 0.064 239.3)", "oklch(63% 0.064 239.3)", "oklch(75% 0.064 239.3)", "oklch(87% 0.064 239.3)", "oklch(95% 0.064 239.3)"]
+      },
+      "carolina-blue-pale": {
+        "role": "primary",
+        "displayName": "Carolina Mist",
+        "canonical": "#dcecf7",
+        "tonalRamp": ["oklch(15% 0.023 237.6)", "oklch(27% 0.023 237.6)", "oklch(39% 0.023 237.6)", "oklch(51% 0.023 237.6)", "oklch(63% 0.023 237.6)", "oklch(75% 0.023 237.6)", "oklch(87% 0.023 237.6)", "oklch(95% 0.023 237.6)"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Quant Ink",
+        "canonical": "#102638",
+        "tonalRamp": ["oklch(15% 0.044 245.3)", "oklch(27% 0.044 245.3)", "oklch(39% 0.044 245.3)", "oklch(51% 0.044 245.3)", "oklch(63% 0.044 245.3)", "oklch(75% 0.044 245.3)", "oklch(87% 0.044 245.3)", "oklch(95% 0.044 245.3)"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Slate Note",
+        "canonical": "#556a7b",
+        "tonalRamp": ["oklch(15% 0.037 242.9)", "oklch(27% 0.037 242.9)", "oklch(39% 0.037 242.9)", "oklch(51% 0.037 242.9)", "oklch(63% 0.037 242.9)", "oklch(75% 0.037 242.9)", "oklch(87% 0.037 242.9)", "oklch(95% 0.037 242.9)"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Rule Blue-Gray",
+        "canonical": "#cdd9e1",
+        "tonalRamp": ["oklch(15% 0.017 236.7)", "oklch(27% 0.017 236.7)", "oklch(39% 0.017 236.7)", "oklch(51% 0.017 236.7)", "oklch(63% 0.017 236.7)", "oklch(75% 0.017 236.7)", "oklch(87% 0.017 236.7)", "oklch(95% 0.017 236.7)"]
+      },
+      "surface-white": {
+        "role": "neutral",
+        "displayName": "Open White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(27% 0 0)", "oklch(39% 0 0)", "oklch(51% 0 0)", "oklch(63% 0 0)", "oklch(75% 0 0)", "oklch(87% 0 0)", "oklch(95% 0 0)"]
+      },
+      "surface-cool": {
+        "role": "neutral",
+        "displayName": "Cool Lab Surface",
+        "canonical": "#edf3f6",
+        "tonalRamp": ["oklch(15% 0.008 228.9)", "oklch(27% 0.008 228.9)", "oklch(39% 0.008 228.9)", "oklch(51% 0.008 228.9)", "oklch(63% 0.008 228.9)", "oklch(75% 0.008 228.9)", "oklch(87% 0.008 228.9)", "oklch(95% 0.008 228.9)"]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas Air",
+        "canonical": "#f7f9fb",
+        "tonalRamp": ["oklch(15% 0.003 247.9)", "oklch(27% 0.003 247.9)", "oklch(39% 0.003 247.9)", "oklch(51% 0.003 247.9)", "oklch(63% 0.003 247.9)", "oklch(75% 0.003 247.9)", "oklch(87% 0.003 247.9)", "oklch(95% 0.003 247.9)"]
+      },
+      "field-surface": {
+        "role": "neutral",
+        "displayName": "Field Frost",
+        "canonical": "#fbfcfd",
+        "tonalRamp": ["oklch(15% 0.002 247.8)", "oklch(27% 0.002 247.8)", "oklch(39% 0.002 247.8)", "oklch(51% 0.002 247.8)", "oklch(63% 0.002 247.8)", "oklch(75% 0.002 247.8)", "oklch(87% 0.002 247.8)", "oklch(95% 0.002 247.8)"]
+      },
+      "focus-gold": {
+        "role": "primary",
+        "displayName": "Focus Gold",
+        "canonical": "#f2b544",
+        "tonalRamp": ["oklch(15% 0.144 79.3)", "oklch(27% 0.144 79.3)", "oklch(39% 0.144 79.3)", "oklch(51% 0.144 79.3)", "oklch(63% 0.144 79.3)", "oklch(75% 0.144 79.3)", "oklch(87% 0.144 79.3)", "oklch(95% 0.144 79.3)"]
+      },
+      "danger": {
+        "role": "primary",
+        "displayName": "Validation Red",
+        "canonical": "#b42318",
+        "tonalRamp": ["oklch(15% 0.182 29.5)", "oklch(27% 0.182 29.5)", "oklch(39% 0.182 29.5)", "oklch(51% 0.182 29.5)", "oklch(63% 0.182 29.5)", "oklch(75% 0.182 29.5)", "oklch(87% 0.182 29.5)", "oklch(95% 0.182 29.5)"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Short page and hero statements with tightly controlled line length."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section propositions and major closing actions."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Cards, list rows, disclosures, and process steps."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading copy and explanatory content, normally capped at 72ch."
+      },
+      "label": {
+        "displayName": "Data Label",
+        "purpose": "Compact facts, states, sequence markers, and footer headings."
+      }
+    },
+    "shadows": [
+      {
+        "name": "action-lift",
+        "value": "0 0.55rem 1.3rem rgba(2, 17, 29, 0.18)",
+        "purpose": "Primary-button hover feedback."
+      },
+      {
+        "name": "event-float",
+        "value": "0 1rem 3rem rgba(21, 49, 68, 0.1)",
+        "purpose": "Ambient separation for event cards."
+      },
+      {
+        "name": "access-panel",
+        "value": "0 1.2rem 3.5rem rgba(8, 31, 51, 0.12)",
+        "purpose": "Isolation for the member-access panel."
+      },
+      {
+        "name": "status-glow",
+        "value": "0 0.2rem 0.75rem rgba(123, 175, 212, 0.5)",
+        "purpose": "Small luminous emphasis for status dots."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Default easing for directional movement and settling."
+      },
+      {
+        "name": "control-color",
+        "value": "180ms ease",
+        "purpose": "Button background and text-color transitions."
+      },
+      {
+        "name": "control-lift",
+        "value": "280ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Button transform and shadow response."
+      },
+      {
+        "name": "link-arrow",
+        "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Directional arrow translation on text-link hover."
+      },
+      {
+        "name": "mobile-menu",
+        "value": "340ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Full-height navigation panel entry and exit."
+      },
+      {
+        "name": "hero-settle",
+        "value": "1.35s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Single image-scale and saturation settle on the home hero."
+      },
+      {
+        "name": "signal-rise",
+        "value": "900ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Staggered partner-signal bars with delays from 120ms to 360ms."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "Collapses transitions and animations and disables smooth scrolling when reduced motion is requested."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "navigation-collapse",
+        "value": "70rem"
+      },
+      {
+        "name": "single-column",
+        "value": "50rem"
+      },
+      {
+        "name": "compact-mobile",
+        "value": "34rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default high-emphasis action on light or dark-neutral fields.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Join Traders at Carolina <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ".ds-btn-primary { display: inline-flex; min-height: 3.25rem; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.8rem 1.3rem; border: 1px solid transparent; border-radius: 0.8rem; background: var(--blue, #7bafd4); color: var(--navy-deep, #041522); font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; line-height: 1; cursor: pointer; transition: background 180ms ease, transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background: #9bc7e6; transform: translateY(-2px); box-shadow: 0 0.55rem 1.3rem rgba(2, 17, 29, 0.18); } .ds-btn-primary:focus-visible { outline: 3px solid var(--focus, #f2b544); outline-offset: 4px; } .ds-btn-primary:active { transform: translateY(0); box-shadow: none; }"
+    },
+    {
+      "name": "Light Button",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "High-emphasis action placed over navy, photography, or a Carolina-blue action band.",
+      "html": "<button class=\"ds-btn-light\" type=\"button\">Explore membership <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ".ds-btn-light { display: inline-flex; min-height: 3.25rem; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.8rem 1.3rem; border: 1px solid transparent; border-radius: 0.8rem; background: var(--surface, #ffffff); color: var(--navy-deep, #041522); font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; line-height: 1; cursor: pointer; transition: background 180ms ease, transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-light:hover { background: var(--blue-pale, #dcecf7); transform: translateY(-2px); box-shadow: 0 0.55rem 1.3rem rgba(2, 17, 29, 0.18); } .ds-btn-light:focus-visible { outline: 3px solid var(--focus, #f2b544); outline-offset: 4px; } .ds-btn-light:active { transform: translateY(0); box-shadow: none; }"
+    },
+    {
+      "name": "Ghost Light Button",
+      "kind": "button",
+      "refersTo": "button-ghost-light",
+      "description": "Secondary action over dark media or navy fields.",
+      "html": "<div class=\"ds-ghost-stage\"><button class=\"ds-btn-ghost\" type=\"button\">View upcoming events</button></div>",
+      "css": ".ds-ghost-stage { display: inline-flex; padding: 1.25rem; background: var(--navy-deep, #041522); } .ds-btn-ghost { display: inline-flex; min-height: 3.25rem; align-items: center; justify-content: center; padding: 0.8rem 1.3rem; border: 1px solid rgba(255, 255, 255, 0.58); border-radius: 0.8rem; background: transparent; color: #ffffff; font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; line-height: 1; cursor: pointer; transition: background 180ms ease, border-color 180ms ease, transform 280ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-ghost:hover { border-color: #ffffff; background: rgba(255, 255, 255, 0.12); transform: translateY(-2px); } .ds-btn-ghost:focus-visible { outline: 3px solid var(--focus, #f2b544); outline-offset: 4px; } .ds-btn-ghost:active { transform: translateY(0); }"
+    },
+    {
+      "name": "Primary Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-link",
+      "description": "Dark horizontal navigation with an underlined active page and a persistent Join action.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Primary navigation preview\"><a class=\"ds-nav-link ds-is-active\" href=\"#\">Home</a><a class=\"ds-nav-link\" href=\"#\">Membership</a><a class=\"ds-nav-link\" href=\"#\">Events</a><a class=\"ds-nav-join\" href=\"#\">Join <svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M7 17 17 7M8 7h9v9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 0.3rem; padding: 1rem; background: var(--navy-deep, #041522); font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; } .ds-nav-link { display: inline-flex; min-height: 2.7rem; align-items: center; padding: 0.55rem 0.7rem; color: rgba(255, 255, 255, 0.77); font-size: 0.89rem; font-weight: 560; text-decoration: none; } .ds-nav-link:hover { color: #ffffff; } .ds-nav-link.ds-is-active { color: #ffffff; text-decoration: underline; text-decoration-color: var(--blue, #7bafd4); text-decoration-thickness: 2px; text-underline-offset: 0.55rem; } .ds-nav-link:focus-visible, .ds-nav-join:focus-visible { outline: 3px solid var(--focus, #f2b544); outline-offset: 4px; } .ds-nav-join { display: inline-flex; min-height: 2.7rem; align-items: center; gap: 0.45rem; margin-left: auto; padding: 0 1.05rem; border-radius: 0.7rem; background: var(--blue, #7bafd4); color: var(--navy-deep, #041522); font-size: 0.89rem; font-weight: 700; text-decoration: none; transition: background 180ms ease, transform 280ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-nav-join:hover { background: #9bc7e6; transform: translateY(-2px); }"
+    },
+    {
+      "name": "Event Card",
+      "kind": "card",
+      "refersTo": "card-event",
+      "description": "A portable event object with fallback media, explicit audience and status, metadata, and an optional action.",
+      "html": "<article class=\"ds-event-card\"><div class=\"ds-event-media\"><span>Workshop</span></div><div class=\"ds-event-body\"><div class=\"ds-tag-row\"><span class=\"ds-tag\">Public</span><span class=\"ds-tag ds-tag-open\">Registration open</span></div><h3>Quant research workshop</h3><p>Build, test, and discuss one market question with peers.</p><dl><div><dt><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" aria-hidden=\"true\"><path d=\"M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span class=\"ds-sr-only\">Date</span></dt><dd>Oct 8, 6:00 PM</dd></div></dl><a class=\"ds-card-link\" href=\"#\">Register <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M7 17 17 7M8 7h9v9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></a></div></article>",
+      "css": ".ds-event-card { max-width: 24rem; overflow: hidden; border-radius: 0.9rem; background: #ffffff; color: var(--ink, #102638); font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; box-shadow: 0 1rem 3rem rgba(21, 49, 68, 0.1); } .ds-event-media { display: grid; aspect-ratio: 16 / 8.5; place-items: end start; padding: 1.4rem; background: var(--blue-pale, #dcecf7); color: var(--navy, #081f33); } .ds-event-media span { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-event-body { padding: 1.5rem; } .ds-tag-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1rem; } .ds-tag { display: inline-flex; min-height: 1.8rem; align-items: center; padding: 0.3rem 0.62rem; border-radius: 999px; background: var(--surface-cool, #edf3f6); color: var(--navy, #081f33); font-size: 0.7rem; font-weight: 680; } .ds-tag-open { background: #dff5e9; color: #155d3d; } .ds-event-card h3 { margin: 0; font-size: 1.6rem; font-weight: 680; line-height: 1.05; letter-spacing: -0.035em; } .ds-event-card h3 + p { margin: 0.9rem 0 0; color: var(--muted, #556a7b); line-height: 1.6; } .ds-event-card dl { margin: 1.35rem 0 0; } .ds-event-card dl div { display: grid; grid-template-columns: 1.5rem 1fr; gap: 0.45rem; color: #40596b; font-size: 0.85rem; } .ds-event-card dt, .ds-event-card dd { margin: 0; } .ds-card-link { display: inline-flex; align-items: center; gap: 0.55rem; margin-top: 1.35rem; color: var(--navy, #081f33); font-weight: 700; text-decoration: underline; text-decoration-color: var(--blue, #7bafd4); text-decoration-thickness: 2px; text-underline-offset: 0.35rem; } .ds-card-link svg { transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-card-link:hover svg { transform: translateX(0.3rem); } .ds-card-link:focus-visible { outline: 3px solid var(--focus, #f2b544); outline-offset: 4px; } .ds-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }"
+    },
+    {
+      "name": "Status Tags",
+      "kind": "chip",
+      "refersTo": "chip-neutral",
+      "description": "Compact audience and event-state labels whose text repeats the meaning carried by color.",
+      "html": "<div class=\"ds-status-tags\"><span class=\"ds-chip\">Members only</span><span class=\"ds-chip ds-chip-open\">Registration open</span><span class=\"ds-chip ds-chip-complete\">Complete</span><span class=\"ds-chip ds-chip-canceled\">Canceled</span></div>",
+      "css": ".ds-status-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; } .ds-chip { display: inline-flex; min-height: 1.8rem; align-items: center; padding: 0.3rem 0.62rem; border-radius: 999px; background: var(--surface-cool, #edf3f6); color: var(--navy, #081f33); font-size: 0.7rem; font-weight: 680; } .ds-chip-open { background: #dff5e9; color: #155d3d; } .ds-chip-complete { background: #e8e7f5; color: #3f3a75; } .ds-chip-canceled { background: #fbe4e0; color: #82231a; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Touch-sized form field with explicit focus and validation states.",
+      "html": "<div class=\"ds-field\"><label for=\"ds-email\">Email</label><input id=\"ds-email\" type=\"email\" placeholder=\"you@unc.edu\"/><span class=\"ds-field-error\">Enter a valid email address.</span></div>",
+      "css": ".ds-field { display: grid; gap: 0.45rem; max-width: 28rem; font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; } .ds-field label { color: var(--navy, #081f33); font-size: 0.86rem; font-weight: 680; } .ds-field input { width: 100%; min-height: 3.25rem; padding: 0 0.9rem; border: 1px solid #9eb2bf; border-radius: 0.65rem; background: #fbfcfd; color: var(--ink, #102638); font: inherit; } .ds-field input:hover { border-color: #7891a1; } .ds-field input:focus { border-color: #3d7699; background: #ffffff; outline: 3px solid rgba(123, 175, 212, 0.32); } .ds-field input[aria-invalid='true'] { border-color: var(--danger, #b42318); } .ds-field-error { display: none; color: var(--danger, #b42318); font-size: 0.78rem; } .ds-field input[aria-invalid='true'] + .ds-field-error { display: block; }"
+    },
+    {
+      "name": "Empty State",
+      "kind": "custom",
+      "refersTo": "empty-state",
+      "description": "A factual publishing gap that preserves hierarchy without inventing content.",
+      "html": "<div class=\"ds-empty-state\"><svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" aria-hidden=\"true\"><path d=\"M6 2h9l3 3v17H6zM14 2v5h5M9 13h6M9 17h4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><div><h3>Club photography is being curated</h3><p>Meeting, competition, workshop, and community photos will appear after member-approved assets are supplied.</p></div><a href=\"#\">Get updates</a></div>",
+      "css": ".ds-empty-state { display: grid; grid-template-columns: auto 1fr auto; gap: 1.25rem; align-items: center; min-height: 9rem; padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px dashed #93a9b8; border-radius: 0.85rem; background: rgba(255, 255, 255, 0.64); color: var(--ink, #102638); font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; } .ds-empty-state > svg { color: #557c97; } .ds-empty-state h3 { margin: 0; font-size: 1.25rem; font-weight: 680; line-height: 1.05; letter-spacing: -0.035em; } .ds-empty-state p { max-width: 52rem; margin: 0.35rem 0 0; color: var(--muted, #556a7b); font-size: 0.9rem; line-height: 1.6; } .ds-empty-state a { color: var(--navy, #081f33); font-weight: 700; text-decoration: underline; text-decoration-color: var(--blue, #7bafd4); text-decoration-thickness: 2px; text-underline-offset: 0.35rem; } .ds-empty-state a:hover { color: #315f7a; } .ds-empty-state a:focus-visible { outline: 3px solid var(--focus, #f2b544); outline-offset: 4px; }"
+    },
+    {
+      "name": "Editorial Page Hero",
+      "kind": "custom",
+      "refersTo": "page-hero-blue",
+      "description": "Broad two-column opening field used by interior public pages.",
+      "html": "<section class=\"ds-page-hero\"><div><h1>Your first step is simply to stay curious.</h1></div><p>Recruitment details will be published as a complete, transparent process. Until then, tell us what you want to learn.</p></section>",
+      "css": ".ds-page-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr); gap: clamp(3rem, 8vw, 8rem); align-items: end; padding: clamp(6rem, 12vw, 10.5rem) clamp(1rem, 4vw, 3rem); background: var(--blue, #7bafd4); color: var(--navy-deep, #041522); font-family: 'Chivo Variable', 'Helvetica Neue', Arial, sans-serif; } .ds-page-hero h1 { max-width: 12ch; margin: 0; font-size: clamp(3.1rem, 7vw, 6rem); font-weight: 760; line-height: 1.05; letter-spacing: -0.035em; text-wrap: balance; } .ds-page-hero p { max-width: 42rem; margin: 0; color: #1b445f; font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.6; } @media (max-width: 50rem) { .ds-page-hero { grid-template-columns: 1fr; } } @media (max-width: 34rem) { .ds-page-hero { padding-block: 5rem; } .ds-page-hero h1 { font-size: clamp(2.75rem, 15vw, 4.2rem); } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Carolina Learning Floor",
+    "overview": "The current system frames Traders at Carolina as an active place to learn in public: broad editorial fields, compact data labels, direct status language, and a first viewport grounded in campus rather than generic finance imagery. Deep navy supplies institutional weight, Carolina blue carries action and signal, and generous white space keeps dense ideas approachable.\n\nThis is the implemented design baseline, not approved final club branding. Its tokens, components, responsive behavior, and accessibility rules are real and should be preserved when extending the current build, while the palette, mark, and overall identity remain intentionally swappable in a later brand phase.",
+    "keyCharacteristics": [
+      "A campus-first opening that pairs a full-bleed photograph with a high-contrast editorial headline.",
+      "Deep navy anchors, open white and cool-white fields, and Carolina blue used as a signal rather than decoration.",
+      "Large, tightly set headings balanced by compact uppercase data labels and readable body copy.",
+      "Broad split grids, ruled lists, and deliberate empty states instead of a wall of interchangeable cards.",
+      "Clear Join and Partners paths with restrained motion, visible focus, and mobile-first fallbacks."
+    ],
+    "rules": [
+      {
+        "name": "The Signal, Not Wash Rule",
+        "body": "Carolina blue should mark action, emphasis, or a meaningful content field; do not tint every section blue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Deep Field Rule",
+        "body": "Navy surfaces carry the highest-attention moments—navigation, first viewports, learning modules, status bands, and the footer—while white space does the everyday explanatory work.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Family Rule",
+        "body": "Keep Chivo as the sole interface family and build hierarchy through the established variable weights and fluid scales.",
+        "section": "typography"
+      },
+      {
+        "name": "The Short-Statement Rule",
+        "body": "Display headlines are dense and line-broken by layout, not stretched across the full container; most hero titles stay between 8ch and 14ch.",
+        "section": "typography"
+      },
+      {
+        "name": "The Editorial Field Rule",
+        "body": "Prefer one strong split, ruled sequence, or full-width color field over several nested cards.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat-by-Default Rule",
+        "body": "Do not add shadows to ruled lists, section fields, or navigation; elevation is an exception for hover feedback and isolated cards.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Soft-Control Rule",
+        "body": "Round what users touch or what must read as a contained object; keep page-level fields, editorial grids, and structural bands square.",
+        "section": "shapes"
+      },
+      {
+        "name": "The State-Is-Copy Rule",
+        "body": "Current activity, pending content, and recruitment availability must be communicated in explicit text as well as color.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do use deep navy for the highest-attention fields and let Open White or Cool Lab Surface carry longer explanations.",
+      "Do keep Carolina blue tied to action, meaningful emphasis, live state, and a few broad feature bands.",
+      "Do preserve broad split layouts, ruled sequences, compact data labels, and deliberate empty states as the core editorial grammar.",
+      "Do keep Join visually persistent, keep Member Login quieter, and preserve visible focus and reduced-motion behavior.",
+      "Do treat this document as the coded provisional baseline while final club brand identity remains unresolved."
+    ],
+    "donts": [
+      "Don't present this palette, mark, or visual identity as final approved club branding.",
+      "Don't turn the site into a generic finance brochure built from stock trading imagery, glowing charts, or dashboard-style gradients.",
+      "Don't place every section inside elevated cards or add shadows where rules and tonal fields already establish structure.",
+      "Don't use color alone to communicate event, recruitment, validation, or navigation state.",
+      "Don't fill pending modules with invented statistics, logos, events, portraits, or testimonials; use the implemented empty-state pattern."
+    ]
+  }
+}
