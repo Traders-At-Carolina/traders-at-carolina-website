@@ -1,68 +1,75 @@
-import type { ReactElement } from 'react'
+import { useEffect, useState, type ReactElement } from 'react'
+import { ImageOrPlaceholder } from '../components/ImageOrPlaceholder'
 import { Reveal } from '../components/Reveal'
+import { SectionHeader } from '../components/SectionHeader'
 import '../styles/placement.css'
 
 type PlacementLogo = { src: string; name: string }
 
 /**
- * Firm logos, read from `public/images/placement/`.
- *
- * ADDING LOGOS: drop the file into `public/images/placement/` and add an entry
- * here, e.g. `{ src: '/images/placement/firm.svg', name: 'Firm' }`. The grid
- * appears automatically; while this list is empty a blank block is shown
- * instead. Do not add a firm until it is confirmed.
+ * Firm logos live in `public/images/placement/` and are listed in
+ * `public/images/placement/placement.json` as `[{ "src", "name" }]`.
+ * While the list is empty a blank warm-gray block is shown instead.
  */
-const placementLogos: PlacementLogo[] = []
+const PLACEMENT_MANIFEST = '/images/placement/placement.json'
+const PLACEMENT_DIR = '/images/placement/'
 
-/**
- * Section 5 — where members end up. Two-column marker/content layout, no rule
- * line above the marker, square corners throughout.
- */
+function parsePlacement(payload: unknown): PlacementLogo[] {
+  if (!Array.isArray(payload)) return []
+  const logos: PlacementLogo[] = []
+  for (const entry of payload) {
+    if (typeof entry !== 'object' || entry === null) continue
+    const { src, name } = entry as { src?: unknown; name?: unknown }
+    if (typeof src !== 'string' || src.trim() === '' || typeof name !== 'string') continue
+    const path = src.trim()
+    logos.push({ src: path.startsWith('/') ? path : `${PLACEMENT_DIR}${path}`, name })
+  }
+  return logos
+}
+
+/** Section 5 — where members end up. */
 export function HomePlacement(): ReactElement {
+  const [logos, setLogos] = useState<PlacementLogo[]>([])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch(PLACEMENT_MANIFEST, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload: unknown) => setLogos(parsePlacement(payload)))
+      .catch(() => {
+        // Missing manifest is the normal empty state; the blank block covers it.
+      })
+    return () => controller.abort()
+  }, [])
+
   return (
-    <section className="tac-section tac-section--white tac-placement">
+    <section className="tac-section tac-section--white tac-block">
       <div className="tac-container">
-        <div className="tac-placement__grid">
-          <Reveal>
-            <span className="tac-eyebrow tac-placement__number">02</span>
-            <span className="tac-label tac-placement__marker-label">
-              Placement
-            </span>
-          </Reveal>
+        <SectionHeader
+          number="02"
+          label="Placement"
+          heading="Where our members go."
+          subtext="Our members and alumni go on to top trading and technology firms."
+        />
 
-          <Reveal delay={80}>
-            <h2 className="tac-h-lg tac-placement__heading">
-              Where our members go.
-            </h2>
-            <p className="tac-body tac-placement__lede">
-              Our members and alumni go on to top trading and technology firms.
-            </p>
-
-            <div className="tac-placement__logos">
-              {placementLogos.length > 0 ? (
-                <ul className="tac-placement__logo-grid">
-                  {placementLogos.map((logo) => (
-                    <li key={logo.src}>
-                      <img
-                        className="tac-placement__logo"
-                        src={logo.src}
-                        alt={logo.name}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="tac-placement__logos-empty">
-                  <span className="tac-placement__logos-empty-text">
-                    [Firm logos]
-                  </span>
-                </div>
-              )}
-            </div>
-          </Reveal>
-        </div>
+        <Reveal className="tac-placement__logos">
+          {logos.length > 0 ? (
+            <ul className="tac-placement__logo-grid">
+              {logos.map((logo) => (
+                <li key={logo.src} className="tac-placement__logo-cell">
+                  <ImageOrPlaceholder
+                    className="tac-placement__logo"
+                    src={logo.src}
+                    alt={logo.name}
+                    placeholder={logo.name}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="tac-placement__logos-empty" />
+          )}
+        </Reveal>
       </div>
     </section>
   )

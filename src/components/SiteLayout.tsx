@@ -5,9 +5,9 @@ import { siteSettings } from '../data/siteContent'
 import '../styles/chrome.css'
 
 const primaryLinks = [
-  { label: 'Sponsors', to: '/partners' },
-  { label: 'Members', to: '/about' },
-  { label: 'Recruitment', to: '/membership' },
+  { label: 'Sponsors', to: '/sponsors' },
+  { label: 'Members', to: '/members' },
+  { label: 'Recruitment', to: '/#recruitment' },
 ]
 
 const MOBILE_MENU_ID = 'tac-mobile-menu'
@@ -27,6 +27,8 @@ function SiteHeader() {
   }
 
   const closeMenu = () => setOpen(false)
+  const currentProps = (to: string) =>
+    to === location.pathname ? ({ 'aria-current': 'page' } as const) : {}
 
   return (
     <header className="tac-header">
@@ -53,7 +55,7 @@ function SiteHeader() {
           <ul className="tac-header__links">
             {primaryLinks.map((item) => (
               <li key={item.to}>
-                <Link className="tac-header__link" to={item.to}>
+                <Link className="tac-header__link" to={item.to} {...currentProps(item.to)}>
                   {item.label}
                 </Link>
               </li>
@@ -84,7 +86,12 @@ function SiteHeader() {
         <ul className="tac-header__panel-list">
           {primaryLinks.map((item) => (
             <li key={item.to}>
-              <Link className="tac-header__link" to={item.to} onClick={closeMenu}>
+              <Link
+                className="tac-header__link"
+                to={item.to}
+                onClick={closeMenu}
+                {...currentProps(item.to)}
+              >
                 {item.label}
               </Link>
             </li>
@@ -138,11 +145,16 @@ function SiteFooter() {
 }
 
 function RouteEffects() {
-  const location = useLocation()
+  const { pathname, hash } = useLocation()
 
+  // New page: start at the top. Hash link (e.g. /#recruitment): scroll to it.
   useEffect(() => {
+    if (hash) {
+      document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView()
+      return
+    }
     window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [location.pathname])
+  }, [pathname, hash])
 
   return null
 }

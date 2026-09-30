@@ -1,60 +1,10 @@
 /* ==========================================================================
    Section 3 — About  (src/home/HomeAbout.tsx)
+   Header layout comes from the shared .tac-sh pattern in tokens.css.
 
    Warm-gray field. No rule line above the section marker, no dividers
    anywhere, square corners, nothing bolder than Poppins 500.
    ========================================================================== */
-
-.tac-about {
-  padding-top: 112px;
-  padding-bottom: 112px;
-}
-
-.tac-about__grid {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  column-gap: 80px;
-  align-items: start;
-}
-
-/* --------------------------------------------------------------------------
-   Left column — numbered section marker
-   -------------------------------------------------------------------------- */
-
-.tac-about__marker {
-  display: flex;
-  flex-direction: column;
-}
-
-.tac-about__marker-num {
-  font-family: var(--tac-font-head);
-  font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-  color: var(--tac-black);
-}
-
-.tac-about__marker-label {
-  margin-top: 4px;
-  font-family: var(--tac-font-body);
-  font-style: italic;
-  font-size: 17px;
-  color: var(--tac-text-label);
-}
-
-/* --------------------------------------------------------------------------
-   Right column — heading, lede, stats
-   -------------------------------------------------------------------------- */
-
-.tac-about__heading {
-  margin: 0;
-  max-width: 760px;
-}
-
-.tac-about__lede {
-  margin: 28px 0 0;
-  max-width: 620px;
-}
 
 .tac-about__stats {
   display: flex;
@@ -87,17 +37,6 @@
    -------------------------------------------------------------------------- */
 
 @media (max-width: 900px) {
-  .tac-about {
-    padding-top: 64px;
-    padding-bottom: 64px;
-  }
-
-  .tac-about__grid {
-    grid-template-columns: 1fr;
-    column-gap: 0;
-    row-gap: 32px;
-  }
-
   .tac-about__stats {
     flex-direction: column;
     /* The 120px column gap must never cause horizontal overflow. */

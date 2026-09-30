@@ -107,7 +107,8 @@
 }
 
 .tac-header__link:hover,
-.tac-header__link:focus-visible {
+.tac-header__link:focus-visible,
+.tac-header__link[aria-current='page'] {
   color: var(--tac-navy);
 }
 
@@ -211,7 +212,7 @@
 .tac-footer__brand {
   font-family: var(--tac-font-head);
   font-weight: 400;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--tac-white);
@@ -285,9 +286,8 @@
   outline-offset: 3px;
 }
 
-.tac-header__join:focus-visible,
 .tac-footer__link:focus-visible {
-  outline-color: currentColor;
+  outline-color: var(--tac-white);
 }
 
 /* ==========================================================================

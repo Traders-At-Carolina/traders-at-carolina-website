@@ -21,7 +21,8 @@
    any per-card offset would put a visible seam in the loop. */
 .tac-slider__viewport {
   overflow: hidden;
-  padding-left: var(--tac-pad-x);
+  /* Align the first card with the 1248px content column on wide screens. */
+  padding-left: max(var(--tac-pad-x), calc((100% - var(--tac-content-max)) / 2));
 }
 
 .tac-slider__track {

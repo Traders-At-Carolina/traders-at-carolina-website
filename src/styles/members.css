@@ -1,0 +1,126 @@
+/* ==========================================================================
+   Members page (src/pages/MembersPage.tsx)
+   Square corners, no borders or shadows, weights capped at 500.
+   ========================================================================== */
+
+/* ---- Leadership: 4 -> 2 -> 1 --------------------------------------------- */
+
+.tac-leaders {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 56px 32px;
+  margin: 72px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tac-leader__photo,
+.tac-member__photo {
+  aspect-ratio: 1 / 1;
+  background: var(--tac-warm-gray);
+  overflow: hidden;
+}
+
+.tac-member__photo {
+  background: var(--tac-white);
+}
+
+.tac-leader__photo img,
+.tac-member__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tac-leader__name {
+  margin: 20px 0 0;
+  font-family: var(--tac-font-head);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--tac-black);
+}
+
+.tac-leader__role {
+  margin: 4px 0 0;
+  font-family: var(--tac-font-body);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--tac-text-label);
+}
+
+/* Icons sit flush with the card's left edge; the 44px hit area overhangs
+   the icon glyph, so pull the row back by the glyph inset. */
+.tac-leader__links {
+  display: flex;
+  gap: 0;
+  margin: 6px 0 0 -12px;
+}
+
+/* ---- Members: 6 -> 3 -> 2 ------------------------------------------------ */
+
+.tac-members {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 40px 24px;
+  margin: 72px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tac-member__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 10px;
+}
+
+/* Right-align the glyph with the photo edge. */
+.tac-member__row .tac-icon-link {
+  margin-right: -12px;
+  flex: none;
+}
+
+.tac-member__name {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--tac-font-head);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--tac-black);
+  overflow-wrap: anywhere;
+}
+
+.tac-member__year {
+  margin: 0;
+  font-family: var(--tac-font-body);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--tac-text-label);
+}
+
+@media (max-width: 1100px) {
+  .tac-leaders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tac-members { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .tac-leaders {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 48px;
+  }
+
+  .tac-members {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 16px;
+    margin-top: 48px;
+  }
+}

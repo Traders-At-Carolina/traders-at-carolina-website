@@ -1,0 +1,97 @@
+/* ==========================================================================
+   Sponsors page (src/pages/SponsorsPage.tsx)
+   Flat warm-gray tiles, no borders, square corners.
+   ========================================================================== */
+
+.tac-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 88px;
+  margin-top: 88px;
+}
+
+.tac-tier {
+  text-align: center;
+}
+
+.tac-tier__name {
+  margin: 0;
+  font-family: var(--tac-font-head);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--tac-navy);
+}
+
+/* flex-wrap + centre keeps an incomplete last row centred. */
+.tac-tier__logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tac-sponsor {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 288px;
+  max-width: 100%;
+  height: 180px;
+  background: var(--tac-warm-gray);
+  transition: background-color 180ms ease;
+}
+
+.tac-tier__logos > li {
+  max-width: 100%;
+}
+
+a.tac-sponsor:hover {
+  background: #E2E1DA;
+}
+
+/* The placeholder block fills the tile; a real logo gets ~32px of air. */
+.tac-sponsor__logo {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 32px;
+  object-fit: contain;
+}
+
+.tac-sponsors__cta {
+  margin: 112px auto 0;
+  text-align: center;
+}
+
+.tac-sponsors__cta-link {
+  font-style: italic;
+  color: var(--tac-navy);
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.tac-sponsors__cta-link:hover {
+  color: var(--tac-black);
+}
+
+@media (max-width: 900px) {
+  .tac-tiers {
+    gap: 56px;
+    margin-top: 56px;
+  }
+
+  .tac-tier__logos {
+    gap: 16px;
+  }
+
+  .tac-sponsors__cta {
+    margin-top: 72px;
+  }
+}

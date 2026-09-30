@@ -1,0 +1,61 @@
+{
+  "year": "[2025–2026]",
+  "contactEmail": "",
+  "tiers": [
+    {
+      "name": "Platinum",
+      "sponsors": [
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        },
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        },
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        },
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "name": "Gold",
+      "sponsors": [
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        },
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        },
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        },
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        },
+        {
+          "name": "[Sponsor]",
+          "logo": "",
+          "url": ""
+        }
+      ]
+    }
+  ]
+}

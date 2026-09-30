@@ -24,24 +24,22 @@ export function HomeRecruitment() {
           </p>
         </Reveal>
 
-        <Reveal delay={80}>
-          <ol className="tac-recruit__steps">
-            {recruitmentSteps.map((step, index) => (
-              <Reveal
-                as="li"
-                key={step.number}
-                className="tac-recruit__step"
-                delay={index * 60}
-              >
-                <span className="tac-recruit__num" aria-hidden="true">
-                  {step.number}
-                </span>
-                <span className="tac-recruit__title">{step.title}</span>
-                <span className="tac-recruit__date">{step.date}</span>
-              </Reveal>
-            ))}
-          </ol>
-        </Reveal>
+        <ol className="tac-recruit__steps">
+          {recruitmentSteps.map((step, index) => (
+            <Reveal
+              as="li"
+              key={step.number}
+              className="tac-recruit__step"
+              delay={index * 60}
+            >
+              <span className="tac-recruit__num" aria-hidden="true">
+                {step.number}
+              </span>
+              <span className="tac-recruit__title">{step.title}</span>
+              <span className="tac-recruit__date">{step.date}</span>
+            </Reveal>
+          ))}
+        </ol>
       </div>
     </section>
   )
