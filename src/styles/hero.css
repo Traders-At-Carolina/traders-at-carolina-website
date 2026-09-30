@@ -8,7 +8,7 @@
    Layering, bottom to top:
      1. the section's own solid navy   — the fallback when the photo 404s
      2. .tac-hero__image              — the photograph, as a background layer
-     3. .tac-hero__scrim              — flat navy at 80% (a solid, not a gradient)
+     3. .tac-hero__scrim              — flat navy at 70% (a solid, not a gradient)
      4. .tac-hero__inner              — content
    ========================================================================== */
 
@@ -38,7 +38,7 @@
 
 .tac-hero__scrim {
   background: var(--tac-navy);
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 /* --------------------------------------------------------------------------

@@ -7,7 +7,7 @@ import '../styles/hero.css'
  * Section 2 — Hero.
  *
  * Full-bleed navy field: the section itself is solid navy, the photograph sits
- * behind an 80% navy scrim as a CSS background layer (never an <img>), so a
+ * behind a 70% navy scrim as a CSS background layer (never an <img>), so a
  * missing file degrades to flat navy with no broken-image icon.
  *
  * Deliberately NOT wrapped in <Reveal>: this is above the fold and must paint
