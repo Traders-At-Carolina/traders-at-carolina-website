@@ -1,126 +1,137 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ArrowUpRight, LogIn, Menu, X } from 'lucide-react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { navigation, siteSettings } from '../data/siteContent'
+import { Menu, X } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { siteSettings } from '../data/siteContent'
+import '../styles/chrome.css'
 
-function Brand() {
-  return (
-    <Link className="brand" to="/" aria-label="Traders at Carolina home">
-      <span className="brand-mark" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </span>
-      <span className="brand-name">
-        Traders <span>at Carolina</span>
-      </span>
-    </Link>
-  )
-}
+const primaryLinks = [
+  { label: 'Sponsors', to: '/partners' },
+  { label: 'Members', to: '/about' },
+  { label: 'Recruitment', to: '/membership' },
+]
+
+const MOBILE_MENU_ID = 'tac-mobile-menu'
 
 function SiteHeader() {
   const [open, setOpen] = useState(false)
+  const [logoFailed, setLogoFailed] = useState(false)
+  const location = useLocation()
 
-  useEffect(() => {
-    document.body.classList.toggle('menu-open', open)
-    return () => document.body.classList.remove('menu-open')
-  }, [open])
+  // Close the mobile panel whenever the route changes — including on
+  // browser back/forward. Adjusting state during render (rather than in an
+  // effect) avoids a cascading second render.
+  const [menuPath, setMenuPath] = useState(location.pathname)
+  if (menuPath !== location.pathname) {
+    setMenuPath(location.pathname)
+    setOpen(false)
+  }
+
+  const closeMenu = () => setOpen(false)
 
   return (
-    <header className="site-header">
-      <div className="header-inner">
-        <Brand />
-        <div className="header-mobile-actions">
-          <Link className="mobile-join" to="/join" onClick={() => setOpen(false)}>Join</Link>
-          <button
-            className="menu-toggle"
-            type="button"
-            aria-expanded={open}
-            aria-controls="primary-navigation"
-            aria-label={open ? 'Close navigation' : 'Open navigation'}
-            onClick={() => setOpen((value) => !value)}
-          >
-            {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-          </button>
-        </div>
-        <nav
-          id="primary-navigation"
-          className={`primary-navigation ${open ? 'is-open' : ''}`}
-          aria-label="Primary navigation"
-        >
-          <div className="nav-links">
-            {navigation.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) => (isActive ? 'nav-link is-active' : 'nav-link')}
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </NavLink>
+    <header className="tac-header">
+      <div className="tac-header__inner tac-container">
+        <Link className="tac-header__brand" to="/" aria-label="Traders at Carolina home">
+          {logoFailed ? (
+            <span className="tac-header__logo-fallback" aria-hidden="true">
+              TC
+            </span>
+          ) : (
+            <img
+              className="tac-header__logo"
+              src="/images/logo/logo-mark.svg"
+              alt=""
+              width={36}
+              height={36}
+              onError={() => setLogoFailed(true)}
+            />
+          )}
+          <span className="tac-header__wordmark">Traders at Carolina</span>
+        </Link>
+
+        <nav className="tac-header__nav" aria-label="Primary navigation">
+          <ul className="tac-header__links">
+            {primaryLinks.map((item) => (
+              <li key={item.to}>
+                <Link className="tac-header__link" to={item.to}>
+                  {item.label}
+                </Link>
+              </li>
             ))}
-          </div>
-          <div className="nav-actions">
-            <Link className="login-link" to="/login" onClick={() => setOpen(false)}>
-              <LogIn size={17} aria-hidden="true" />
-              Member Login
-            </Link>
-            <Link className="button button-small" to="/join" onClick={() => setOpen(false)}>
-              Join
-              <ArrowUpRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
+          </ul>
+          <Link className="tac-btn tac-header__join" to="/join">
+            JOIN
+          </Link>
         </nav>
+
+        <button
+          className="tac-header__toggle"
+          type="button"
+          aria-expanded={open}
+          aria-controls={MOBILE_MENU_ID}
+          aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
+          onClick={() => setOpen((value) => !value)}
+        >
+          {open ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+        </button>
       </div>
+
+      <nav
+        id={MOBILE_MENU_ID}
+        className={open ? 'tac-header__panel tac-container is-open' : 'tac-header__panel tac-container'}
+        aria-label="Mobile navigation"
+      >
+        <ul className="tac-header__panel-list">
+          {primaryLinks.map((item) => (
+            <li key={item.to}>
+              <Link className="tac-header__link" to={item.to} onClick={closeMenu}>
+                {item.label}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <Link className="tac-btn tac-header__join" to="/join" onClick={closeMenu}>
+              JOIN
+            </Link>
+          </li>
+        </ul>
+      </nav>
     </header>
   )
 }
 
 function SiteFooter() {
-  const socials = [
-    { label: 'LinkedIn', url: siteSettings.linkedinUrl },
-    { label: 'Instagram', url: siteSettings.instagramUrl },
-    { label: 'Discord', url: siteSettings.discordUrl },
-  ].filter((item): item is { label: string; url: string } => Boolean(item.url))
+  /* TODO: real URLs — these fall back to "#" until confirmed links exist. */
+  const footerLinks = [
+    { label: 'Instagram', href: siteSettings.instagramUrl || '#' },
+    { label: 'LinkedIn', href: siteSettings.linkedinUrl || '#' },
+    { label: 'Mailing list', href: '#' },
+  ]
 
   return (
-    <footer className="site-footer">
-      <div className="footer-main container">
-        <div className="footer-statement">
-          <Brand />
-          <p>A student community exploring quantitative finance at UNC-Chapel Hill.</p>
-        </div>
-        <div className="footer-column">
-          <h2>Explore</h2>
-          {navigation.slice(1).map((item) => (
-            <Link key={item.to} to={item.to}>
-              {item.label}
-            </Link>
-          ))}
-        </div>
-        <div className="footer-column">
-          <h2>Get involved</h2>
-          <Link to="/join">Join the club</Link>
-          <Link to="/partners">Partner with us</Link>
-          <Link to="/login">Member login</Link>
-        </div>
-        <div className="footer-column">
-          <h2>Follow</h2>
-          {socials.length ? (
-            socials.map((item) => (
-              <a key={item.label} href={item.url} target="_blank" rel="noreferrer">
+    <footer className="tac-footer">
+      <div className="tac-footer__inner tac-container">
+        <span className="tac-footer__brand">Traders at Carolina</span>
+        <div className="tac-footer__links">
+          {footerLinks.map((item) =>
+            item.href === '#' ? (
+              <a key={item.label} className="tac-footer__link" href="#">
                 {item.label}
               </a>
-            ))
-          ) : (
-            <p className="footer-pending">Verified social links will be published here.</p>
+            ) : (
+              <a
+                key={item.label}
+                className="tac-footer__link"
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {item.label}
+              </a>
+            ),
           )}
         </div>
-      </div>
-      <div className="footer-bottom container">
-        <span>© {new Date().getFullYear()} Traders at Carolina</span>
-        <span>Student-led at UNC-Chapel Hill</span>
+        <span className="tac-footer__meta">© 2026, Chapel Hill</span>
       </div>
     </footer>
   )

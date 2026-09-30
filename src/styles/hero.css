@@ -1,0 +1,232 @@
+/* ==========================================================================
+   Section 2 — Hero  (src/home/HomeHero.tsx)
+
+   House rules: no shadows, no gradients, no dividers, square corners.
+   The one border-radius in this file is the circular scroll affordance,
+   which is specified as a circle.
+
+   Layering, bottom to top:
+     1. the section's own solid navy   — the fallback when the photo 404s
+     2. .tac-hero__image              — the photograph, as a background layer
+     3. .tac-hero__scrim              — flat navy at 80% (a solid, not a gradient)
+     4. .tac-hero__inner              — content
+   ========================================================================== */
+
+.tac-hero {
+  position: relative;
+  width: 100%;
+  height: 752px;
+  background-color: var(--tac-navy);
+  overflow: hidden;
+}
+
+/* Background image only — never an <img>, so a missing file shows nothing
+   at all rather than a broken-image icon. */
+.tac-hero__image,
+.tac-hero__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tac-hero__image {
+  background-image: url('/images/hero/hero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.tac-hero__scrim {
+  background: var(--tac-navy);
+  opacity: 0.8;
+}
+
+/* --------------------------------------------------------------------------
+   Content
+   -------------------------------------------------------------------------- */
+
+.tac-hero__inner {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--tac-white);
+}
+
+/* Logo mark ---------------------------------------------------------------- */
+
+.tac-hero__mark {
+  display: block;
+  width: 88px;
+  height: 88px;
+  margin: 0 0 28px;
+}
+
+/* Shown only when the mark fails to load. */
+.tac-hero__mark-fallback {
+  box-sizing: border-box;
+  width: 88px;
+  height: 88px;
+  margin: 0 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--tac-white);
+  font-family: var(--tac-font-head);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: var(--tac-white);
+}
+
+/* Type -------------------------------------------------------------------- */
+
+.tac-hero__title {
+  margin: 0 0 20px;
+  font-family: var(--tac-font-head);
+  font-weight: 400;
+  font-size: 96px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--tac-white);
+}
+
+.tac-hero__subtext {
+  margin: 0 0 40px;
+  font-family: var(--tac-font-body);
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.4;
+  color: var(--tac-on-navy);
+}
+
+/* Buttons ----------------------------------------------------------------- */
+
+.tac-hero__actions {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* A transparent 1.5px border on both buttons keeps the filled and outlined
+   variants exactly the same height. */
+.tac-hero .tac-hero__btn {
+  box-sizing: border-box;
+  padding: 16px 30px;
+  border: 1.5px solid transparent;
+  border-radius: 0;
+  font-family: var(--tac-font-head);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+.tac-hero .tac-hero__btn--solid {
+  background: var(--tac-white);
+  color: var(--tac-navy);
+}
+
+/* Hover is colour only — no transform, no shadow. */
+.tac-hero .tac-hero__btn--solid:hover,
+.tac-hero .tac-hero__btn--solid:focus-visible {
+  background: var(--tac-on-navy);
+  color: var(--tac-navy);
+}
+
+.tac-hero .tac-hero__btn--outline {
+  background: transparent;
+  border-color: var(--tac-white);
+  color: var(--tac-white);
+}
+
+.tac-hero .tac-hero__btn--outline:hover,
+.tac-hero .tac-hero__btn--outline:focus-visible {
+  background: var(--tac-white);
+  border-color: var(--tac-white);
+  color: var(--tac-navy);
+}
+
+/* Scroll affordance ------------------------------------------------------- */
+
+.tac-hero__chevron {
+  position: absolute;
+  z-index: 1;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* The only circle on the site: the spec calls for a round affordance. */
+  border-radius: 50%;
+  border: 1.5px solid var(--tac-white);
+  background: transparent;
+  color: var(--tac-white);
+  text-decoration: none;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.tac-hero__chevron:hover,
+.tac-hero__chevron:focus-visible {
+  border-color: var(--tac-on-navy);
+  color: var(--tac-on-navy);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .tac-hero {
+    height: auto;
+    min-height: 620px;
+  }
+
+  .tac-hero__inner {
+    /* Room at the foot so content never collides with the chevron. */
+    padding-top: 72px;
+    padding-bottom: 136px;
+    min-height: 620px;
+  }
+
+  .tac-hero__title {
+    font-size: 44px;
+  }
+
+  .tac-hero__subtext {
+    font-size: 19px;
+  }
+
+  .tac-hero__actions {
+    flex-direction: column;
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .tac-hero .tac-hero__btn {
+    width: 100%;
+  }
+
+  .tac-hero__chevron {
+    bottom: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tac-hero .tac-hero__btn,
+  .tac-hero__chevron {
+    transition: none;
+  }
+}

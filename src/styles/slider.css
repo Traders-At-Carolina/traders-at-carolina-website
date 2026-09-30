@@ -1,0 +1,127 @@
+/* ==========================================================================
+   Section 4 — photo slider (src/home/HomeSlider.tsx)
+
+   A full-bleed, continuously auto-scrolling strip of photo cards that pauses
+   on hover / keyboard focus. The loop is seamless because the photo list is
+   rendered twice as two identical copies and the track slides exactly -50%.
+
+   House rules: no shadows, no gradients, no dividers. The 22px card radius is
+   the one sanctioned exception to square corners.
+   ========================================================================== */
+
+.tac-slider {
+  padding-top: 72px;
+  padding-bottom: 72px;
+}
+
+/* Clipping window. The left padding offsets the track's starting position so
+   the first photo lines up with the page gutter; because overflow clips at the
+   padding box, cards still run edge to edge as they scroll. Padding lives here
+   rather than on the first card so each copy stays exactly 50% of the track —
+   any per-card offset would put a visible seam in the loop. */
+.tac-slider__viewport {
+  overflow: hidden;
+  padding-left: var(--tac-pad-x);
+}
+
+.tac-slider__track {
+  display: flex;
+  width: max-content;
+  animation: tac-slider-scroll 60s linear infinite;
+  will-change: transform;
+}
+
+/* Pause for anyone reading a caption, mouse or keyboard. */
+.tac-slider__viewport:hover .tac-slider__track,
+.tac-slider__viewport:focus-within .tac-slider__track {
+  animation-play-state: paused;
+}
+
+/* One copy of the photo list. Two of these sit in the track. */
+.tac-slider__copy {
+  display: flex;
+}
+
+/* Card spacing is margin, not flex `gap`: with margin each copy measures
+   exactly n * (card + gap), so translateX(-50%) lands seam-free. */
+.tac-slider__item {
+  flex: 0 0 auto;
+  width: 520px;
+  margin-right: 40px;
+}
+
+.tac-slider__media,
+.tac-slider__placeholder {
+  display: block;
+  width: 520px;
+  height: 340px;
+  border-radius: 22px;
+}
+
+.tac-slider__media {
+  object-fit: cover;
+  background: var(--tac-warm-gray);
+}
+
+.tac-slider__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tac-warm-gray);
+}
+
+.tac-slider__placeholder-text {
+  font-family: var(--tac-font-body);
+  font-size: 15px;
+  color: var(--tac-text-label);
+}
+
+.tac-slider__caption {
+  margin: 16px 0 0;
+  font-family: var(--tac-font-body);
+  font-size: 21px;
+  line-height: 1.45;
+  color: var(--tac-text-muted);
+}
+
+@keyframes tac-slider-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — no movement at all. The strip becomes a normal
+   horizontally scrollable region so every photo stays reachable.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .tac-slider__track {
+    animation: none !important;
+    will-change: auto;
+  }
+
+  .tac-slider__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile — smaller cards so the strip never forces page-level scroll.
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .tac-slider__item {
+    width: 300px;
+    margin-right: 20px;
+  }
+
+  .tac-slider__media,
+  .tac-slider__placeholder {
+    width: 300px;
+    height: 200px;
+  }
+
+  .tac-slider__caption {
+    margin-top: 12px;
+    font-size: 17px;
+  }
+}

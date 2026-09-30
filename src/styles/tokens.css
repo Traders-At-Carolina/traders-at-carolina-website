@@ -1,0 +1,188 @@
+/* ==========================================================================
+   Traders at Carolina — design tokens
+   Single source of truth. Other modules USE these tokens and classes;
+   they never redefine them.
+
+   House rules baked in here:
+     - No shadows. No gradients. No rounded corners (slider cards excepted,
+       and those opt in locally). Nothing in this file authors any of them.
+     - No borders or rules as section dividers — background alternation
+       (.tac-section--white / .tac-section--warm) is the only separator.
+     - Type never goes bolder than 500.
+   ========================================================================== */
+
+:root {
+  /* ---- Palette ---------------------------------------------------------- */
+  --tac-navy: #233265;
+  --tac-warm-gray: #EBEAE4;
+  --tac-white: #FFFFFF;
+  --tac-black: #000000;
+  --tac-text-muted: #4A4A4A;   /* body copy */
+  --tac-text-label: #5A5A5A;   /* small labels / captions */
+  --tac-on-navy: #D6DAE6;      /* subtext on navy */
+
+  /* ---- Type ------------------------------------------------------------- */
+  --tac-font-head: 'Poppins', system-ui, -apple-system, sans-serif;
+  /* Georgia Pro is a licensed face and is NOT on Google Fonts.
+     Drop an Adobe Fonts kit <link> in index.html, or add an
+     @font-face block here pointing at licensed Georgia Pro webfonts,
+     and it will take over automatically. Georgia is the fallback. */
+  --tac-font-body: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+
+  /* ---- Layout ----------------------------------------------------------- */
+  --tac-pad-x: 96px;
+}
+
+@media (max-width: 900px) {
+  :root { --tac-pad-x: 16px; }
+}
+
+/* ==========================================================================
+   Globals
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* No horizontal scroll on mobile. */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   Layout utilities
+   ========================================================================== */
+
+/* Full-bleed container: gutters only, deliberately no max-width. */
+.tac-container {
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: var(--tac-pad-x);
+  padding-right: var(--tac-pad-x);
+}
+
+/* Section wrapper. Background alternation is the only separator —
+   no borders, no dividers, no shadows. */
+.tac-section {
+  position: relative;
+  width: 100%;
+}
+
+.tac-section--white { background: var(--tac-white); }
+.tac-section--warm { background: var(--tac-warm-gray); }
+
+/* ==========================================================================
+   Type helpers
+   ========================================================================== */
+
+.tac-h-lg {
+  font-family: var(--tac-font-head);
+  font-weight: 400;
+  font-size: 56px;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: var(--tac-black);
+}
+
+.tac-body {
+  font-family: var(--tac-font-body);
+  font-size: 22px;
+  line-height: 1.6;
+  color: var(--tac-text-muted);
+}
+
+.tac-label {
+  font-family: var(--tac-font-body);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--tac-text-label);
+}
+
+.tac-eyebrow {
+  font-family: var(--tac-font-head);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--tac-black);
+}
+
+@media (max-width: 900px) {
+  .tac-h-lg { font-size: 36px; }
+  .tac-body { font-size: 18px; }
+}
+
+/* ==========================================================================
+   Button base — square corners, never rounded
+   ========================================================================== */
+
+.tac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  font-family: var(--tac-font-head);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+/* ==========================================================================
+   Reveal — scroll-triggered fade & rise (see src/components/Reveal.tsx)
+   ========================================================================== */
+
+.tac-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 300ms ease-out,
+    transform 300ms ease-out;
+}
+
+.tac-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+.tac-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  /* Safety net: never leave revealed content stuck invisible. */
+  .tac-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

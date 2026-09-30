@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Section 3 — About  (src/home/HomeAbout.tsx)
+
+   Warm-gray field. No rule line above the section marker, no dividers
+   anywhere, square corners, nothing bolder than Poppins 500.
+   ========================================================================== */
+
+.tac-about {
+  padding-top: 112px;
+  padding-bottom: 112px;
+}
+
+.tac-about__grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  column-gap: 80px;
+  align-items: start;
+}
+
+/* --------------------------------------------------------------------------
+   Left column — numbered section marker
+   -------------------------------------------------------------------------- */
+
+.tac-about__marker {
+  display: flex;
+  flex-direction: column;
+}
+
+.tac-about__marker-num {
+  font-family: var(--tac-font-head);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--tac-black);
+}
+
+.tac-about__marker-label {
+  margin-top: 4px;
+  font-family: var(--tac-font-body);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--tac-text-label);
+}
+
+/* --------------------------------------------------------------------------
+   Right column — heading, lede, stats
+   -------------------------------------------------------------------------- */
+
+.tac-about__heading {
+  margin: 0;
+  max-width: 760px;
+}
+
+.tac-about__lede {
+  margin: 28px 0 0;
+  max-width: 620px;
+}
+
+.tac-about__stats {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 32px 120px;
+  margin: 56px 0 0;
+}
+
+.tac-about__stat-num {
+  margin: 0;
+  font-family: var(--tac-font-head);
+  font-weight: 400;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--tac-black);
+}
+
+.tac-about__stat-label {
+  margin: 6px 0 0;
+  font-family: var(--tac-font-body);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--tac-text-label);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile — single column, stacked stats
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .tac-about {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .tac-about__grid {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 32px;
+  }
+
+  .tac-about__stats {
+    flex-direction: column;
+    /* The 120px column gap must never cause horizontal overflow. */
+    gap: 32px;
+    margin-top: 40px;
+  }
+}

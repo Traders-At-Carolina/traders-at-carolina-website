@@ -1,0 +1,100 @@
+/* ==========================================================================
+   Section 5 — placement (src/home/HomePlacement.tsx)
+
+   Same two-column marker/content pattern as About. No rule line above the
+   marker — background alternation is the only separator on this site.
+   ========================================================================== */
+
+.tac-placement {
+  padding-top: 112px;
+  padding-bottom: 112px;
+}
+
+.tac-placement__grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+/* Left marker: number, then the section name directly below it. */
+.tac-placement__number {
+  display: block;
+}
+
+.tac-placement__marker-label {
+  display: block;
+  /* matches the About marker's number-to-label spacing */
+  margin-top: 4px;
+}
+
+/* Right column. */
+.tac-placement__heading {
+  margin: 0;
+  max-width: 760px;
+}
+
+.tac-placement__lede {
+  margin: 28px 0 0;
+  max-width: 620px;
+}
+
+.tac-placement__logos {
+  margin-top: 48px;
+}
+
+/* Empty state: a plain warm-gray field, square corners, no border. */
+.tac-placement__logos-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 340px;
+  border-radius: 0;
+  background: var(--tac-warm-gray);
+}
+
+.tac-placement__logos-empty-text {
+  font-family: var(--tac-font-body);
+  font-size: 15px;
+  color: var(--tac-text-label);
+}
+
+/* Populated state: responsive logo grid. */
+.tac-placement__logo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 48px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tac-placement__logo {
+  display: block;
+  max-width: 100%;
+  max-height: 40px;
+  object-fit: contain;
+}
+
+@media (max-width: 900px) {
+  .tac-placement {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .tac-placement__grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .tac-placement__logos-empty {
+    height: 200px;
+  }
+
+  .tac-placement__logo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 32px;
+  }
+}

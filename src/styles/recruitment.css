@@ -1,0 +1,95 @@
+/* ==========================================================================
+   Traders at Carolina — Section 6: Recruitment
+
+   Consumes tokens and utilities from src/styles/tokens.css and defines
+   nothing that belongs there. House rules: no shadows, no gradients, no
+   dividers or rule lines (and no connecting line between the steps), square
+   corners, weights capped at 500, hover changes colour only.
+   ========================================================================== */
+
+.tac-recruit {
+  padding-top: 112px;
+  padding-bottom: 112px;
+}
+
+/* ---- Heading block ------------------------------------------------------- */
+
+/* Deliberately no eyebrow / section marker here — the heading leads. */
+.tac-recruit__heading {
+  margin: 0;
+  text-align: center;
+}
+
+.tac-recruit__lede {
+  margin: 20px auto 0;
+  max-width: 640px;
+  text-align: center;
+}
+
+/* ---- Steps --------------------------------------------------------------- */
+
+.tac-recruit__steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 32px;
+  margin: 64px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tac-recruit__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.tac-recruit__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  background: var(--tac-navy);
+  color: var(--tac-white);
+  font-family: var(--tac-font-head);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.tac-recruit__title {
+  margin-top: 20px;
+  font-family: var(--tac-font-head);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--tac-black);
+}
+
+.tac-recruit__date {
+  margin-top: 6px;
+  font-family: var(--tac-font-body);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--tac-navy);
+}
+
+/* ---- Mobile: single centred column -------------------------------------- */
+
+@media (max-width: 900px) {
+  .tac-recruit {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .tac-recruit__steps {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-top: 48px;
+  }
+}
