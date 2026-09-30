@@ -9,9 +9,7 @@ import '../styles/recruitment.css'
  * number, no italic section name above it. The five steps are an ordered
  * list rendered as an equal-width row, with no connecting line between them —
  * the numbered navy squares carry the sequence on their own.
- *
- * Every date comes from src/data/recruitmentSteps.ts; nothing here is
- * hardcoded, so filling in the cycle never touches this file.
+
  */
 export function HomeRecruitment() {
   return (
@@ -20,7 +18,7 @@ export function HomeRecruitment() {
         <Reveal as="header">
           <h2 className="tac-h-lg tac-recruit__heading">How recruitment works</h2>
           <p className="tac-body tac-recruit__lede">
-            Open to undergraduates in any quantitative field.
+            Recruitment for Fall 2026 is over.
           </p>
         </Reveal>
 
@@ -36,7 +34,6 @@ export function HomeRecruitment() {
                 {step.number}
               </span>
               <span className="tac-recruit__title">{step.title}</span>
-              <span className="tac-recruit__date">{step.date}</span>
             </Reveal>
           ))}
         </ol>

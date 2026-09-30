@@ -30,7 +30,10 @@ export const recruitmentCycle: RecruitmentCycle = {
   publicationStatus: 'published',
 }
 
-export const siteSettings: SiteSettings = {}
+export const siteSettings: SiteSettings = {
+  instagramUrl: 'https://www.instagram.com/tradersatcarolina/',
+  linkedinUrl: 'https://www.linkedin.com/company/tradersatcarolina/',
+}
 
 export const pillars = [
   {

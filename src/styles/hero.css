@@ -8,14 +8,18 @@
    Layering, bottom to top:
      1. the section's own solid navy   — the fallback when the photo 404s
      2. .tac-hero__image              — the photograph, as a background layer
-     3. .tac-hero__scrim              — flat navy at 70% (a solid, not a gradient)
+     3. .tac-hero__scrim              — flat navy at 85% (a solid, not a gradient)
      4. .tac-hero__inner              — content
    ========================================================================== */
 
 .tac-hero {
   position: relative;
   width: 100%;
-  height: 752px;
+  /* Match hero.jpg's native 1175x620 ratio so the photo fits the frame
+     exactly — no cropping, no distortion. */
+  aspect-ratio: 1175 / 620;
+  /* Floor for narrow desktops so the content never meets the chevron. */
+  min-height: 600px;
   background-color: var(--tac-navy);
   overflow: hidden;
 }
@@ -38,7 +42,7 @@
 
 .tac-hero__scrim {
   background: var(--tac-navy);
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 /* --------------------------------------------------------------------------
@@ -54,32 +58,6 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: var(--tac-white);
-}
-
-/* Logo mark ---------------------------------------------------------------- */
-
-.tac-hero__mark {
-  display: block;
-  width: 88px;
-  height: 88px;
-  margin: 0 0 28px;
-}
-
-/* Shown only when the mark fails to load. */
-.tac-hero__mark-fallback {
-  box-sizing: border-box;
-  width: 88px;
-  height: 88px;
-  margin: 0 0 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid var(--tac-white);
-  font-family: var(--tac-font-head);
-  font-weight: 400;
-  font-size: 22px;
-  letter-spacing: 0.02em;
   color: var(--tac-white);
 }
 
@@ -190,7 +168,7 @@
 
 @media (max-width: 900px) {
   .tac-hero {
-    height: auto;
+    aspect-ratio: auto;
     min-height: 620px;
   }
 

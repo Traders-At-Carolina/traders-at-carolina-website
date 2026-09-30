@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import '../styles/hero.css'
@@ -7,15 +6,13 @@ import '../styles/hero.css'
  * Section 2 — Hero.
  *
  * Full-bleed navy field: the section itself is solid navy, the photograph sits
- * behind a 70% navy scrim as a CSS background layer (never an <img>), so a
+ * behind an 85% navy scrim as a CSS background layer (never an <img>), so a
  * missing file degrades to flat navy with no broken-image icon.
  *
  * Deliberately NOT wrapped in <Reveal>: this is above the fold and must paint
  * on first frame.
  */
 export function HomeHero() {
-  const [markFailed, setMarkFailed] = useState<boolean>(false)
-
   return (
     <section className="tac-hero">
       {/* Photograph, then scrim. Both decorative background layers. */}
@@ -23,21 +20,6 @@ export function HomeHero() {
       <div className="tac-hero__scrim" aria-hidden="true" />
 
       <div className="tac-hero__inner tac-container">
-        {markFailed ? (
-          <div className="tac-hero__mark-fallback" aria-hidden="true">
-            TC
-          </div>
-        ) : (
-          <img
-            className="tac-hero__mark"
-            src="/images/logo/logo-mark-white.svg"
-            alt=""
-            width={88}
-            height={88}
-            onError={() => setMarkFailed(true)}
-          />
-        )}
-
         <h1 className="tac-hero__title">Traders at Carolina</h1>
 
         <p className="tac-hero__subtext">

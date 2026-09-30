@@ -14,7 +14,6 @@ const MOBILE_MENU_ID = 'tac-mobile-menu'
 
 function SiteHeader() {
   const [open, setOpen] = useState(false)
-  const [logoFailed, setLogoFailed] = useState(false)
   const location = useLocation()
 
   // Close the mobile panel whenever the route changes — including on
@@ -34,20 +33,6 @@ function SiteHeader() {
     <header className="tac-header">
       <div className="tac-header__inner tac-container">
         <Link className="tac-header__brand" to="/" aria-label="Traders at Carolina home">
-          {logoFailed ? (
-            <span className="tac-header__logo-fallback" aria-hidden="true">
-              TC
-            </span>
-          ) : (
-            <img
-              className="tac-header__logo"
-              src="/images/logo/logo-mark.svg"
-              alt=""
-              width={36}
-              height={36}
-              onError={() => setLogoFailed(true)}
-            />
-          )}
           <span className="tac-header__wordmark">Traders at Carolina</span>
         </Link>
 
@@ -108,11 +93,9 @@ function SiteHeader() {
 }
 
 function SiteFooter() {
-  /* TODO: real URLs — these fall back to "#" until confirmed links exist. */
   const footerLinks = [
     { label: 'Instagram', href: siteSettings.instagramUrl || '#' },
     { label: 'LinkedIn', href: siteSettings.linkedinUrl || '#' },
-    { label: 'Mailing list', href: '#' },
   ]
 
   return (

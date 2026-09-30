@@ -70,15 +70,6 @@
   color: var(--tac-black);
 }
 
-.tac-recruit__date {
-  margin-top: 6px;
-  font-family: var(--tac-font-body);
-  font-style: italic;
-  font-size: 17px;
-  line-height: 1.4;
-  color: var(--tac-navy);
-}
-
 /* ---- Mobile: single centred column -------------------------------------- */
 
 @media (max-width: 900px) {
