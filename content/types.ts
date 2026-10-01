@@ -69,3 +69,35 @@ export type HomeContent = {
     link?: ContentLink;
   };
 };
+
+export type Partner = {
+  name: string;
+  /** The club's actual relationship term, e.g. "Sponsor since 2024", "Event partner". */
+  relationship?: string;
+  /** Optional https link to the firm's site. */
+  url?: string;
+};
+
+export type Advisor = { name: string; title: string; department: string; note?: string };
+
+/** About page content. Field definitions: docs/specs/02-about.md §5. */
+export type AboutContent = {
+  header: { h1: string; lead: string };
+  /** H2 copy for each section. `advisorsOnly` is used when there are advisors but no partners. */
+  headings: { mission: string; story: string; principles: string; partners: string; advisorsOnly: string };
+  mission: { statement: string; body: string };
+  vision: { statement: string; body: string };
+  story: {
+    /** 0 (section hidden unless 3+ milestones) or 2–4 paragraphs. Third person. */
+    paragraphs: string[];
+    quote?: { text: string; name: string; role: string; classYear?: number };
+  };
+  /** 3–4 principles. */
+  principles: Array<{ title: string; body: string }>;
+  /** Only firms that have agreed to be listed. */
+  partners: Partner[];
+  advisors: Advisor[];
+};
+
+/** Club history milestone (00 §12, 02 §5). The list appears once there are 3+ entries. */
+export type TimelineEntry = { year: number; title: string; description?: string };
