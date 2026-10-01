@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Traders at Carolina
 
-## Getting Started
+Website for Traders at Carolina, UNC's quantitative finance club. Built with Next.js (App Router), TypeScript and Tailwind CSS, statically generated and deployed on Vercel.
 
-First, run the development server:
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev          # http://localhost:3000
+pnpm test         # Vitest
+pnpm typecheck
+pnpm lint
+pnpm build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`/styleguide` (not indexed) renders every design token and shared component.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Updating content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Club officers only need to edit files in `content/`:
 
-## Learn More
+| File | What it controls |
+|---|---|
+| `content/site.ts` | Mission line, contact email, social links, recruiting status and dates |
+| `content/nav.ts` | Header and footer navigation |
 
-To learn more about Next.js, take a look at the following resources:
+### Each recruiting cycle
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+In `content/site.ts` → `recruiting`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Set `applyUrl` to the new Google Form and `applicationsOpen: true`.
+2. Set `applyDeadline` (`"YYYY-MM-DDTHH:mm"`, Eastern time).
+3. Redeploy.
 
-## Deploy on Vercel
+At the deadline, also set the Google Form to **Not accepting responses**. Apply buttons switch to the closed state automatically on the next build after the deadline.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The build fails with a clear message if the recruiting config is invalid (for example, applications open without a Google Forms URL).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Specs
+
+Design and page specs live in `docs/specs/`:
+
+- `00-vision-and-style.md` — brand, tokens, typography, shared components (implemented)
+- `01-home.md` … `05-apply.md` — page specs
+
+## Pending from the club
+
+- Logo files (SVG) — the header currently uses a typeset wordmark (`components/Wordmark.tsx`).
+- Contact email, Instagram and LinkedIn URLs.
+- Whether UNC requires a student-organization disclaimer in the footer.
