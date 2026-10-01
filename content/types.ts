@@ -99,5 +99,44 @@ export type AboutContent = {
   advisors: Advisor[];
 };
 
+export type TrackId = "trading" | "research" | "development";
+
+export type Expectation = { value: string; detail: string };
+
+/** Membership page content. Field definitions: docs/specs/03-membership.md §5. */
+export type MembershipContent = {
+  header: { h1: string; lead: string };
+  headings: { how: string; tracks: string; activities: string; expectations: string };
+  /** Exactly 3: Apply, Choose a track, Build with your track. */
+  steps: Array<{ title: string; body: string }>;
+  /** Shown under the steps when set, e.g. "Members can switch tracks at the start of each semester." */
+  switchingPolicy?: string;
+  /** Exactly 3, in Trading, Research, Development order. */
+  tracks: Array<{
+    id: TrackId;
+    /** e.g. "Quantitative trading" (rendered uppercase). */
+    roleLabel: string;
+    name: string;
+    description: string;
+    /** 2–4 items. Recommended, never required. */
+    recommendedBackground: string[];
+    /** Slug of a person in content/team.ts (spec 04). */
+    leadSlug?: string;
+  }>;
+  activities: Array<{
+    name: string;
+    description: string;
+    /** Real cadence, e.g. "Weekly" or "Thursdays, 7–8:30 PM". Left blank until confirmed. */
+    frequency?: string;
+    tracks: "all" | TrackId[];
+  }>;
+  /** Rows without a confirmed value are omitted; prerequisites is always shown. */
+  expectations: {
+    timeCommitment?: Expectation;
+    attendance?: Expectation;
+    prerequisites: Expectation;
+  };
+};
+
 /** Club history milestone (00 §12, 02 §5). The list appears once there are 3+ entries. */
 export type TimelineEntry = { year: number; title: string; description?: string };
