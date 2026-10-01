@@ -195,7 +195,7 @@ export const home = {
   stats: {
     members?: number;          // rendered as "{n}+"
     foundedYear?: number;      // e.g. 2019
-    partnerFirms?: number;
+    partnerFirms?: number;     // defaults to about.partners.length (spec 02 §5)
   },
   photos: Array<{ src: string; alt: string; caption: string; ratio: "3:2" | "4:5" }>, // 2–3 items
   upcoming?: {

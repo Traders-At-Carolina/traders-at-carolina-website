@@ -366,7 +366,7 @@ All variants are square, use the Button type role, and have 12px × 24px padding
 |---|---|---|
 | 00 | `00-vision-and-style.md` | This document |
 | 01 | `01-home.md` | Hero, what we do, stats, inside the club, CTA |
-| 02 | `02-about.md` | Mission, history timeline, values |
+| 02 | `02-about.md` | Mission and vision, founding story, principles, partners and advisors |
 | 03 | `03-membership.md` | Club structure, tracks, weekly cadence, expectations |
 | 04 | `04-team.md` | Leadership grid, placements |
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
