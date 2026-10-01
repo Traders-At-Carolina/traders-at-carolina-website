@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Gelasio, Public_Sans } from "next/font/google";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/content/site";
 import { validateSite } from "@/lib/validate-site";
 import "./globals.css";
@@ -38,9 +40,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="skip-link">
           Skip to content
         </a>
+        <SiteHeader />
         <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
           {children}
         </main>
+        <SiteFooter />
       </body>
     </html>
   );
