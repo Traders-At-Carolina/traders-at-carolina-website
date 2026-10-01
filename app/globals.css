@@ -1,26 +1,199 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Design tokens — docs/specs/00-vision-and-style.md §4–6. Components use these only. */
+@theme {
+  --color-*: initial;
+  --color-bone: #ebeae4;
+  --color-white: #ffffff;
+  --color-navy: #233265;
+  --color-black: #000000;
+  --color-ink-2: #474644;
+  --color-ink-3: #636260;
+  --color-rule: rgb(0 0 0 / 0.15);
+  --color-rule-strong: rgb(0 0 0 / 0.35);
+  --color-rule-inverse: rgb(235 234 228 / 0.2);
+  --color-navy-press: color-mix(in oklab, #233265 85%, black);
+  --color-grid: rgb(35 50 101 / 0.06);
+
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  /* Type roles (00 §5.2) */
+  --text-display: clamp(2.75rem, 6vw, 5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.01em;
+  --text-h1: clamp(2.25rem, 4.5vw, 3.75rem);
+  --text-h1--line-height: 1.1;
+  --text-h2: clamp(1.75rem, 3vw, 2.5rem);
+  --text-h2--line-height: 1.15;
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.25;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.6;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.65;
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+  --text-stat: clamp(2rem, 4vw, 3rem);
+  --text-stat--line-height: 1;
+  --text-nav: 0.9375rem;
+  --text-nav--line-height: 1;
+  --text-button: 0.9375rem;
+  --text-button--line-height: 1;
+  --text-button--letter-spacing: 0.01em;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--letter-spacing: 0.14em;
+
+  /* 1200px content + 48px gutters each side (00 §6) */
+  --container-page: 81rem;
+  --container-prose: 68ch;
 }
 
+/* next/font sets these variables on <html>, so they must resolve inline. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: "Georgia Pro", Georgia, var(--font-gelasio), "Times New Roman", serif;
+  --font-sans: var(--font-public-sans), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background-color: var(--color-bone);
+    color: var(--color-black);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: var(--color-bone);
+  }
+
+  ::selection {
+    background-color: var(--color-navy);
+    color: var(--color-white);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--color-navy);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Decorative graph-paper layer; apply to an absolutely positioned, aria-hidden element (00 §7.3). */
+@utility graph-paper {
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 100%);
+}
+
+/* Resting hairline underline that fills in from the left on hover (00 §9.2). */
+@utility link-underline {
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(color-mix(in srgb, currentColor 35%, transparent), color-mix(in srgb, currentColor 35%, transparent));
+  background-size:
+    0% 1px,
+    100% 1px;
+  background-position:
+    0 100%,
+    0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 4px;
+  box-decoration-break: clone;
+  transition: background-size 200ms ease-out;
+
+  &:hover,
+  &:focus-visible {
+    background-size:
+      100% 1px,
+      100% 1px;
+  }
+}
+
+@utility skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-navy);
+  color: var(--color-white);
+  font-weight: 600;
+
+  &:focus {
+    top: 1rem;
+  }
+}
+
+/* Motion (00 §9.2). Content stays visible without JS or with reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 400ms ease-out,
+      transform 400ms ease-out;
+  }
+
+  html.js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .draw-in path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw-in 1.2s ease-out forwards;
+  }
+
+  .draw-in path:nth-child(2) {
+    animation-delay: 80ms;
+  }
+
+  .draw-in path:nth-child(3) {
+    animation-delay: 160ms;
+  }
+
+  .draw-in path:nth-child(n + 4) {
+    animation-delay: 240ms;
+  }
+}
+
+@keyframes draw-in {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
