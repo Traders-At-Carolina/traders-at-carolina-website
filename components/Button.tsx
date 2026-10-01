@@ -9,6 +9,8 @@ type ButtonProps = {
   variant?: ButtonVariant;
   /** Opens in a new tab with ↗ (00 §10). */
   external?: boolean;
+  /** Trailing → on internal links (external links always show ↗). */
+  arrow?: boolean;
   fullWidth?: boolean;
   className?: string;
 };
@@ -20,7 +22,7 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 /** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
-export function Button({ href, children, variant = "primary", external, fullWidth, className = "" }: ButtonProps) {
+export function Button({ href, children, variant = "primary", external, arrow, fullWidth, className = "" }: ButtonProps) {
   const classes = [
     "inline-flex min-h-11 items-center justify-center gap-2 px-6 py-3 text-button font-semibold transition-colors duration-150",
     variants[variant],
@@ -41,6 +43,7 @@ export function Button({ href, children, variant = "primary", external, fullWidt
   return (
     <Link href={href} className={classes}>
       {children}
+      {arrow ? <span aria-hidden="true">→</span> : null}
     </Link>
   );
 }

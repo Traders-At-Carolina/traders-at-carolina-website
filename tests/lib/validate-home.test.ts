@@ -8,6 +8,7 @@ const photo = (n: number): HomePhoto => ({ src: image, alt: `Members at event ${
 
 const valid: HomeContent = {
   hero: { headline: "Rigor, practiced together.", headlineEmphasis: "practiced", subhead: "Subhead." },
+  headings: { pillars: "Pillars", numbers: "Numbers", inside: "Inside" },
   pillars: [
     { title: "Preparation", body: "Body.", link: { label: "See the curriculum", href: "/membership" } },
     { title: "Engagement", body: "Body.", link: { label: "How membership works", href: "/membership" } },

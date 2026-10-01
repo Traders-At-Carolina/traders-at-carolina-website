@@ -53,6 +53,8 @@ export type HomeContent = {
     headlineEmphasis?: string;
     subhead: string;
   };
+  /** H2 copy for each section. */
+  headings: { pillars: string; numbers: string; inside: string };
   /** Exactly three: Preparation, Engagement, Opportunity. */
   pillars: Array<{ title: string; body: string; link: ContentLink }>;
   /** Real, defensible numbers only. Missing values are omitted from the page. */
