@@ -308,7 +308,7 @@ All variants are square, use the Button type role, and have 12px × 24px padding
 - The seeded SVG motif described in §7.2. Props: `seed`, `paths` (3–5), `size` (`hero` | `header`).
 
 ### Apply link behavior (all Apply buttons and links)
-- **Single source of truth.** `applyUrl`, `applicationsOpen` (boolean) and `applyDeadline` (ISO date) live in `content/site.ts`. Each recruiting cycle needs only that one file edited.
+- **Single source of truth.** `applyUrl`, `applicationsOpen` (boolean), `applyDeadline` (ISO date) and `nextApplicationOpenDate` (ISO date, shown when closed) live in `content/site.ts`. Each recruiting cycle needs only that one file edited.
 - **External link.** It opens the Google Form in a new tab with `target="_blank" rel="noopener noreferrer"` and a `↗` indicator.
 - **Closed state.** When `applicationsOpen` is `false`, Apply buttons point to `/apply`. That page shows when the next cycle opens. The exact copy and states are defined in spec 05.
 
@@ -365,7 +365,7 @@ All variants are square, use the Button type role, and have 12px × 24px padding
 | # | File | Covers |
 |---|---|---|
 | 00 | `00-vision-and-style.md` | This document |
-| 01 | `01-home.md` | Hero, what we do, proof (stats and placements), CTA |
+| 01 | `01-home.md` | Hero, what we do, stats, inside the club, CTA |
 | 02 | `02-about.md` | Mission, history timeline, values |
 | 03 | `03-membership.md` | Club structure, tracks, weekly cadence, expectations |
 | 04 | `04-team.md` | Leadership grid, placements |
