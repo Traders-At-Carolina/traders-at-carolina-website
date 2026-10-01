@@ -60,6 +60,16 @@ describe("TeamPage", () => {
     expect(screen.getByText("Incoming QT intern, Firm X")).toBeInTheDocument();
   });
 
+  it("renders co-presidents, executive board and directors as ordered tiers", () => {
+    const co: Person = { slug: "co-one", name: "Co One", role: "Co-President, Trading", group: "co-president", order: 1 };
+    const dir: Person = { slug: "dir-one", name: "Dir One", role: "Director of Education", group: "director", order: 1 };
+    const { container } = renderTeam({ people: [dir, pres, co] });
+    expect(eyebrows()).toEqual(["§ 01 — Co-Presidents", "§ 02 — Executive board", "§ 03 — Directors", "§ 04 — Track leads"]);
+    // No class year or major: the card shows no meta line.
+    expect((container.querySelector("#co-one") as HTMLElement).textContent).not.toContain("·");
+    expect(screen.getByText("Director of Education")).toBeInTheDocument();
+  });
+
   it("falls back to an initials tile without a headshot", () => {
     const { container } = renderTeam({ people: [lead] });
     expect((container.querySelector("#tom-trader") as HTMLElement).textContent).toContain("TT");

@@ -10,11 +10,24 @@ export function execMembers(people: Person[]): Person[] {
   return people.filter((p) => p.group === "exec").sort(byOrder);
 }
 
+export function coPresidents(people: Person[]): Person[] {
+  return people.filter((p) => p.group === "co-president").sort(byOrder);
+}
+
+export function directors(people: Person[]): Person[] {
+  return people.filter((p) => p.group === "director").sort(byOrder);
+}
+
+/** Meta line under a name, e.g. "'27 · Mathematics"; empty when neither is set. */
+export function personMeta(person: Pick<Person, "classYear" | "major">): string {
+  return [person.classYear ? shortClassYear(person.classYear) : "", person.major ?? ""].filter(Boolean).join(" · ");
+}
+
 export type TrackGroup = {
   track: TrackId;
   /** Track-lead cards for this track. */
   leads: Person[];
-  /** Exec members who also lead this track; shown as a "Led by" line, not a second card. */
+  /** Board members who also lead this track; shown as a "Led by" line, not a second card. */
   execLeads: Person[];
 };
 
@@ -23,7 +36,7 @@ export function trackGroups(people: Person[]): TrackGroup[] {
   return TRACK_ORDER.map((track) => ({
     track,
     leads: people.filter((p) => p.group === "track-lead" && p.track === track).sort(byOrder),
-    execLeads: people.filter((p) => p.group === "exec" && p.track === track).sort(byOrder),
+    execLeads: people.filter((p) => p.group !== "track-lead" && p.track === track).sort(byOrder),
   }));
 }
 

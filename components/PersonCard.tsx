@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { LinkedInIcon } from "@/components/LinkedInIcon";
 import type { Person } from "@/content/types";
-import { initials, shortClassYear } from "@/lib/team";
+import { initials, personMeta } from "@/lib/team";
 
 /**
  * Headshot, role, name, class year and major, optional placement and LinkedIn (spec 04 §3.1).
@@ -31,9 +31,7 @@ export function PersonCard({ person }: { person: Person }) {
         <h3 id={`${person.slug}-name`} className="mt-2 text-h3">
           {person.name}
         </h3>
-        <p className="mt-1 text-caption text-ink-3 tabular">
-          {shortClassYear(person.classYear)} · {person.major}
-        </p>
+        {personMeta(person) ? <p className="mt-1 text-caption text-ink-3 tabular">{personMeta(person)}</p> : null}
         {person.placement ? <p className="mt-1 text-caption text-ink-2">{person.placement}</p> : null}
         {person.linkedin ? (
           <a

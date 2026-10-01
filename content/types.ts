@@ -145,14 +145,15 @@ export type Person = {
   name: string;
   /** e.g. "President", "Trading Lead". */
   role: string;
-  group: "exec" | "track-lead";
+  /** Leadership tiers on /team: co-presidents, then executive board, then directors, then track leads. */
+  group: "co-president" | "exec" | "director" | "track-lead";
   /** Required for track leads; set on an exec who also leads a track. */
   track?: TrackId;
   /** Sort order within the group (President first by convention). */
   order: number;
-  /** e.g. 2027 → rendered "'27". */
-  classYear: number;
-  major: string;
+  /** e.g. 2027 → rendered "'27". Optional; the meta line shows whatever is set. */
+  classYear?: number;
+  major?: string;
   /** Static import from public/images/team, e.g. `import jane from "@/public/images/team/jane-doe.jpg"`. */
   headshot?: StaticImageData;
   /** Required when headshot is set, e.g. "Portrait of Jane Doe". */

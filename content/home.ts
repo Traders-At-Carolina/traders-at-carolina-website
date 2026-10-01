@@ -1,4 +1,7 @@
 import type { HomeContent } from "@/content/types";
+import clubOverview from "@/public/images/events/club-overview.jpg";
+import closingQa from "@/public/images/events/closing-qa.jpg";
+import generalMeeting from "@/public/images/events/general-meeting.jpg";
 
 /**
  * Home page content (docs/specs/01-home.md). Officers edit this file.
@@ -40,5 +43,24 @@ export const home: HomeContent = {
     },
   ],
   stats: {},
-  photos: [],
+  photos: [
+    {
+      src: generalMeeting,
+      alt: "Members seated in a UNC lecture hall during a Traders at Carolina general meeting",
+      caption: "General meeting",
+      ratio: "3:2",
+    },
+    {
+      src: clubOverview,
+      alt: "Officers presenting the club overview to a full classroom",
+      caption: "Introducing the club",
+      ratio: "3:2",
+    },
+    {
+      src: closingQa,
+      alt: "Officers at the front of the room during the closing Q&A",
+      caption: "Closing Q&A",
+      ratio: "3:2",
+    },
+  ],
 };
