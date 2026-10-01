@@ -14,9 +14,9 @@ export function Pillars({ index, title, pillars }: PillarsProps) {
   return (
     <Section labelledBy="pillars-title">
       <SectionHeader index={index} eyebrow="What we do" title={title} id="pillars-title" />
-      <Reveal as="ol" className="mt-12 grid grid-cols-1 divide-y divide-rule md:mt-16 md:grid-cols-3 md:divide-x md:divide-y-0">
+      <Reveal as="ol" className="mt-12 grid grid-cols-1 divide-y divide-rule md:mt-16 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
         {pillars.map((pillar, i) => (
-          <li key={pillar.title} className="py-8 first:pt-0 last:pb-0 md:px-8 md:py-0 md:first:pl-0 md:last:pr-0">
+          <li key={pillar.title} className="max-w-prose py-8 first:pt-0 last:pb-0 lg:px-8 lg:py-0 lg:first:pl-0 lg:last:pr-0">
             <p aria-hidden="true" className="text-caption font-medium text-navy tabular">
               {String(i + 1).padStart(2, "0")}
             </p>

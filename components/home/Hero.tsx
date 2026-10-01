@@ -37,11 +37,11 @@ export function Hero({ hero, index, apply }: HeroProps) {
               <Headline headline={hero.headline} emphasis={hero.headlineEmphasis} />
             </h1>
             <p className="mt-6 max-w-[34rem] text-lead text-ink-2">{hero.subhead}</p>
-            <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-8">
+            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-5">
               <Button href={apply.href} external={apply.external} arrow={apply.arrow} className="w-full sm:w-auto">
                 {apply.label}
               </Button>
-              <TextLink href="/membership" arrow>
+              <TextLink href="/membership" arrow className="whitespace-nowrap">
                 How membership works
               </TextLink>
             </div>
