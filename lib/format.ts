@@ -27,6 +27,16 @@ export function formatEventDateTime(date: Date): string {
   return `${normalize(dayFormatter.format(date))} · ${normalize(timeFormatter.format(date))}`;
 }
 
+/** "Fri, Feb 6" in Eastern time. */
+export function formatWeekdayMonthDay(date: Date): string {
+  return normalize(dayFormatter.format(date));
+}
+
+/** "11:59 PM" in Eastern time. */
+export function formatTime(date: Date): string {
+  return normalize(timeFormatter.format(date));
+}
+
 /** "Jan 12" in Eastern time. */
 export function formatMonthDay(date: Date): string {
   return normalize(monthDayFormatter.format(date));

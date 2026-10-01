@@ -172,5 +172,18 @@ export type TeamContent = {
 /** A firm where members or alumni have interned or worked full-time. Names only (spec 04 §4.4). */
 export type Placement = { firm: string };
 
+/** Apply page content. Field definitions: docs/specs/05-apply.md §5. */
+export type ApplyContent = {
+  /** Exactly 3, in order: Application, Interview, Decision. */
+  stages: Array<{
+    title: string;
+    description: string;
+    /** Shown when applications are closed or a date is missing, e.g. "Week 2". */
+    genericTiming?: string;
+  }>;
+  /** Answers support [links](/path) and *emphasis* only. */
+  faq: Array<{ question: string; answer: string }>;
+};
+
 /** Club history milestone (00 §12, 02 §5). The list appears once there are 3+ entries. */
 export type TimelineEntry = { year: number; title: string; description?: string };
