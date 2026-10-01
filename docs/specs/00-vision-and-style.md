@@ -341,8 +341,8 @@ All variants are square, use the Button type role, and have 12px × 24px padding
   | File | Contains |
   |---|---|
   | `content/site.ts` | Club name, mission line, contact email, social URLs, Apply config (§10) |
-  | `content/team.ts` | Leadership: name, role, class year, headshot path, alt text, LinkedIn |
-  | `content/placements.ts` | Member placements: firm, role type (QT / QR / SWE / other), year |
+  | `content/team.ts` | Exec board and track leads: name, role, group, track, class year, major, headshot, alt text, placement, LinkedIn (spec 04 §5) |
+  | `content/placements.ts` | Firms where members have placed: firm name only (spec 04 §5) |
   | `content/timeline.ts` | Club history milestones: year, title, description |
 
   Field-level shapes are finalized in the page spec that first uses each file. No CMS until the resource hub exists.
@@ -368,7 +368,7 @@ All variants are square, use the Button type role, and have 12px × 24px padding
 | 01 | `01-home.md` | Hero, what we do, stats, inside the club, CTA |
 | 02 | `02-about.md` | Mission and vision, founding story, principles, partners and advisors |
 | 03 | `03-membership.md` | Club structure, tracks, weekly cadence, expectations |
-| 04 | `04-team.md` | Leadership grid, placements |
+| 04 | `04-team.md` | Executive board, track leads, placements (firm names) |
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
 
 **Every page spec contains:**
