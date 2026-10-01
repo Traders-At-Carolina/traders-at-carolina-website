@@ -161,15 +161,15 @@ Only these sections appear on Home. No placement section (data isn't available y
 
 ## 5. Apply behavior on this page
 
-The hero button and the band button both read from `content/site.ts` (00 §10):
+The hero button and the band button both use `getApplicationState()` (spec 05 §3), which combines `applicationsOpen` with `applyDeadline` at build time:
 
-| `applicationsOpen` | Hero button | Band H2 | Band button |
+| State | Hero button | Band H2 | Band button |
 |---|---|---|---|
-| `true` | "Apply ↗", opens `applyUrl` in a new tab | "Ready to start?" | "Apply ↗", opens `applyUrl` |
-| `false` | "Applications open {Mon D}", links to `/apply` (`primary` style kept) | "Applications are closed for now." | "Get notified", links to `/apply` |
+| `open` | "Apply ↗", opens `applyUrl` in a new tab | "Ready to start?" | "Apply ↗", opens `applyUrl` |
+| `closed` | "Applications open {Mon D}", links to `/apply` (`primary` style kept) | "Applications are closed for now." | "Get notified", links to `/apply` |
 
 - `{Mon D}` comes from `nextApplicationOpenDate` (ISO date).
-- If `applicationsOpen` is false *and* `nextApplicationOpenDate` is missing, the button reads "How to apply →" and links to `/apply`.
+- If the state is closed *and* `nextApplicationOpenDate` is missing, the button reads "How to apply →" and links to `/apply`.
 - What `/apply` shows in the closed state is defined in spec 05.
 
 ---
@@ -184,7 +184,7 @@ applicationsOpen: boolean;
 nextApplicationOpenDate?: string;    // ISO "YYYY-MM-DD"; shown when closed
 ```
 
-(`applyDeadline` from 00 §10 is used by spec 05, not by Home.)
+(The full recruiting field set, including `applyDeadline`, is defined in spec 05 §5.)
 
 ### `content/home.ts` (new)
 
@@ -240,7 +240,7 @@ export const home = {
 
 1. At 375px, 768px, 1280px and 1440px widths, the eyebrow, headline, subhead and Apply button are all visible without scrolling on the first screen.
 2. The page renders sections in exactly the order in §2, with backgrounds as listed. There's exactly one navy band.
-3. Toggling `applicationsOpen` in `content/site.ts` switches both the hero and band buttons per §5, with no other code changes.
+3. Toggling `applicationsOpen` (or setting `applyDeadline` in the past) in `content/site.ts` switches both the hero and band buttons per §5, with no other code changes.
 4. Removing any stat from `content/home.ts` drops it from the row with no gap or leftover hairline.
 5. Removing `upcoming`, or setting it to a past date, renders the photo-only layout in §3.4 with no empty card.
 6. The random walk is identical across reloads and builds (fixed seed), has `aria-hidden="true"`, and renders fully drawn under `prefers-reduced-motion`.

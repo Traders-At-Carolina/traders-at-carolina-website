@@ -308,7 +308,7 @@ All variants are square, use the Button type role, and have 12px × 24px padding
 - The seeded SVG motif described in §7.2. Props: `seed`, `paths` (3–5), `size` (`hero` | `header`).
 
 ### Apply link behavior (all Apply buttons and links)
-- **Single source of truth.** `applyUrl`, `applicationsOpen` (boolean), `applyDeadline` (ISO date) and `nextApplicationOpenDate` (ISO date, shown when closed) live in `content/site.ts`. Each recruiting cycle needs only that one file edited.
+- **Single source of truth.** Recruiting fields (`applyUrl`, `applicationsOpen`, `applyDeadline` as an ISO date-time in America/New_York, `nextApplicationOpenDate`, `interestFormUrl`, cycle dates) live in `content/site.ts`; their full definition is spec 05 §5. Every Apply button derives its state from `getApplicationState()` (spec 05 §3). Each recruiting cycle needs only that one file edited.
 - **External link.** It opens the Google Form in a new tab with `target="_blank" rel="noopener noreferrer"` and a `↗` indicator.
 - **Closed state.** When `applicationsOpen` is `false`, Apply buttons point to `/apply`. That page shows when the next cycle opens. The exact copy and states are defined in spec 05.
 
