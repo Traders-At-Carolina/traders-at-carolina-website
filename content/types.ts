@@ -138,5 +138,39 @@ export type MembershipContent = {
   };
 };
 
+/** Exec board member or track lead. Field definitions: docs/specs/04-team.md §5. */
+export type Person = {
+  /** Unique kebab-case id; used as the /team#anchor and by membership leadSlug. */
+  slug: string;
+  name: string;
+  /** e.g. "President", "Trading Lead". */
+  role: string;
+  group: "exec" | "track-lead";
+  /** Required for track leads; set on an exec who also leads a track. */
+  track?: TrackId;
+  /** Sort order within the group (President first by convention). */
+  order: number;
+  /** e.g. 2027 → rendered "'27". */
+  classYear: number;
+  major: string;
+  /** Static import from public/images/team, e.g. `import jane from "@/public/images/team/jane-doe.jpg"`. */
+  headshot?: StaticImageData;
+  /** Required when headshot is set, e.g. "Portrait of Jane Doe". */
+  alt?: string;
+  /** Only with the person's consent, e.g. "Incoming QT intern, Firm X". */
+  placement?: string;
+  /** Full https URL. */
+  linkedin?: string;
+};
+
+export type TeamContent = {
+  /** e.g. "2026–27"; shown in the Executive board heading. */
+  academicYear?: string;
+  people: Person[];
+};
+
+/** A firm where members or alumni have interned or worked full-time. Names only (spec 04 §4.4). */
+export type Placement = { firm: string };
+
 /** Club history milestone (00 §12, 02 §5). The list appears once there are 3+ entries. */
 export type TimelineEntry = { year: number; title: string; description?: string };
