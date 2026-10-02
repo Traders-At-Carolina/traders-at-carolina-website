@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
+import { viewForChange } from "@/components/home/volSurfaceScene";
 import { MARKET_REGIMES, describeSurface, easeInOut, lerpParams, type VolParams } from "@/lib/vol-surface";
 
 // three.js stays out of the initial bundle: the canvas loads after hydration, once the figure is near the viewport.
@@ -11,8 +12,8 @@ const VolSurfaceCanvas = dynamic(() => import("@/components/home/VolSurfaceCanva
   loading: () => <VolSurfacePoster />,
 });
 
-/** How long each market is held, and how long the surface takes to morph into the next. */
-const HOLD_MS = 4500;
+/** How long each market is held (long enough for the camera to settle on the next view), and the morph length. */
+const HOLD_MS = 5000;
 const MORPH_MS = 2600;
 const IDLE_MS = 4000;
 
@@ -117,7 +118,9 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
   }, []);
 
   const regime = MARKET_REGIMES[index];
-  const autoRotate = idle && !reducedMotion && inView && pageVisible;
+  // During each hold the camera turns to the angle that best shows the change that is coming next.
+  const view = viewForChange(regime.params, MARKET_REGIMES[(index + 1) % MARKET_REGIMES.length].params);
+  const animateCamera = idle && !reducedMotion && inView && pageVisible;
 
   return (
     <figure className={className}>
@@ -125,7 +128,8 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
         {nearViewport ? (
           <VolSurfaceCanvas
             params={params}
-            autoRotate={autoRotate}
+            animate={animateCamera}
+            view={view}
             label={`${regime.name}. ${describeSurface(regime.params)}`}
             onInteractStart={onInteractStart}
             onInteractEnd={onInteractEnd}

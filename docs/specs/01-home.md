@@ -55,7 +55,7 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Art — "Fig. 1":** `VolSurfaceFigure`, a deliberately bare, rotatable 3D implied-volatility surface that eases on its own between market regimes:
   - Strike (log-moneyness −0.5…0.5) × maturity (0.1–2y) × implied vol, from an SSVI-style model in `lib/vol-surface.ts`. The vol axis starts at 10% so the surface sits on its axes.
   - A smooth 61 × 41 mesh shaded with a three-stop navy ramp (design-token colors, no tone mapping), a bone wire grid every 5th row/column and a deep-navy outline (anti-aliased `LineSegments2`).
-  - Three plain hairline axes from the front-left corner titled "Strike", "Maturity" and "Implied vol" — no floor grid, tick marks or values.
+  - Three plain hairline axes from the front-right corner (the corner nearest the camera across the whole reachable arc) titled "Strike", "Maturity" and "Implied vol" — no floor grid, tick marks or values.
   - Six regimes (`MARKET_REGIMES`) cycle unlabelled; their names appear only in the accessible label.
   - `<figcaption>`: just `hero.figureCaption` ("Fig. 1 — Implied volatility across strike and maturity.").
 
@@ -71,10 +71,11 @@ Only these sections appear on Home. No placement section (data isn't available y
   - No min-height. Content defines the height.
 
 **Behavior**
-- **Rotate:** drag (OrbitControls; zoom and pan off; polar angle limited) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
-- **Auto-rotate:** slow spin while idle; it stops on interaction and resumes 4s after it ends.
-- **Market cycle:** each regime is held for 4.5s, then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.
-- The cycle and auto-rotate pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and does not auto-rotate.
+- **Framing:** the camera distance is solved numerically for the canvas aspect ratio (`fitDistance`) so the whole box, axes and titles stay inside the frame from every reachable angle; rotation is limited to the front-right quadrant (azimuth ≈ 3°–86°, a narrow tilt range), where the surface reads well and the axes stay in front of it.
+- **Rotate:** drag (OrbitControls; zoom and pan off) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
+- **Camera director (while idle):** before each market change the camera turns slowly (critically damped spring, ≤ ~11°/s) to the angle that best shows it: face-on to strike when the skew changes most, face-on to maturity when the term structure does, three-quarter when the overall level does — with a gentle sway. It stops on interaction and resumes 4s after it ends.
+- **Market cycle:** each regime is held for 5s (time for the camera to settle), then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.
+- The cycle and camera director pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and the camera stays still.
 - The canvas wrapper is `role="img"` with an `aria-label` naming and summarising the current regime; the axis titles are `aria-hidden`.
 - The headline is the page's only `<h1>`.
 - **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island that first renders a static SVG poster of the surface (same math, no layout shift, also the no-WebGL fallback). three.js (`three`, `@react-three/fiber`, `@react-three/drei`, ~245 kB gzipped) loads lazily via `next/dynamic` only once the figure is within 200px of the viewport, so it is never on the LCP path. Budget: LCP stays text, CLS 0.
@@ -253,7 +254,7 @@ export const home = {
 3. Toggling `applicationsOpen` (or setting `applyDeadline` in the past) in `content/site.ts` switches both the hero and band buttons per §5, with no other code changes.
 4. Removing any stat from `content/home.ts` drops it from the row with no gap or leftover hairline.
 5. Removing `upcoming`, or setting it to a past date, renders the photo-only layout in §3.4 with no empty card.
-6. The hero figure first renders the default regime (poster, then the same surface in WebGL), never shifts layout, and under `prefers-reduced-motion` neither auto-rotates nor animates.
+6. The hero figure first renders the default regime (poster, then the same surface in WebGL), never shifts layout, and under `prefers-reduced-motion` neither moves the camera nor animates.
 7. All images have non-empty alt text. TypeScript fails the build if `alt` is missing.
 8. Lighthouse (mobile) ≥ 95 in Performance, Accessibility, Best Practices and SEO. LCP < 2.0s and CLS < 0.05.
 9. Keyboard-only: every link and button is reachable in visual order with a visible focus ring (00 §4.3).

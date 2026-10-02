@@ -8,12 +8,15 @@ import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
-import { CAMERA, NK, NT, SCENE, WIRE_STEP, toX, toY, toZ } from "@/components/home/volSurfaceScene";
+import { AXIS_LABELS, CAMERA, NK, NT, SCENE, WIRE_STEP, cameraDirection, fitDistance, toX, toY, toZ } from "@/components/home/volSurfaceScene";
 import { surfaceGrid, type VolParams } from "@/lib/vol-surface";
 
 type VolSurfaceCanvasProps = {
   params: VolParams;
-  autoRotate: boolean;
+  /** Whether the camera director runs (off while the user is interacting, offscreen or under reduced motion). */
+  animate: boolean;
+  /** Azimuth the director steers toward: the angle that best shows the next market change. */
+  view: number;
   label: string;
   onInteractStart: () => void;
   onInteractEnd: () => void;
@@ -154,12 +157,7 @@ function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
   );
 }
 
-/** Axis titles: plain spans positioned each rendered frame (no extra React roots). */
-const LABELS: { text: string; at: [number, number, number] }[] = [
-  { text: "Strike", at: [0, 0, Z + 0.28] },
-  { text: "Maturity", at: [-X - 0.38, 0, 0] },
-  { text: "Implied vol", at: [-X - 0.05, H + 0.18, Z] },
-];
+const LABELS = AXIS_LABELS;
 
 /** Projects each label's 3D anchor to the canvas and moves its span there. */
 function LabelTracker({ spans }: { spans: RefObject<(HTMLSpanElement | null)[]> }) {
@@ -189,13 +187,83 @@ function Lights() {
   );
 }
 
-/** Three hairline axes meeting at the front-left corner: strike along the front, maturity along the left, vol up. */
+/** Three hairline axes meeting at the front-right corner: strike along the front, maturity along the right, vol up. */
 function Axes() {
   const colors = useBrandColors();
-  const axesBuf = useMemo(() => new Float32Array([-X, 0, Z, X, 0, Z, -X, 0, Z, -X, 0, -Z, -X, 0, Z, -X, H, Z]), []);
+  const axesBuf = useMemo(() => new Float32Array([-X, 0, Z, X, 0, Z, X, 0, Z, X, 0, -Z, X, 0, Z, X, H, Z]), []);
   const axes = useLines(axesBuf.length / 6, colors.black, 1, 0.45);
   useEffect(() => writeLines(axes, axesBuf), [axes, axesBuf]);
   return <primitive object={axes} />;
+}
+
+/**
+ * Orbit controls locked to the fitted distance for the canvas's aspect ratio (see fitDistance), so the surface,
+ * axes and titles stay in frame from every angle. OrbitControls clamps the camera to that distance on update.
+ */
+function FittedControls({
+  controls,
+  animate,
+  onInteractStart,
+  onInteractEnd,
+}: Pick<VolSurfaceCanvasProps, "animate" | "onInteractStart" | "onInteractEnd"> & { controls: RefObject<Controls | null> }) {
+  const size = useThree((s) => s.size);
+  const distance = useMemo(() => fitDistance(size.width / size.height), [size.width, size.height]);
+  return (
+    <OrbitControls
+      ref={controls}
+      target={CAMERA.target}
+      minDistance={distance}
+      maxDistance={distance}
+      enableZoom={false}
+      enablePan={false}
+      // Damping is for hand-dragging only: it would smear the director's per-frame angle updates.
+      enableDamping={!animate}
+      minAzimuthAngle={CAMERA.minAzimuth}
+      maxAzimuthAngle={CAMERA.maxAzimuth}
+      minPolarAngle={CAMERA.minPolar}
+      maxPolarAngle={CAMERA.maxPolar}
+      onStart={onInteractStart}
+      onEnd={onInteractEnd}
+    />
+  );
+}
+
+/** Starting camera position along the default view; FittedControls pulls it to the fitted distance. */
+const INITIAL_CAMERA = cameraDirection(CAMERA.azimuth, CAMERA.polar).map((d, i) => CAMERA.target[i] + d * 8) as [number, number, number];
+
+/** Shortest signed angle from a to b. */
+const angleDelta = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
+
+/**
+ * Slowly steers the camera toward `view` with a critically damped spring (smooth start and stop, capped speed),
+ * plus a gentle sway, so each market change is seen from the angle that shows it best and the camera never wanders
+ * round to the back or underside.
+ */
+function CameraDirector({ controls, view, animate }: { controls: RefObject<Controls | null>; view: number; animate: boolean }) {
+  const state = useRef({ t: 0, va: 0, vp: 0 });
+  useFrame((_, delta) => {
+    const c = controls.current;
+    const s = state.current;
+    if (!c || !animate) {
+      s.va = 0;
+      s.vp = 0;
+      return;
+    }
+    const dt = Math.min(delta, 0.05);
+    s.t += dt;
+    const sway = Math.sin((s.t / 26) * 2 * Math.PI);
+    const goalAz = view + 0.1 * sway;
+    const goalPolar = CAMERA.polar + 0.04 * Math.sin((s.t / 31) * 2 * Math.PI);
+
+    const k = 0.9;
+    const maxSpeed = 0.2;
+    const spring = (v: number, offset: number) => Math.max(-maxSpeed, Math.min(maxSpeed, v + (k * k * offset - 2 * k * v) * dt));
+    s.va = spring(s.va, angleDelta(c.getAzimuthalAngle(), goalAz));
+    s.vp = spring(s.vp, goalPolar - c.getPolarAngle());
+    c.setAzimuthalAngle(c.getAzimuthalAngle() + s.va * dt);
+    c.setPolarAngle(c.getPolarAngle() + s.vp * dt);
+  });
+  return null;
 }
 
 /** Lets vertical swipes scroll the page on touch screens; horizontal drags still rotate. */
@@ -212,7 +280,7 @@ function TouchScroll() {
 }
 
 /** The interactive WebGL volatility surface (spec 01 §3.1). Loaded lazily by VolSurfaceFigure. */
-export default function VolSurfaceCanvas({ params, autoRotate, label, onInteractStart, onInteractEnd }: VolSurfaceCanvasProps) {
+export default function VolSurfaceCanvas({ params, animate, view, label, onInteractStart, onInteractEnd }: VolSurfaceCanvasProps) {
   const controls = useRef<Controls>(null);
   const labelSpans = useRef<(HTMLSpanElement | null)[]>([]);
 
@@ -236,28 +304,17 @@ export default function VolSurfaceCanvas({ params, autoRotate, label, onInteract
     >
       <Canvas
         flat
-        camera={{ position: CAMERA.position, fov: CAMERA.fov }}
+        camera={{ fov: CAMERA.fov, position: INITIAL_CAMERA }}
         dpr={[1, 2]}
-        frameloop={autoRotate ? "always" : "demand"}
+        frameloop={animate ? "always" : "demand"}
         fallback={<VolSurfacePoster params={params} />}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <Lights />
         <Surface params={params} />
         <Axes />
-        <OrbitControls
-          ref={controls}
-          target={CAMERA.target}
-          enableZoom={false}
-          enablePan={false}
-          enableDamping
-          minPolarAngle={0.55}
-          maxPolarAngle={1.4}
-          autoRotate={autoRotate}
-          autoRotateSpeed={0.6}
-          onStart={onInteractStart}
-          onEnd={onInteractEnd}
-        />
+        <FittedControls controls={controls} animate={animate} onInteractStart={onInteractStart} onInteractEnd={onInteractEnd} />
+        <CameraDirector controls={controls} view={view} animate={animate} />
         <TouchScroll />
         <LabelTracker spans={labelSpans} />
       </Canvas>

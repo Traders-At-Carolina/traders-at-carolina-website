@@ -54,7 +54,7 @@ describe("VolSurfaceFigure", () => {
     await renderLoaded();
     expect(screen.getByRole("img")).toHaveAccessibleName(/^Calm market\./);
 
-    act(() => vi.advanceTimersByTime(4500 + 2600 + 100));
+    act(() => vi.advanceTimersByTime(5000 + 2600 + 100));
 
     expect(screen.getByRole("img")).toHaveAccessibleName(/^Sell-off\./);
   });
