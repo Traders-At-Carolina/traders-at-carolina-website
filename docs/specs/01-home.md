@@ -2,6 +2,10 @@
 
 **Status:** Approved · **Date:** 2026-09-30 · **Route:** `/` · **Depends on:** [Spec 00](00-vision-and-style.md)
 
+> **Revision (2026-10-02, hero):** the live readout moved from above the plot to below it. With the surface drawn low in its canvas, a readout at the top of the figure column floated away from what it describes; under the plot it reads as the figure's data line, and on mobile it brings the top of the surface into the first screen. The gap between the hero text and the figure is also tighter below 1024px (32px, was 48px).
+
+> **Revision (2026-10-02):** two Home sections changed. **By the numbers** no longer shows a one-item stat row: a lone stat becomes the section heading (§3.3). **Inside the club** with three photos now uses one large lead photo with the other two stacked beside it, instead of a 3-up row of equal thumbnails (§3.4). Where this note conflicts with §3 below, this note wins.
+
 All tokens, type roles, motifs and components named here are defined in spec 00. Section references like (00 §7.2) point there.
 
 ---
@@ -57,7 +61,7 @@ Only these sections appear on Home. No placement section (data isn't available y
   - A matte 61 × 41 mesh washed in navy (mixed into white), deeper where implied vol is higher — tinted by absolute vol, so a sell-off reads darker than a calm market. Design-token colors, no tone mapping, mostly ambient light.
   - Navy-ink lines (anti-aliased `LineSegments2`): a faint wire grid every 5th row/column, a thin outline, and a bold **at-the-money line** (K/S = 1) tracing the ATM term structure.
   - Hairline axes meeting at the front-right corner, with tick marks and values: strike K/S 0.8 / "1.0 ATM" / 1.25, maturity 6M / 1Y / 18M / 2Y, implied vol 20% / 40% / 60%; titled "Strike K/S", "Maturity" and "Implied vol". Each label fades out as its axis turns away from the camera, so far-side numbers never sit over the surface. No floor grid.
-  - **Live readout** above the plot (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the canvas label carries the same information).
+  - **Live readout** directly under the plot, on a `rule` hairline and above the caption, like the data line of a printed figure (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the canvas label carries the same information).
   - `<figcaption>`: `hero.figureCaption` ("Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.")
 
 **Layout**
@@ -115,6 +119,7 @@ Only these sections appear on Home. No placement section (data isn't available y
 
 **Rules**
 - Stats must be real, defensible numbers. If a value is missing, that stat is omitted and the row reflows to two. Never use placeholder or rounded-up numbers.
+- **A stat row needs at least two stats.** With exactly one, the row is dropped and that stat is written as the section heading instead, as a short sentence in the H2 role: "Founded in 2023." The eyebrow changes from `BY THE NUMBERS` to `AT A GLANCE`, since a section with one fact shouldn't promise numbers. The sponsors list stays below. The officer-written H2 (`headings.numbers`) is used only when the stat row shows.
 - The "Founded" stat displays the year (Public Sans, lining figures), not "years active". That way it never goes stale.
 - No partner names in this section.
 
@@ -141,9 +146,9 @@ Only these sections appear on Home. No placement section (data isn't available y
   - A 4:5 photo spans columns 7–9.
   - The Upcoming card spans columns 10–12, top-aligned.
 - **Desktop without the Upcoming card:**
-  - The 3:2 photo spans columns 1–7.
-  - The 4:5 photo spans columns 8–12.
-  - A third photo, if provided, comes first in a 3-up row of 3:2 images.
+  - **Two photos:** the 3:2 photo spans columns 1–7 and the 4:5 photo spans columns 8–12.
+  - **Three photos:** the first is the lead. It is a 3:2 photo spanning columns 1–8 and runs the full height of the group. The other two are 3:2 photos stacked in columns 9–12. One image leads, and the club's best evidence of real activity is never a thumbnail. Put the strongest photo first in `content/home.ts`.
+- **Tablet (768–1023px), three photos, no Upcoming card:** the lead is full width, and the other two sit side by side beneath it.
 - **Mobile:**
   - The first photo is full width.
   - The Upcoming card (if present) comes next.
@@ -160,6 +165,16 @@ Only these sections appear on Home. No placement section (data isn't available y
 - Optional lead: one sentence in bone.
 - Button behavior per §5.
 - This is the page's single navy band.
+
+### 3.6 Intro
+
+A short branded intro each time the Home page loads.
+
+- **When it plays:** on every full page load of `/`, including reloads and new tabs. Client-side navigation to Home from another page (header logo, nav links) doesn't replay it, since the head script only runs on full loads.
+- **Timeline (~2.15s):** on a `bone` screen, 28px graph-paper rows sweep in top to bottom and columns left to right (0–0.9s). The full-colour logo, then the Georgia name, fade in and rise 8px (0.45–1.2s). After a short hold they fade (1.5–1.75s), then the bone and the lines fade away (1.65–2.15s). The overlay's grid starts at the hero's top edge, so its lines hand over to the hero's graph paper.
+- **Skip:** any key, click, tap or scroll cuts to a 200ms fade.
+- **Robustness:** an inline `<head>` script (`lib/intro.ts`) decides before first paint, and it also ends the intro on a timer, so the overlay can never stay up. The overlay itself is CSS-only.
+- **Accessibility:** decorative (`aria-hidden`). It never plays under `prefers-reduced-motion` or without JavaScript.
 
 ---
 

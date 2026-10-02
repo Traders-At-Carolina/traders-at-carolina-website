@@ -3,6 +3,7 @@ import { Chivo, Gelasio, Public_Sans } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/content/site";
+import { introScript } from "@/lib/intro";
 import { validateSite } from "@/lib/validate-site";
 import "./globals.css";
 
@@ -43,6 +44,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         {/* Enables reveal-on-scroll styles only when JS runs, so content never stays hidden. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* Decides before first paint whether this tab plays the Home intro (spec 01 §3.6). */}
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
       </head>
       <body className="flex min-h-dvh flex-col">
         <a href="#main" className="skip-link">

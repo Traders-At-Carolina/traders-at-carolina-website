@@ -16,7 +16,7 @@ type ButtonProps = {
   shape?: "square" | "rounded";
   /**
    * `compact` trims side padding for tight spots like the mobile header; height stays 44px.
-   * `sm` (36px tall) is reserved for the desktop header's Apply button (00 §10 SiteHeader).
+   * `sm` (32px tall) is reserved for the desktop header's Apply button (00 §10 SiteHeader).
    */
   size?: "default" | "compact" | "sm";
   className?: string;
@@ -31,7 +31,7 @@ const variants: Record<ButtonVariant, string> = {
 const sizes = {
   default: "min-h-11 px-6 py-3",
   compact: "min-h-11 px-4 py-3",
-  sm: "min-h-9 px-5 py-2",
+  sm: "min-h-8 px-5 py-1.5",
 } as const;
 
 /** Button styling, shared with the few real `<button>` actions (e.g. the hero figure's re-draw). */

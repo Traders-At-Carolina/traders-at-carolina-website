@@ -53,7 +53,7 @@ export function Hero({ hero, index, actions }: HeroProps) {
     <section aria-labelledby="hero-title" className="relative overflow-hidden">
       <div aria-hidden="true" className="graph-paper absolute inset-0" />
       <Container className="relative flex flex-col justify-center pt-12 pb-14 md:pt-16 md:pb-20 lg:min-h-[clamp(600px,calc(100svh-5rem),820px)] lg:py-16">
-        <Grid className="gap-y-12 lg:items-center">
+        <Grid className="gap-y-8 lg:items-center lg:gap-y-12">
           <div className="col-span-12 lg:col-span-6 lg:col-start-1 lg:row-start-1 xl:pr-6">
             {/* Header floats as soon as the first line of text reaches it (00 §10). */}
             <span aria-hidden="true" data-nav-float-point className="-mb-px block h-px" />
