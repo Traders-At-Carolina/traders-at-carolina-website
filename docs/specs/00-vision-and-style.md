@@ -207,7 +207,13 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 ### 8.1 Logo
 - The club's existing logo is the source of truth. SVG is preferred.
 - Required variants: full-color (if it has color), one-color black (for bone and white), and one-color bone (for navy and black).
-- Location: `public/brand/`.
+- Location: `public/brand/`: `logo.svg` (full-color navy), `logo-black.svg` and `logo-bone.svg`. The three share identical geometry (a test enforces it).
+- The club supplied the logo as a 400 × 400 JPG of the **mark only** (no wordmark in the artwork). The SVGs are a faithful trace of it (within about 1px), so swap them for the club's original vector files if they exist.
+- Where it appears:
+  - **Header:** the full-color mark (32px tall, 28px on phones) beside the typeset name. Below 360px wide the name is dropped and only the mark remains.
+  - **Footer:** the bone mark (44px tall) beside the name.
+  - **Browser tab and home screen:** `app/icon.svg`, `app/favicon.ico` (16, 32 and 48px) and `app/apple-icon.png` (180px on `bone`), all made from the same mark.
+- The typeset name next to the mark is Georgia, not part of the logo.
 - Clear space: at least the cap height of the wordmark on every side.
 - Don't recolor, stretch or add effects to the logo.
 
@@ -395,7 +401,7 @@ Each spec is implemented separately, only after it is approved.
 
 These are needed from the club. None of them block this spec.
 
-- [ ] Logo files (SVG preferred), plus one-color black and bone variants if they exist.
+- [x] Logo: received as a JPG of the mark and traced to SVG (§8.1). Still wanted: the original vector files and any official wordmark lockup.
 - [ ] Whether "T@C" is an established short form.
 - [ ] Contact email, Instagram URL, LinkedIn URL.
 - [ ] Whether UNC requires a student-organization disclaimer in the footer.
