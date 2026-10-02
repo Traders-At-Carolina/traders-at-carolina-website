@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Gelasio, Public_Sans } from "next/font/google";
+import { Chivo, Gelasio, Public_Sans } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/content/site";
@@ -11,6 +11,14 @@ validateSite(site);
 const publicSans = Public_Sans({
   subsets: ["latin"],
   variable: "--font-public-sans",
+  display: "swap",
+});
+
+// Boxy, heavy grotesque for the Team page tier titles.
+const chivo = Chivo({
+  subsets: ["latin"],
+  weight: "800",
+  variable: "--font-chivo",
   display: "swap",
 });
 
@@ -31,7 +39,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${publicSans.variable} ${gelasio.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${publicSans.variable} ${gelasio.variable} ${chivo.variable}`} suppressHydrationWarning>
       <head>
         {/* Enables reveal-on-scroll styles only when JS runs, so content never stays hidden. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />

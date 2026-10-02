@@ -60,9 +60,15 @@
 @theme inline {
   --font-display: "Georgia Pro", Georgia, var(--font-gelasio), "Times New Roman", serif;
   --font-sans: var(--font-public-sans), system-ui, sans-serif;
+  --font-title: var(--font-chivo), "Arial Black", system-ui, sans-serif;
 }
 
 @layer base {
+  /* Photos always render in standard dynamic range, never HDR-boosted. */
+  img {
+    dynamic-range-limit: standard;
+  }
+
   html {
     background-color: var(--color-bone);
     color: var(--color-black);

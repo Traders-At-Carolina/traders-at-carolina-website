@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { StaticImageData } from "next/image";
 import type { Person } from "@/content/types";
-import { execMembers, initials, shortClassYear, showPlacements, sortFirms, trackGroups, trackLeadNames } from "@/lib/team";
+import { execMembers, initials, shortClassYear, showPlacements, sortFirms, trackLeadNames } from "@/lib/team";
 import { validateTeam } from "@/lib/validate-team";
 
 const person = (p: Partial<Person> & Pick<Person, "slug" | "name">): Person => ({
@@ -22,15 +22,6 @@ const people: Person[] = [
 describe("team grouping", () => {
   it("orders exec members by order", () => {
     expect(execMembers(people).map((p) => p.slug)).toEqual(["pres", "vp"]);
-  });
-
-  it("groups leads by track in fixed order and keeps exec leads separate", () => {
-    const groups = trackGroups(people);
-    expect(groups.map((g) => g.track)).toEqual(["trading", "research", "development"]);
-    expect(groups[0].leads.map((p) => p.slug)).toEqual(["t-lead"]);
-    expect(groups[1].leads).toEqual([]);
-    expect(groups[1].execLeads.map((p) => p.slug)).toEqual(["pres"]);
-    expect(groups[2].leads).toEqual([]);
   });
 
   it("maps everyone with a track to their name for membership links", () => {

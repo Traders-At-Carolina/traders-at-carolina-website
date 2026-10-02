@@ -180,6 +180,8 @@ export type Person = {
 export type TeamContent = {
   /** e.g. "2026–27"; shown in the Executive board heading. */
   academicYear?: string;
+  /** Closing note at the bottom of /team; hidden when empty. */
+  note?: string;
   people: Person[];
 };
 
