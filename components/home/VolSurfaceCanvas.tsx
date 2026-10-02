@@ -1,15 +1,32 @@
 "use client";
 
 import { OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, type ComponentRef, type KeyboardEvent, type RefObject } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef, type KeyboardEvent, type RefObject } from "react";
 import * as THREE from "three";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
-import { AXIS_LABELS, CAMERA, NK, NT, SCENE, TICKS, WIRE_STEP, cameraDirection, fitDistance, toX, toY, toZ, xFromMoneyness, zFromMaturity } from "@/components/home/volSurfaceScene";
-import { surfaceGrid, type VolParams } from "@/lib/vol-surface";
+import {
+  AXIS_LABELS,
+  CAMERA,
+  NK,
+  NT,
+  SCENE,
+  TICKS,
+  WIRE_STEP,
+  cameraDirection,
+  fitDistance,
+  kFromX,
+  tFromZ,
+  toX,
+  toY,
+  toZ,
+  xFromMoneyness,
+  zFromMaturity,
+} from "@/components/home/volSurfaceScene";
+import { DOMAIN, impliedVol, surfaceGrid, type VolParams } from "@/lib/vol-surface";
 
 type VolSurfaceCanvasProps = {
   params: VolParams;
@@ -79,7 +96,10 @@ const ATM_COLUMN = (NK - 1) / 2;
 const FILL_VOL = [0.12, 0.6] as const;
 
 /** The surface: a matte navy-on-bone mesh, a navy-ink wire grid, an outline and the ATM line, rewritten in place as params change. */
-function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
+/** A hovered point on the surface: log-moneyness k, maturity T, and the pointer's client position. */
+type SurfacePoint = { k: number; T: number; clientX: number; clientY: number };
+
+function Surface({ params, onHover }: Pick<VolSurfaceCanvasProps, "params"> & { onHover: (point: SurfacePoint | null) => void }) {
   const invalidate = useThree((s) => s.invalidate);
   const colors = useBrandColors();
   const wires = useLines(wireSegments, colors.navy, 1, 0.28);
@@ -159,13 +179,91 @@ function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
 
   return (
     <>
-      <mesh geometry={mesh}>
+      <mesh
+        geometry={mesh}
+        onPointerMove={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          onHover({ k: kFromX(e.point.x), T: tFromZ(e.point.z), clientX: e.nativeEvent.clientX, clientY: e.nativeEvent.clientY });
+        }}
+        onPointerOut={() => onHover(null)}
+      >
         <meshLambertMaterial vertexColors side={THREE.DoubleSide} polygonOffset polygonOffsetFactor={2} polygonOffsetUnits={4} />
       </mesh>
       <primitive object={wires} />
       <primitive object={outline} />
       <primitive object={atm} />
     </>
+  );
+}
+
+const SLICE_SAMPLES = 60;
+
+/**
+ * Hover detail on the surface: a marker at the hovered point plus its two slices — the smile across strikes at that
+ * maturity and the term structure across maturities at that strike — redrawn as the surface morphs.
+ */
+function HoverSlices({ params, at }: { params: VolParams; at: { k: number; T: number } | null }) {
+  const invalidate = useThree((s) => s.invalidate);
+  const colors = useBrandColors();
+  const smile = useLines(SLICE_SAMPLES, colors.navy, 2, 1);
+  const term = useLines(SLICE_SAMPLES, colors.navy, 2, 1);
+  const marker = useRef<THREE.Mesh>(null);
+  const smileBuf = useMemo(() => new Float32Array(SLICE_SAMPLES * 6), []);
+  const termBuf = useMemo(() => new Float32Array(SLICE_SAMPLES * 6), []);
+
+  useEffect(() => {
+    if (at) {
+      const lift = 0.035;
+      const point = (k: number, T: number): [number, number, number] => [
+        xFromMoneyness(Math.exp(k)),
+        toY(impliedVol(k, T, params)) + lift,
+        zFromMaturity(T),
+      ];
+      const lerp = ([a, b]: readonly [number, number], t: number) => a + (b - a) * t;
+      for (let i = 0; i < SLICE_SAMPLES; i++) {
+        const [t0, t1] = [i / SLICE_SAMPLES, (i + 1) / SLICE_SAMPLES];
+        smileBuf.set([...point(lerp(DOMAIN.k, t0), at.T), ...point(lerp(DOMAIN.k, t1), at.T)], i * 6);
+        termBuf.set([...point(at.k, lerp(DOMAIN.T, t0)), ...point(at.k, lerp(DOMAIN.T, t1))], i * 6);
+      }
+      writeLines(smile, smileBuf);
+      writeLines(term, termBuf);
+      marker.current?.position.set(...point(at.k, at.T));
+    }
+    invalidate();
+  }, [params, at, smile, term, smileBuf, termBuf, invalidate]);
+
+  return (
+    <>
+      <primitive object={smile} visible={at !== null} />
+      <primitive object={term} visible={at !== null} />
+      <mesh ref={marker} visible={at !== null} renderOrder={10}>
+        <sphereGeometry args={[0.045, 20, 12]} />
+        <meshBasicMaterial color={colors.navy} depthTest={false} />
+      </mesh>
+    </>
+  );
+}
+
+const formatMaturity = (T: number) => (T < 1 ? `${Math.max(1, Math.round(T * 12))}M` : `${T.toFixed(1)}Y`);
+
+/** Details for the hovered point: strike, maturity, implied vol and its spread to at-the-money. Decorative. */
+function HoverTooltip({ params, hover }: { params: VolParams; hover: { k: number; T: number; x: number; y: number; flip: boolean } }) {
+  const vol = impliedVol(hover.k, hover.T, params);
+  const spread = (vol - impliedVol(0, hover.T, params)) * 100;
+  return (
+    <div
+      aria-hidden="true"
+      className={`pointer-events-none absolute top-0 left-0 bg-bone/95 px-3 py-2 text-caption leading-snug whitespace-nowrap tabular shadow-[0_0_0_1px_var(--color-rule)]`}
+      style={{ transform: `translate(${hover.x + (hover.flip ? -14 : 14)}px, ${hover.y + 14}px)${hover.flip ? " translateX(-100%)" : ""}` }}
+    >
+      <span className="block font-medium text-navy">σ {(vol * 100).toFixed(1)}%</span>
+      <span className="block text-ink-2">
+        K/S {Math.exp(hover.k).toFixed(2)} · {formatMaturity(hover.T)}
+      </span>
+      <span className="block text-ink-3">
+        {Math.abs(spread) < 0.05 ? "At the money" : `${spread > 0 ? "+" : "−"}${Math.abs(spread).toFixed(1)} pts vs ATM`}
+      </span>
+    </div>
   );
 }
 
@@ -315,6 +413,28 @@ function TouchScroll() {
 export default function VolSurfaceCanvas({ params, animate, label, onInteractStart, onInteractEnd }: VolSurfaceCanvasProps) {
   const controls = useRef<Controls>(null);
   const labelSpans = useRef<(HTMLSpanElement | null)[]>([]);
+  const wrapper = useRef<HTMLDivElement>(null);
+  const [hover, setHover] = useState<{ k: number; T: number; x: number; y: number; flip: boolean } | null>(null);
+  const hovering = useRef(false);
+
+  // Hovering pauses the spin (like a drag) so the details hold still; it resumes 4s after the pointer leaves.
+  const onHover = useCallback(
+    (point: SurfacePoint | null) => {
+      if (!point) {
+        if (hovering.current) onInteractEnd();
+        hovering.current = false;
+        setHover(null);
+        return;
+      }
+      if (!hovering.current) onInteractStart();
+      hovering.current = true;
+      const r = wrapper.current?.getBoundingClientRect();
+      if (!r) return;
+      const x = point.clientX - r.left;
+      setHover({ k: point.k, T: point.T, x, y: point.clientY - r.top, flip: x > r.width * 0.6 });
+    },
+    [onInteractStart, onInteractEnd],
+  );
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const c = controls.current;
@@ -328,6 +448,7 @@ export default function VolSurfaceCanvas({ params, animate, label, onInteractSta
 
   return (
     <div
+      ref={wrapper}
       role="img"
       aria-label={`${label} Use the left and right arrow keys to rotate.`}
       tabIndex={0}
@@ -343,7 +464,8 @@ export default function VolSurfaceCanvas({ params, animate, label, onInteractSta
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <Lights />
-        <Surface params={params} />
+        <Surface params={params} onHover={onHover} />
+        <HoverSlices params={params} at={hover} />
         <Axes />
         <FreeControls controls={controls} animate={animate} onInteractStart={onInteractStart} onInteractEnd={onInteractEnd} />
         <FitCamera controls={controls} />
@@ -365,6 +487,7 @@ export default function VolSurfaceCanvas({ params, animate, label, onInteractSta
           {text}
         </span>
       ))}
+      {hover ? <HoverTooltip params={params} hover={hover} /> : null}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { AXIS_LABELS, CAMERA, SCENE, cameraDirection, fitDistance, xFromMoneyness, zFromMaturity } from "@/components/home/volSurfaceScene";
+import { AXIS_LABELS, CAMERA, SCENE, cameraDirection, fitDistance, kFromX, tFromZ, xFromMoneyness, zFromMaturity } from "@/components/home/volSurfaceScene";
 
 const { halfX: X, halfZ: Z, height: H } = SCENE;
 const points = [
@@ -51,5 +51,17 @@ describe("axis ticks", () => {
   it("labels every tick and the three axes", () => {
     const texts = AXIS_LABELS.map((l) => l.text);
     expect(texts).toEqual(expect.arrayContaining(["1.0 ATM", "6M", "2Y", "20%", "60%", "Strike K/S", "Maturity", "Implied vol"]));
+  });
+});
+
+describe("hover mapping", () => {
+  it("inverts the axis mapping, so hovered points read back the same strike and maturity as the ticks", () => {
+    for (const m of [0.8, 1, 1.25]) expect(Math.exp(kFromX(xFromMoneyness(m)))).toBeCloseTo(m, 6);
+    for (const T of [0.5, 1, 1.5, 2]) expect(tFromZ(zFromMaturity(T))).toBeCloseTo(T, 6);
+  });
+
+  it("clamps points just outside the surface edge onto it", () => {
+    expect(tFromZ(SCENE.halfZ + 0.2)).toBeCloseTo(0.1);
+    expect(Math.exp(kFromX(-SCENE.halfX - 0.2))).toBeCloseTo(Math.exp(-0.5));
   });
 });

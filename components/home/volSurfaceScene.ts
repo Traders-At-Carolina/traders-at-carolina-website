@@ -27,6 +27,11 @@ export const AXIS_ORIGIN: Vec3 = [X, 0, Z];
 export const xFromMoneyness = (m: number) => -X + ((Math.log(m) - DOMAIN.k[0]) / (DOMAIN.k[1] - DOMAIN.k[0])) * 2 * X;
 export const zFromMaturity = (T: number) => Z - ((T - DOMAIN.T[0]) / (DOMAIN.T[1] - DOMAIN.T[0])) * 2 * Z;
 
+const clampTo = ([lo, hi]: readonly [number, number], v: number) => Math.min(hi, Math.max(lo, v));
+/** Inverse mappings, for hover: scene x → log-moneyness k, scene z → maturity T (clamped to the surface). */
+export const kFromX = (x: number) => clampTo(DOMAIN.k, DOMAIN.k[0] + ((x + X) / (2 * X)) * (DOMAIN.k[1] - DOMAIN.k[0]));
+export const tFromZ = (z: number) => clampTo(DOMAIN.T, DOMAIN.T[0] + ((Z - z) / (2 * Z)) * (DOMAIN.T[1] - DOMAIN.T[0]));
+
 /** Tick values on each axis. K/S 1.0 is the at-the-money strike, where the bold ATM line runs. */
 export const TICKS = {
   strike: [0.8, 1, 1.25],
