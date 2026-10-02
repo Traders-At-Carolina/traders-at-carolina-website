@@ -165,7 +165,7 @@ Text colors are always **solid** values (`ink-2` and `ink-3`), never `opacity` o
 - **Section padding:** 96–128px vertical on desktop, 64px on mobile.
 - **Section anatomy:** hairline `rule` at the top, then eyebrow, then H2, then optional lead, then content.
 - **Background rhythm:** bone by default, with occasional white sections for contrast. At most one navy band per page. The footer is always black.
-- **Corners and depth:** `border-radius: 0` everywhere, no box shadows. Elevation is a `white` surface plus a 1px `rule` border. **Sole exception:** the floating `SiteHeader` capsule and its Apply pill (§10).
+- **Corners and depth:** `border-radius: 0` everywhere, no box shadows. Elevation is a `white` surface plus a 1px `rule` border. **Sole exception:** the `SiteHeader`'s floating bar, nav highlight, Apply pill and mobile menu card (§10).
 - **Breakpoints:** Tailwind defaults (`sm` 640, `md` 768, `lg` 1024, `xl` 1280). Mobile-first.
 
 ---
@@ -241,8 +241,9 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Hero random walk | Stroke draw-in over 1.2s on load |
 | Link underline | Underline scales in from the left on hover, 200ms |
 | Button hover | Background color transition, 150ms |
-| Header float | Docked bar morphs into the floating capsule over 450ms, `--ease-soft` (no overshoot) |
-| Header nav underline | One shared line springs between links over 650ms, `--ease-bounce` (~16% overshoot). Header only |
+| Header float | Docked bar morphs into the floating bar over 450ms, `--ease-soft` (no overshoot) |
+| Header nav highlight | One shared pill highlight springs between links over 650ms, `--ease-bounce` (~16% overshoot). Header only |
+| Mobile menu card | Fades in and drops 8px over 250ms, `--ease-soft`. Header only |
 
 - No parallax, marquees, scroll-jacking or auto-advancing carousels.
 - Under `prefers-reduced-motion: reduce`, every effect above is disabled and content renders in its final state.
@@ -256,10 +257,10 @@ Page specs reference these by name. Each one is built once and reused.
 ### `SiteHeader`
 - Logo on the left (links to `/`). Nav on the right: **About · Membership · Team**, then an **Apply** `Button` (`primary`).
 - **Docked** until the first line of hero text (Home `Hero` or `PageHeader`) reaches the header, tracked by a 1px `data-nav-float-point` marker at the top of the hero's text column: full-width, sticky, on a `bone` background, 64 / 80px tall.
-- **Floating** as soon as that text would pass under it (pages without a hero: as soon as the page scrolls): a centred bar inset 8 / 12px from the top, `min(100% − 2rem, 64rem)` wide, with 16px corners, `bone` at 85% with a backdrop blur, a 1px `rule` border and a soft shadow. The header keeps its height, so the page never shifts. Opening the mobile menu docks it again.
-- **Nav underline:** a single 1px `navy` line rests under the active page's link, springs to whichever link is hovered or focused, and springs back when the pointer or focus leaves. With no active page (Home) it fades in at the hovered link. Under reduced motion it jumps.
-- The Apply button is a `primary` **pill** (`shape="pill"`), in the bar and in the mobile menu. Apply buttons elsewhere stay square.
-- **Mobile (< 768px):** logo and a menu button. The menu opens a full-screen `bone` overlay with large Georgia (H2-size) links and a full-width Apply button. Focus is trapped while it's open, and `Esc` closes it.
+- **Floating** as soon as that text would pass under it (pages without a hero: as soon as the page scrolls): a centred bar inset 8 / 12px from the top, 48px tall on desktop (52px on mobile) and `min(100% − 2rem, 52rem)` wide, with 16px corners, `bone` at 85% with a backdrop blur, a 1px `rule` border and a soft shadow. The header keeps its height, so the page never shifts. It stays floating while the mobile menu is open.
+- **Nav highlight:** a single pill-shaped `wash` highlight (navy at 8%) rests behind the active page's link, springs to whichever link is hovered or focused, and springs back when the pointer or focus leaves. The hovered or active link's text turns `navy`. With no active page (Home) the highlight fades in at the hovered link. Under reduced motion it jumps.
+- The Apply button is a `primary` **pill** (`shape="pill"`), in the bar and in the mobile menu. In the desktop bar it is compact (`size="sm"`, 36px tall, a 6px inset in the 48px bar), the one exception to the 44px minimum height; it is pointer-only there, and the mobile menu's Apply stays 44px. Apply buttons elsewhere stay square.
+- **Mobile (< 768px):** logo and a menu button. The menu opens a dropdown card directly under the bar: `bone`, 1px `rule` border, 16px corners and the bar's shadow, with Georgia (H3-size) links, each at least 48px tall, and a full-width Apply pill. It is a disclosure, not a modal: the page behind still scrolls and there is no focus trap. `Esc`, a press outside the header, tabbing out of the header or choosing a link closes it. The current page's link sits on the `wash` highlight.
 
 ### `SiteFooter`
 - Background `black`, text `bone`, hairlines `rule-inverse`.
@@ -274,7 +275,7 @@ Page specs reference these by name. Each one is built once and reused.
   - a UNC student-organization disclaimer, if UNC requires one (§14)
 
 ### `Button`
-All variants are square (except the header's Apply pill, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px.
+All variants are square (except the header's Apply pill, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (36px tall, 8px × 20px padding).
 
 | Variant | Rest | Hover / press |
 |---|---|---|

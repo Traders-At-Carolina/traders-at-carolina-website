@@ -60,6 +60,7 @@ function renderHeader({ withHero = true } = {}) {
     <>
       <SiteHeaderClient links={primaryNav} applyHref="/apply" applyExternal={false} />
       {withHero ? <span data-nav-float-point /> : null}
+      <button type="button">Outside</button>
     </>,
   );
 }
@@ -101,6 +102,14 @@ describe("SiteHeaderClient", () => {
     expect(apply).toHaveClass("rounded-full");
   });
 
+  it("renders the header Apply button compact, at 36px", () => {
+    renderHeader();
+    const nav = screen.getByRole("navigation", { name: "Primary" });
+    const apply = Array.from(nav.querySelectorAll("a")).find((a) => a.textContent === "Apply");
+    expect(apply).toHaveClass("min-h-9");
+    expect(apply).not.toHaveClass("min-h-11");
+  });
+
   it("opens and closes the mobile menu with the button", async () => {
     const user = userEvent.setup();
     renderHeader();
@@ -131,6 +140,55 @@ describe("SiteHeaderClient", () => {
     const menu = document.getElementById("mobile-menu");
     const apply = Array.from(menu?.querySelectorAll("a") ?? []).find((a) => a.textContent === "Apply");
     expect(apply).toHaveClass("rounded-full");
+    expect(apply).toHaveClass("min-h-11");
+    expect(apply).not.toHaveClass("min-h-9");
+  });
+});
+
+describe("SiteHeaderClient mobile menu card", () => {
+  async function openMenu() {
+    const user = userEvent.setup();
+    renderHeader();
+    await user.click(screen.getByRole("button", { name: "Open menu" }));
+    return user;
+  }
+
+  it("drops down inside the header instead of covering the page", async () => {
+    await openMenu();
+    const menu = document.getElementById("mobile-menu");
+    expect(menu).not.toBeNull();
+    expect(banner().contains(menu)).toBe(true);
+    expect(menu).not.toHaveClass("fixed");
+  });
+
+  it("does not lock page scrolling", async () => {
+    await openMenu();
+    expect(document.body.style.overflow).not.toBe("hidden");
+  });
+
+  it("closes on a pointer press outside the header", async () => {
+    const user = await openMenu();
+    await user.click(document.body);
+    expect(screen.queryByRole("navigation", { name: "Mobile" })).not.toBeInTheDocument();
+  });
+
+  it("stays open when the card itself is pressed", async () => {
+    const user = await openMenu();
+    await user.click(document.getElementById("mobile-menu")!);
+    expect(screen.getByRole("navigation", { name: "Mobile" })).toBeInTheDocument();
+  });
+
+  it("closes when focus moves out of the header", async () => {
+    await openMenu();
+    act(() => screen.getByRole("button", { name: "Outside" }).focus());
+    expect(screen.queryByRole("navigation", { name: "Mobile" })).not.toBeInTheDocument();
+  });
+
+  it("closes when a link is chosen", async () => {
+    const user = await openMenu();
+    const nav = screen.getByRole("navigation", { name: "Mobile" });
+    await user.click(nav.querySelector("a")!);
+    expect(screen.queryByRole("navigation", { name: "Mobile" })).not.toBeInTheDocument();
   });
 });
 
@@ -179,16 +237,16 @@ describe("SiteHeaderClient floating state", () => {
     expect(banner()).toHaveAttribute("data-floating", "true");
   });
 
-  it("docks while the mobile menu is open", async () => {
+  it("stays floating while the mobile menu is open", async () => {
     const user = userEvent.setup();
     renderHeader();
     setHeroVisible(false);
     await user.click(screen.getByRole("button", { name: "Open menu" }));
-    expect(banner()).toHaveAttribute("data-floating", "false");
+    expect(banner()).toHaveAttribute("data-floating", "true");
   });
 });
 
-describe("SiteHeaderClient sliding underline", () => {
+describe("SiteHeaderClient sliding highlight", () => {
   function linkNamed(name: string) {
     const nav = screen.getByRole("navigation", { name: "Primary" });
     return Array.from(nav.querySelectorAll<HTMLAnchorElement>("[data-nav-link]")).find((a) => a.textContent === name)!;
@@ -201,11 +259,12 @@ describe("SiteHeaderClient sliding underline", () => {
     });
   }
 
-  it("rests under the active page", () => {
+  it("rests behind the active page", () => {
     renderHeader();
     measure();
     expect(indicator()).toHaveAttribute("data-target", "1");
-    expect(indicator().style.transform).toBe("translateX(100px) scaleX(70)");
+    expect(indicator().style.transform).toBe("translateX(100px)");
+    expect(indicator().style.width).toBe("70px");
     expect(indicator()).toHaveAttribute("data-visible", "true");
   });
 
@@ -214,7 +273,8 @@ describe("SiteHeaderClient sliding underline", () => {
     measure();
     fireEvent.pointerEnter(linkNamed("Team"));
     expect(indicator()).toHaveAttribute("data-target", "2");
-    expect(indicator().style.transform).toBe("translateX(200px) scaleX(80)");
+    expect(indicator().style.transform).toBe("translateX(200px)");
+    expect(indicator().style.width).toBe("80px");
 
     fireEvent.pointerLeave(linkNamed("Team").closest("ul")!);
     expect(indicator()).toHaveAttribute("data-target", "1");

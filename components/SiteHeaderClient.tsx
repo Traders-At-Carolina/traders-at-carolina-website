@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
-import { Container } from "@/components/Container";
 import { Wordmark } from "@/components/Wordmark";
 import type { NavLink } from "@/content/nav";
 import { useFloatingHeader } from "@/lib/use-floating-header";
@@ -18,8 +17,6 @@ type SiteHeaderClientProps = {
 
 type LinkBox = { x: number; w: number };
 
-const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
 const SHELL_BASE =
   "mx-auto flex max-w-page items-center justify-between border motion-safe:duration-[450ms] motion-safe:ease-soft " +
   "motion-safe:[transition-property:width,height,margin,padding,border-radius,background-color,border-color,box-shadow,backdrop-filter]";
@@ -27,13 +24,15 @@ const SHELL_BASE =
 const SHELL_DOCKED =
   "h-16 w-full rounded-none border-transparent bg-transparent px-5 md:h-20 md:px-8 lg:px-12";
 
+const FLOAT_SHADOW = "shadow-[0_10px_30px_-12px_rgb(0_0_0/0.25)]";
+
 const SHELL_FLOATING =
   "pointer-events-auto mt-2 h-[3.25rem] w-[calc(100%-1.5rem)] rounded-[1rem] border-rule bg-bone/85 pr-1 pl-5 " +
-  "shadow-[0_10px_30px_-12px_rgb(0_0_0/0.25)] backdrop-blur-md md:mt-3 md:h-14 md:w-[min(calc(100%-2rem),64rem)] md:pr-1.5 md:pl-6";
+  `${FLOAT_SHADOW} backdrop-blur-md md:mt-3 md:h-12 md:w-[min(calc(100%-2rem),52rem)] md:pr-1.5`;
 
 /**
- * Sticky header that docks over the hero and floats as a capsule once the hero scrolls away,
- * with a spring underline shared by the nav links and a full-screen mobile menu (00 §10).
+ * Sticky header that docks over the hero and floats as a rounded bar once the hero's text reaches it,
+ * with a pill highlight that springs between the nav links and a dropdown card for mobile (00 §10).
  */
 export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeaderClientProps) {
   const pathname = usePathname();
@@ -42,8 +41,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  const scrolledPastHero = useFloatingHeader(headerRef, pathname);
-  const floating = scrolledPastHero && !open;
+  const floating = useFloatingHeader(headerRef, pathname);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const activeIndex = links.findIndex((link) => isActive(link.href));
@@ -68,7 +66,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
     return () => window.removeEventListener("resize", measure);
   }, [measure, links]);
 
-  // The underline springs between links, but snaps into place when it first appears.
+  // The highlight springs between links, but snaps into place when it first appears.
   const target = pointed ?? (activeIndex >= 0 ? activeIndex : null);
   const shown = boxes ? target : null;
   const [line, setLine] = useState<{ shown: number | null; at: number | null; snap: boolean }>({
@@ -81,38 +79,26 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
   }
   const box = boxes && line.at !== null ? boxes[line.at] : undefined;
 
+  // The mobile menu is a dropdown disclosure, not a modal: Esc or a press outside the header closes it.
   useEffect(() => {
     if (!open) return;
     const header = headerRef.current;
-    document.body.style.overflow = "hidden";
     header?.querySelector<HTMLElement>("#mobile-menu a")?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        menuButtonRef.current?.focus();
-        return;
-      }
-      if (event.key !== "Tab" || !header) return;
-      const focusable = Array.from(header.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-        (el) => el.offsetParent !== null || el === document.activeElement,
-      );
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (!first || !last) return;
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      menuButtonRef.current?.focus();
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (header && !header.contains(event.target as Node)) setOpen(false);
     };
 
     document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
     return () => {
-      document.body.style.overflow = "";
       document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
     };
   }, [open]);
 
@@ -122,6 +108,10 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
     <header
       ref={headerRef}
       data-floating={floating}
+      onBlur={(event) => {
+        // Tabbing out of the header closes the menu; a press on non-focusable card padding does not.
+        if (open && event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) close();
+      }}
       className={`sticky top-0 z-40 h-16 transition-colors duration-200 md:h-20 ${
         floating ? "pointer-events-none bg-transparent" : "bg-bone"
       }`}
@@ -129,10 +119,24 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
       <div className={`${SHELL_BASE} ${floating ? SHELL_FLOATING : SHELL_DOCKED}`}>
         <Wordmark />
 
-        <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-3 md:flex">
           <div className="relative">
+            <span
+              aria-hidden="true"
+              data-testid="nav-indicator"
+              data-target={line.at ?? ""}
+              data-visible={line.shown !== null}
+              className={`pointer-events-none absolute inset-y-0 left-0 w-0 rounded-full bg-wash ${
+                line.shown !== null ? "opacity-100" : "opacity-0"
+              } ${
+                line.snap
+                  ? "motion-safe:[transition:opacity_150ms_ease-out]"
+                  : "motion-safe:[transition:transform_650ms_var(--ease-bounce),width_650ms_var(--ease-bounce),opacity_150ms_ease-out]"
+              }`}
+              style={box ? { transform: `translateX(${box.x}px)`, width: `${box.w}px` } : undefined}
+            />
             <ul
-              className="flex items-center gap-8"
+              className="relative flex items-center gap-1"
               onPointerLeave={() => setPointed(null)}
               onBlur={(event) => {
                 if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPointed(null);
@@ -149,7 +153,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
                     aria-current={i === activeIndex ? "page" : undefined}
                     onPointerEnter={() => setPointed(i)}
                     onFocus={() => setPointed(i)}
-                    className={`block py-2 text-nav font-medium transition-colors duration-150 ${
+                    className={`flex min-h-9 items-center rounded-full px-3.5 text-nav font-medium transition-colors duration-150 ${
                       i === target ? "text-navy" : "hover:text-navy"
                     }`}
                   >
@@ -158,22 +162,8 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
                 </li>
               ))}
             </ul>
-            <span
-              aria-hidden="true"
-              data-testid="nav-indicator"
-              data-target={line.at ?? ""}
-              data-visible={line.shown !== null}
-              className={`pointer-events-none absolute bottom-1 left-0 h-px w-px origin-left bg-navy ${
-                line.shown !== null ? "opacity-100" : "opacity-0"
-              } ${
-                line.snap
-                  ? "motion-safe:[transition:opacity_150ms_ease-out]"
-                  : "motion-safe:[transition:transform_650ms_var(--ease-bounce),opacity_150ms_ease-out]"
-              }`}
-              style={box ? { transform: `translateX(${box.x}px) scaleX(${box.w})` } : undefined}
-            />
           </div>
-          <Button href={applyHref} external={applyExternal} shape="pill">
+          <Button href={applyHref} external={applyExternal} shape="pill" size="sm">
             Apply
           </Button>
         </nav>
@@ -192,30 +182,33 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
       </div>
 
       {open ? (
-        <div id="mobile-menu" className="fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto bg-bone md:hidden">
-          <Container className="flex flex-col gap-10 py-10">
-            <nav aria-label="Mobile">
-              <ul className="flex flex-col gap-6">
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      onClick={close}
-                      aria-current={isActive(link.href) ? "page" : undefined}
-                      className={`font-display text-h2 ${isActive(link.href) ? "text-navy" : ""}`}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-            <div onClick={close}>
-              <Button href={applyHref} external={applyExternal} shape="pill" fullWidth>
-                Apply
-              </Button>
-            </div>
-          </Container>
+        <div
+          id="mobile-menu"
+          className={`pointer-events-auto absolute inset-x-3 top-full mt-2 rounded-[1rem] border border-rule bg-bone p-5 ${FLOAT_SHADOW} motion-safe:animate-[menu-in_250ms_var(--ease-soft)] md:hidden`}
+        >
+          <nav aria-label="Mobile">
+            <ul className="flex flex-col gap-1">
+              {links.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={close}
+                    aria-current={isActive(link.href) ? "page" : undefined}
+                    className={`-mx-3 flex min-h-12 items-center rounded-[0.75rem] px-3 font-display text-h3 active:bg-wash ${
+                      isActive(link.href) ? "bg-wash text-navy" : ""
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="mt-4" onClick={close}>
+            <Button href={applyHref} external={applyExternal} shape="pill" fullWidth>
+              Apply
+            </Button>
+          </div>
         </div>
       ) : null}
     </header>
