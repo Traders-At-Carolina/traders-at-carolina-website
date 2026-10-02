@@ -198,8 +198,8 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
   }
 }
 
-/* Team header logo strip: a slow loop that fades out at both edges. Static by default (a wrapped row);
-   motion, the mask and the repeated list switch on only without a reduced-motion preference, so nothing is clipped. */
+/* Team header logo strip. Static by default (a wrapped row). Without a reduced-motion preference it becomes a
+   masked, draggable strip whose offset is driven from components/team/PlacementWall.tsx, with the list repeated for the loop. */
 .logo-strip-list {
   display: flex;
   flex-wrap: wrap;
@@ -214,12 +214,20 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
   .logo-strip {
     overflow: hidden;
     mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+    cursor: grab;
+    user-select: none;
+    /* Horizontal drags move the strip; vertical ones still scroll the page. */
+    touch-action: pan-y;
+  }
+
+  .logo-strip[data-dragging] {
+    cursor: grabbing;
   }
 
   .logo-strip-track {
     display: flex;
     width: max-content;
-    animation: logo-strip-scroll 32s linear infinite;
+    will-change: transform;
   }
 
   .logo-strip-list {
@@ -228,16 +236,6 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
 
   .logo-strip-copy {
     display: flex;
-  }
-
-  .logo-strip:hover .logo-strip-track {
-    animation-play-state: paused;
-  }
-
-  @keyframes logo-strip-scroll {
-    to {
-      transform: translateX(-50%);
-    }
   }
 }
 

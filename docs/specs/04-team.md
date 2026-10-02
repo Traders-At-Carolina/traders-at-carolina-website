@@ -82,8 +82,10 @@ Put faces and names to the club, and show where its members go.
   - Eyebrow "Where we've worked", then a slow looping strip of firm marks that fades out at both edges.
   - **Firms:** `content/placement-wall.ts`, in display order: Citadel, JPMorgan Chase, AWS, Infragrid. It is separate from people (`person.company`, used for the headshot hover badge) and from `content/placements.ts` (§4.4).
   - Marks render as flat ink silhouettes with the firm name beneath as a caption, because some marks say nothing alone (Infragrid's is a bare square). The image itself is decorative (`alt=""`).
-  - **Motion:** the list is repeated once and translated by -50% over 32s, linear and infinite, so the loop is seamless. The repeat is `aria-hidden`. It pauses on hover. Edges fade with a CSS mask.
-  - **Reduced motion:** no animation, no mask and no repeat; the firms show as a centered, wrapped static row.
+  - **Motion:** the strip drifts left at about 24px/s, driven from JS (`components/team/PlacementWall.tsx`). The list is repeated once and the offset wraps at one list's width, so the loop is seamless in both directions. The repeat is `aria-hidden`. Edges fade with a CSS mask.
+  - **Drag:** the strip can be dragged or flicked left or right with a mouse, pen or finger. A flick keeps its momentum and eases out; the drift then resumes. The cursor is `grab` / `grabbing`. Horizontal drags move the strip and vertical drags still scroll the page (`touch-action: pan-y`). The drift pauses while the pointer rests on the strip.
+  - **Reduced motion:** no drift, drag, mask or repeat; the firms show as a centered, wrapped static row.
+  - **Keyboard and assistive tech:** the strip is not keyboard-operable. Every firm is in the accessible list once, with its name, so nothing depends on dragging.
   - With an empty list, the art column is left out and the header is text only. It never falls back to the `RandomWalk`.
   - Separate from § 03 Placements (§4.4), which stays text-only and threshold-gated.
 
@@ -208,4 +210,4 @@ export const placements: Array<{ firm: string }> = [];
 7. LinkedIn links have descriptive `aria-label`s, 44×44 tap targets, and open in a new tab.
 8. Lighthouse (mobile) ≥ 95 in all categories, with images served via `next/image` as AVIF/WebP.
 9. No hard-coded hex values or font stacks. Only spec-00 tokens.
-10. The header strip lists each firm in `content/placement-wall.ts` once to assistive tech, with its name, and shows no `RandomWalk`. It loops seamlessly and is static under `prefers-reduced-motion`. With an empty list, the art column is absent.
+10. The header strip lists each firm in `content/placement-wall.ts` once to assistive tech, with its name, and shows no `RandomWalk`. It loops seamlessly, can be dragged, and is static under `prefers-reduced-motion`. With an empty list, the art column is absent.
