@@ -29,7 +29,7 @@ const colors = [
 ];
 
 const typeRoles = [
-  { role: "Hero", className: "font-display text-hero", sample: "Rigor, practiced together." },
+  { role: "Hero", className: "font-display text-hero", sample: "Traders at Carolina" },
   { role: "Display", className: "font-display text-display", sample: "Rigor, practiced together." },
   { role: "H1", className: "font-display text-h1", sample: "Built by students, for the long game." },
   { role: "H2", className: "font-display text-h2", sample: "Three ways we build quants." },

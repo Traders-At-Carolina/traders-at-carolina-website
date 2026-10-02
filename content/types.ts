@@ -48,6 +48,8 @@ export type HomePhoto = {
 /** Home page content. Field definitions: docs/specs/01-home.md §6. */
 export type HomeContent = {
   hero: {
+    /** Line above the headline, rendered as the "§ 01 — …" eyebrow. */
+    eyebrow: string;
     headline: string;
     /** Substring of `headline` rendered in italic. */
     headlineEmphasis?: string;

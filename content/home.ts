@@ -12,10 +12,11 @@ import type { HomeContent } from "@/content/types";
  */
 export const home: HomeContent = {
   hero: {
-    headline: "Rigor, practiced together.",
-    headlineEmphasis: "practiced",
+    eyebrow: "UNC's Premier Quantitative Finance Club",
+    headline: "Traders at Carolina",
+    headlineEmphasis: "at",
     subhead:
-      "Traders at Carolina is UNC's quantitative finance club. We teach the probability, markets and interview craft behind trading and research careers — no finance background required.",
+      "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required.",
     figureCaption: "Fig. 1 — Five random walks from one origin. Same rules, different outcomes.",
   },
   headings: {

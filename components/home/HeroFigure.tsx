@@ -55,9 +55,9 @@ export function HeroFigure({ caption, className = "" }: HeroFigureProps) {
   }
 
   return (
-    <figure className={className}>
+    <figure className={`@container ${className}`}>
       <div
-        className="relative h-[200px] border-b border-l border-rule-strong md:h-[280px] lg:h-[clamp(220px,34vh,400px)]"
+        className="relative h-[200px] border-b border-l border-rule-strong md:h-[280px] lg:h-[clamp(300px,46vh,460px)]"
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
       >
@@ -100,7 +100,7 @@ export function HeroFigure({ caption, className = "" }: HeroFigureProps) {
         {step !== null ? <Crosshair step={step} walks={walks} /> : null}
       </div>
 
-      <figcaption className="mt-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-10">
+      <figcaption className="mt-5 flex flex-col gap-5 @2xl:flex-row @2xl:items-end @2xl:justify-between @2xl:gap-10">
         <div className="max-w-[46rem]">
           <p className="text-caption text-ink-2">{caption}</p>
           <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-caption text-ink-3">
@@ -118,14 +118,14 @@ export function HeroFigure({ caption, className = "" }: HeroFigureProps) {
             </li>
           </ul>
         </div>
-        <div className="flex items-center gap-5 md:shrink-0">
+        <div className="flex items-center gap-5 @2xl:shrink-0">
           <p aria-live="polite" className="text-caption text-ink-3 tabular">
             Seed {seed}
           </p>
           <button
             type="button"
             onClick={() => setSeed(nextSeed(seed))}
-            className={buttonClasses({ variant: "secondary", className: "flex-1 cursor-pointer md:flex-none" })}
+            className={buttonClasses({ variant: "secondary", className: "flex-1 cursor-pointer @md:flex-none" })}
           >
             Draw new paths
           </button>

@@ -47,9 +47,9 @@ Only these sections appear on Home. No placement section (data isn't available y
 ### 3.1 Hero (§ 01)
 
 **Content**
-- **Eyebrow:** `§ 01 — QUANTITATIVE FINANCE AT UNC`
-- **Headline:** **Hero** role (00 §5.2) — an exception to the Display role, used only here, max about 8 words. It may use one italic word for emphasis. Working copy: "Rigor, *practiced* together."
-- **Subhead:** Lead role, max about 25 words. Working copy: "Traders at Carolina is UNC's quantitative finance club. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
+- **Eyebrow:** `hero.eyebrow`, shown as `§ 01 — UNC'S PREMIER QUANTITATIVE FINANCE CLUB` and set slightly larger than the standard eyebrow (13–14px).
+- **Headline:** the club name, "Traders *at* Carolina", in the **Hero** role (00 §5.2). This is an exception to the Display role and is used only here. It's the largest text on the page, and the italic "at" mirrors the wordmark.
+- **Subhead:** Lead role, max about 25 words. Working copy: "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
 - **Art — "Fig. 1":** `HeroFigure`, a captioned figure of five random walks over the graph-paper grid, presented like a figure in a paper:
@@ -60,10 +60,10 @@ Only these sections appear on Home. No placement section (data isn't available y
 
 **Layout**
 - **Desktop (≥ 1024px):**
-  - Row 1: eyebrow and headline in columns 1–7; subhead and actions in columns 8–12, bottom-aligned to the headline.
-  - Row 2: the figure across the full container width, `clamp(220px, 34vh, 400px)` tall, then its caption row (caption and legend left; seed and button right).
-  - The hero is `clamp(640px, 100svh − header, 880px)` tall, with the grid masked to fade at the edges. The plot must start inside the first viewport at 1024 × 768.
-- **Tablet (768–1023px):** single text column (subhead spans 9 columns), then the figure at 280px.
+  - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **right** in columns 7–12, and the figure sits on the left in columns 1–6.
+  - The plot is `clamp(300px, 46vh, 460px)` tall. Its caption row stacks when the figure is narrower than 42rem and splits into caption/legend left and seed/button right above that (container query).
+  - The hero is `clamp(600px, 100svh − header, 820px)` tall, with the grid masked to fade at the edges. The whole hero, figure included, should fit in the first viewport at 1024 × 768.
+- **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
   - Single column: eyebrow, headline, subhead, then the actions stacked (Apply full width, link below).
   - The figure is full width at 200px, followed by the caption, legend, and the seed beside a full-width button.
@@ -198,7 +198,7 @@ nextApplicationOpenDate?: string;    // ISO "YYYY-MM-DD"; shown when closed
 
 ```ts
 export const home = {
-  hero: { headline: string; headlineEmphasis?: string; subhead: string; figureCaption: string },
+  hero: { eyebrow: string; headline: string; headlineEmphasis?: string; subhead: string; figureCaption: string },
   pillars: [ { title, body, link: { label, href } } ×3 ],
   stats: {
     members?: number;          // rendered as "{n}+"
