@@ -52,26 +52,27 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Subhead:** Lead role, max about 25 words. Working copy: "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
-- **Art — "Fig. 1":** `VolSurfaceFigure`, a deliberately bare, rotatable 3D implied-volatility surface that eases on its own between market regimes:
-  - Strike (log-moneyness −0.5…0.5) × maturity (0.1–2y) × implied vol, from an SSVI-style model in `lib/vol-surface.ts`. The vol axis starts at 10% so the surface sits on its axes.
-  - A smooth 61 × 41 mesh shaded with a three-stop navy ramp (design-token colors, no tone mapping), a bone wire grid every 5th row/column and a deep-navy outline (anti-aliased `LineSegments2`).
-  - Three plain hairline axes from the front-right corner (the corner nearest the camera across the whole reachable arc) titled "Strike", "Maturity" and "Implied vol" — no floor grid, tick marks or values.
+- **Art — "Fig. 1":** `VolSurfaceFigure`, a deliberately bare, rotatable 3D implied-volatility surface drawn like a printed figure, easing on its own between market regimes:
+  - Strike (log-moneyness −0.5…0.5) × maturity (0.1–2y) × implied vol (height, from 10%), from an SSVI-style model in `lib/vol-surface.ts`.
+  - A matte 61 × 41 mesh washed in navy (mixed into white), deeper where implied vol is higher — tinted by absolute vol, so a sell-off reads darker than a calm market. Design-token colors, no tone mapping, mostly ambient light.
+  - Navy-ink lines (anti-aliased `LineSegments2`): a faint wire grid every 5th row/column, a thin outline, and a bold **at-the-money line** (K/S = 1) tracing the ATM term structure.
+  - Hairline axes from the front-right corner (nearest the camera across the reachable arc), titled "Strike" and "Maturity"; the vertical axis is untitled — the caption names it. No floor grid, ticks or values.
   - Six regimes (`MARKET_REGIMES`) cycle unlabelled; their names appear only in the accessible label.
-  - `<figcaption>`: just `hero.figureCaption` ("Fig. 1 — Implied volatility across strike and maturity.").
+  - `<figcaption>`: just `hero.figureCaption` ("Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.").
 
 **Layout**
 - **Desktop (≥ 1024px):**
   - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **left** in columns 1–6, and the figure sits on the right in columns 7–12.
-  - The 3D plot is `clamp(300px, 46vh, 460px)` tall (260px mobile, 340px tablet).
+  - The 3D plot is `clamp(320px, 46vh, 440px)` tall (260px mobile, 340px tablet).
   - The hero is `clamp(600px, 100svh − header, 820px)` tall, with the grid masked to fade at the edges. The whole hero, figure included, should fit in the first viewport at 1024 × 768.
 - **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
   - Single column: eyebrow, headline, subhead, then the actions stacked (Apply full width, link below).
-  - The figure is full width at 260px, followed by its one-line caption.
+  - The figure is full width at 260px, followed by its caption.
   - No min-height. Content defines the height.
 
 **Behavior**
-- **Framing:** the camera distance is solved numerically for the canvas aspect ratio (`fitDistance`) so the whole box, axes and titles stay inside the frame from every reachable angle; rotation is limited to the front-right quadrant (azimuth ≈ 3°–86°, a narrow tilt range), where the surface reads well and the axes stay in front of it.
+- **Framing:** the camera distance is solved numerically for the canvas aspect ratio (`fitDistance`) so the whole box, axes and titles stay inside the frame from every reachable angle; rotation is limited to the front-right quadrant (azimuth ≈ 3°–86°, tilt 57°–69° from vertical), where the surface reads well and the axes stay in front of it.
 - **Rotate:** drag (OrbitControls; zoom and pan off) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
 - **Camera director (while idle):** before each market change the camera turns slowly (critically damped spring, ≤ ~11°/s) to the angle that best shows it: face-on to strike when the skew changes most, face-on to maturity when the term structure does, three-quarter when the overall level does — with a gentle sway. It stops on interaction and resumes 4s after it ends.
 - **Market cycle:** each regime is held for 5s (time for the camera to settle), then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.

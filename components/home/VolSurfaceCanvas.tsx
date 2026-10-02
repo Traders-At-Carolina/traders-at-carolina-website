@@ -35,8 +35,10 @@ function useBrandColors() {
     const bone = token("--color-bone", "#ebeae4");
     const black = token("--color-black", "#000000");
     const white = token("--color-white", "#ffffff");
-    // Three-stop ramp for implied vol: pale navy → navy → deep navy.
-    const ramp = [navy.clone().lerp(bone, 0.6), navy.clone().lerp(bone, 0.2), navy.clone().lerp(black, 0.12)];
+
+    // "Printed figure" fill: a navy wash, deeper where implied vol is higher. Mixed into white, not bone:
+    // warm bone plus navy cancels out to a neutral gray.
+    const ramp = [white.clone().lerp(navy, 0.12), white.clone().lerp(navy, 0.3), white.clone().lerp(navy, 0.58)];
     return { navy, bone, black, white, ramp };
   }, []);
 }
@@ -73,15 +75,20 @@ function writeLines(lines: LineSegments2, positions: Float32Array) {
 
 const wireSegments = Math.ceil(NT / WIRE_STEP) * (NK - 1) + Math.ceil(NK / WIRE_STEP) * (NT - 1);
 const outlineSegments = 2 * (NK - 1) + 2 * (NT - 1);
+/** The at-the-money column (K/S = 1, log-moneyness 0): its line traces the ATM term structure. */
+const ATM_COLUMN = (NK - 1) / 2;
+/** Fill colors follow absolute implied vol (not each surface's own range), so a sell-off reads deeper than a calm market. */
+const FILL_VOL = [0.12, 0.6] as const;
 
-/** The surface: smooth-shaded mesh, a bone wire grid and a navy outline, all rewritten in place as params change. */
+/** The surface: a matte navy-on-bone mesh, a navy-ink wire grid, an outline and the ATM line, rewritten in place as params change. */
 function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
   const invalidate = useThree((s) => s.invalidate);
   const colors = useBrandColors();
-  const wires = useLines(wireSegments, colors.bone, 1, 0.75);
-  const outline = useLines(outlineSegments, colors.ramp[2], 1.75, 1);
+  const wires = useLines(wireSegments, colors.navy, 1, 0.28);
+  const outline = useLines(outlineSegments, colors.navy, 1.25, 0.9);
+  const atm = useLines(NT - 1, colors.navy, 2.25, 1);
 
-  const { mesh, values, wireBuf, outlineBuf } = useMemo(() => {
+  const { mesh, values, wireBuf, outlineBuf, atmBuf } = useMemo(() => {
     const mesh = new THREE.BufferGeometry();
     mesh.setAttribute("position", new THREE.BufferAttribute(new Float32Array(NK * NT * 3), 3));
     mesh.setAttribute("color", new THREE.BufferAttribute(new Float32Array(NK * NT * 3), 3));
@@ -98,13 +105,14 @@ function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
       values: new Float32Array(NK * NT),
       wireBuf: new Float32Array(wireSegments * 6),
       outlineBuf: new Float32Array(outlineSegments * 6),
+      atmBuf: new Float32Array((NT - 1) * 6),
     };
   }, []);
 
   useEffect(() => () => mesh.dispose(), [mesh]);
 
   useEffect(() => {
-    const { min, max } = surfaceGrid(params, NK, NT, values);
+    surfaceGrid(params, NK, NT, values);
     const pos = mesh.getAttribute("position") as THREE.BufferAttribute;
     const col = mesh.getAttribute("color") as THREE.BufferAttribute;
     const tint = new THREE.Color();
@@ -113,7 +121,7 @@ function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
       for (let ik = 0; ik < NK; ik++) {
         const i = iT * NK + ik;
         pos.setXYZ(i, toX(ik), toY(values[i]), toZ(iT));
-        const t = max > min ? (values[i] - min) / (max - min) : 0.5;
+        const t = Math.min(1, Math.max(0, (values[i] - FILL_VOL[0]) / (FILL_VOL[1] - FILL_VOL[0])));
         if (t < 0.5) tint.lerpColors(low, mid, t * 2);
         else tint.lerpColors(mid, high, (t - 0.5) * 2);
         col.setXYZ(i, tint.r, tint.g, tint.b);
@@ -143,16 +151,22 @@ function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
     for (const ik of [0, NK - 1]) for (let iT = 0; iT < NT - 1; iT++) o = seg(outlineBuf, o, ik, iT, ik, iT + 1);
     writeLines(outline, outlineBuf);
 
+    o = 0;
+    lift = 0.03;
+    for (let iT = 0; iT < NT - 1; iT++) o = seg(atmBuf, o, ATM_COLUMN, iT, ATM_COLUMN, iT + 1);
+    writeLines(atm, atmBuf);
+
     invalidate();
-  }, [params, mesh, values, wireBuf, outlineBuf, wires, outline, colors, invalidate]);
+  }, [params, mesh, values, wireBuf, outlineBuf, atmBuf, wires, outline, atm, colors, invalidate]);
 
   return (
     <>
       <mesh geometry={mesh}>
-        <meshStandardMaterial vertexColors side={THREE.DoubleSide} roughness={0.7} metalness={0} polygonOffset polygonOffsetFactor={2} polygonOffsetUnits={4} />
+        <meshLambertMaterial vertexColors side={THREE.DoubleSide} polygonOffset polygonOffsetFactor={2} polygonOffsetUnits={4} />
       </mesh>
       <primitive object={wires} />
       <primitive object={outline} />
+      <primitive object={atm} />
     </>
   );
 }
@@ -175,14 +189,13 @@ function LabelTracker({ spans }: { spans: RefObject<(HTMLSpanElement | null)[]> 
   return null;
 }
 
-/** Soft sky/ground fill plus a key and a rim light, all from the brand neutrals. */
+/** Mostly ambient (white sky, bone ground) with a soft key light: enough form to read in 3D, never gray plastic. */
 function Lights() {
   const { white, bone } = useBrandColors();
   return (
     <>
-      <hemisphereLight args={[white, bone, 1.25]} />
-      <directionalLight position={[3, 5, 2]} intensity={1.3} />
-      <directionalLight position={[-4, 2, -3]} intensity={0.35} />
+      <hemisphereLight args={[white, bone, 0.95]} />
+      <directionalLight position={[3, 5, 2]} intensity={0.4} />
     </>
   );
 }

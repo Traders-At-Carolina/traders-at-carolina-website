@@ -26,7 +26,7 @@ describe("fitDistance", () => {
       for (let a = 0; a <= 40; a++) {
         const azimuth = CAMERA.minAzimuth + ((CAMERA.maxAzimuth - CAMERA.minAzimuth) * a) / 40;
         for (const polar of [CAMERA.minPolar, (CAMERA.minPolar + CAMERA.polar) / 2, CAMERA.polar, CAMERA.maxPolar]) {
-          expect(maxNdc(aspect, azimuth, polar)).toBeLessThanOrEqual(0.96);
+          expect(maxNdc(aspect, azimuth, polar)).toBeLessThanOrEqual(0.99);
         }
       }
     }

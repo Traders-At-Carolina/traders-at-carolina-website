@@ -41,8 +41,10 @@ export function VolSurfacePoster({ params = MARKET_REGIMES[0].params }: { params
     >
       <path d={`${toPath(corners)} Z`} fill="none" className="stroke-rule-strong" strokeWidth="1" vectorEffect="non-scaling-stroke" />
       {lines.map((d, i) => (
-        <path key={i} d={d} fill="none" className="stroke-navy" strokeOpacity="0.55" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+        <path key={i} d={d} fill="none" className="stroke-navy" strokeOpacity="0.35" strokeWidth="1" vectorEffect="non-scaling-stroke" />
       ))}
+      {/* At-the-money line (K/S = 1), bold as in the WebGL figure. */}
+      <path d={toPath(Array.from({ length: NT }, (_, iT) => point((NK - 1) / 2, iT)))} fill="none" className="stroke-navy" strokeWidth="2" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }

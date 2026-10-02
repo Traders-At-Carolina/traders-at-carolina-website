@@ -7,7 +7,7 @@ export const NT = 41;
 export const WIRE_STEP = 5;
 
 /** Scene box: strikes run along x, maturities along z (short dates in front), implied vol up y. */
-export const SCENE = { halfX: 1.6, halfZ: 1.2, height: 1.6, volMin: 0.1, volMax: 0.8 } as const;
+export const SCENE = { halfX: 1.6, halfZ: 1.2, height: 1.3, volMin: 0.1, volMax: 0.8 } as const;
 const { halfX: X, halfZ: Z, height: H } = SCENE;
 
 type Vec3 = [number, number, number];
@@ -18,11 +18,10 @@ type Vec3 = [number, number, number];
  */
 export const AXIS_ORIGIN: Vec3 = [X, 0, Z];
 
-/** Axis titles, anchored in scene space (the camera fit keeps them in frame too). */
+/** Axis titles, anchored in scene space (the camera fit keeps them in frame too). Height is implied vol, named in the caption. */
 export const AXIS_LABELS: { text: string; at: Vec3 }[] = [
-  { text: "Strike", at: [0, 0, Z + 0.28] },
-  { text: "Maturity", at: [X + 0.4, 0, 0] },
-  { text: "Implied vol", at: [X + 0.05, H + 0.18, Z] },
+  { text: "Strike", at: [0, 0, Z + 0.24] },
+  { text: "Maturity", at: [X + 0.34, 0, 0] },
 ];
 
 /**
@@ -37,8 +36,8 @@ export const CAMERA = {
   /** Reachable angles (director and drag alike): the front-right quadrant, where the surface reads well. */
   minAzimuth: 0.05,
   maxAzimuth: 1.5,
-  minPolar: 0.9,
-  maxPolar: 1.3,
+  minPolar: 1.0,
+  maxPolar: 1.2,
 };
 
 /** Best viewing angle for each kind of market change (spec 01 §3.1). */
@@ -102,7 +101,7 @@ const FIT_POINTS: Vec3[] = [
  * half-frame) from every reachable azimuth and polar angle, for a perspective camera of the given vertical fov
  * and aspect. The surface therefore never clips, however it is rotated within the allowed arc.
  */
-export function fitDistance(aspect: number, fovDeg = CAMERA.fov, margin = 0.94): number {
+export function fitDistance(aspect: number, fovDeg = CAMERA.fov, margin = 0.98): number {
   const tanV = Math.tan(((fovDeg / 2) * Math.PI) / 180) * margin;
   const tanH = tanV * aspect;
   const views: { forward: Vec3; right: Vec3; up: Vec3 }[] = [];

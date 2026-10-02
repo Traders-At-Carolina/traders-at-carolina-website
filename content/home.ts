@@ -17,7 +17,7 @@ export const home: HomeContent = {
     headlineEmphasis: "at",
     subhead:
       "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required.",
-    figureCaption: "Fig. 1 — Implied volatility across strike and maturity.",
+    figureCaption: "Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.",
   },
   headings: {
     pillars: "Three ways we build quants.",
