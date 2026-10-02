@@ -62,6 +62,23 @@ describe("HomePage", () => {
     expect(within(section).queryByText("Partner firms")).not.toBeInTheDocument();
   });
 
+  it("turns a lone stat into the section heading instead of a one-item stat row", () => {
+    render(<HomePage home={{ ...base, stats: { foundedYear: 2023 } }} recruiting={closed} sponsors={[{ name: "Jane Street" }]} now={now} />);
+    const section = screen.getByRole("region", { name: "Founded in 2023." });
+    expect(within(section).getByRole("heading", { level: 2, name: "Founded in 2023." })).toBeInTheDocument();
+    expect(within(section).getByText("§ 03 — At a glance")).toBeInTheDocument();
+    // Only the sponsor is listed; there is no stat row.
+    expect(within(section).getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.queryByText("By the numbers title")).not.toBeInTheDocument();
+  });
+
+  it("keeps the officer-written heading once there are two or more stats", () => {
+    render(<HomePage home={{ ...base, stats: { members: 120, foundedYear: 2019 } }} recruiting={closed} now={now} />);
+    const section = screen.getByRole("region", { name: "By the numbers title" });
+    expect(within(section).getByText("§ 03 — By the numbers")).toBeInTheDocument();
+    expect(within(section).queryByText("§ 03 — At a glance")).not.toBeInTheDocument();
+  });
+
   it("links hero and band buttons to the form when applications are open", () => {
     render(<HomePage home={base} recruiting={open} now={now} />);
     const applyLinks = screen.getAllByRole("link", { name: /^Apply/ });
@@ -115,8 +132,7 @@ describe("HomePage", () => {
         now={now}
       />,
     );
-    const section = screen.getByRole("region", { name: "By the numbers title" });
-    expect(within(section).getByText("2023")).toBeInTheDocument();
+    const section = screen.getByRole("region", { name: "Founded in 2023." });
     expect(within(section).queryByText("Partner firms")).not.toBeInTheDocument();
     expect(within(section).getByText("Jane Street")).toBeInTheDocument();
     expect(within(section).getByText("TradingView")).toBeInTheDocument();
@@ -134,7 +150,7 @@ describe("HomePage", () => {
         now={now}
       />,
     );
-    const section = screen.getByRole("region", { name: "By the numbers title" });
+    const section = screen.getByRole("region", { name: "Founded in 2023." });
     expect(section).toHaveClass("surface-graphite");
     const marks = section.querySelectorAll('li span[aria-hidden="true"]');
     expect(marks).toHaveLength(1);
@@ -160,6 +176,17 @@ describe("HomePage", () => {
     render(<HomePage home={{ ...base, photos: [photo(1), photo(2), photo(3)] }} recruiting={closed} now={now} />);
     expect(screen.getAllByRole("img", { name: /Members at event/ })).toHaveLength(3);
     expect(screen.getByText("Event 3")).toBeInTheDocument();
+  });
+
+  it("makes the first of three photos the large lead and stacks the other two beside it", () => {
+    render(<HomePage home={{ ...base, photos: [photo(1), photo(2), photo(3)] }} recruiting={closed} now={now} />);
+    const figures = screen.getAllByRole("figure").filter((f) => f.querySelector("img"));
+    expect(figures).toHaveLength(3);
+    expect(figures[0]).toHaveClass("lg:col-span-8");
+    expect(figures[1]).toHaveClass("lg:col-span-4");
+    expect(figures[2]).toHaveClass("lg:col-span-4");
+    // Reading order is lead, then supporting photos.
+    expect(figures[0]).toHaveTextContent("Event 1");
   });
 
   it("renders exactly one navy band", () => {

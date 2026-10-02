@@ -76,10 +76,18 @@ export function InsideTheClub({ index, title, photos, upcoming }: InsideTheClubP
             />
           </Grid>
         ) : third ? (
-          // Three photos: a 3-up row of 3:2 images.
+          // Three photos: one large lead (cols 1–8) with the other two stacked beside it (cols 9–12).
+          // Below 1024px the lead runs full width and the pair sits side by side under it.
           <Grid className="items-start gap-y-10">
-            {photos.map((photo) => (
-              <Photo key={photo.src.src} photo={photo} ratio="3:2" sizes="(min-width: 768px) 33vw, 100vw" className="col-span-12 md:col-span-4" />
+            <Photo photo={first} ratio="3:2" sizes="(min-width: 1024px) 66vw, 100vw" className="col-span-12 lg:col-span-8 lg:col-start-1 lg:row-span-2 lg:row-start-1" />
+            {[second, third].map((photo, i) => (
+              <Photo
+                key={photo.src.src}
+                photo={photo}
+                ratio="3:2"
+                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                className={`col-span-12 md:col-span-6 lg:col-span-4 lg:col-start-9 ${i === 0 ? "lg:row-start-1" : "lg:row-start-2"}`}
+              />
             ))}
           </Grid>
         ) : (
