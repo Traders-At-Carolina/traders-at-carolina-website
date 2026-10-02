@@ -7,35 +7,14 @@ type PersonCardProps = {
   person: Person;
   /** "portrait" is 4:5 (default); "square" is 1:1. */
   shape?: "portrait" | "square";
-  /**
-   * "default": eyebrow role above a regular name.
-   * "bold": heavy black role and name (executive board).
-   * "role": the role leads, set large above a smaller name (directors).
-   */
-  emphasis?: "default" | "bold" | "role";
 };
 
 /**
  * Full-colour headshot, role, name, class year and major, optional placement and LinkedIn (spec 04 §3.1).
  * Only the LinkedIn icon is interactive; the card is the /team#{slug} anchor target.
  */
-export function PersonCard({ person, shape = "portrait", emphasis = "default" }: PersonCardProps) {
+export function PersonCard({ person, shape = "portrait" }: PersonCardProps) {
   const meta = personMeta(person);
-  const roleEl =
-    emphasis === "role" ? (
-      <p className="font-display text-h3 text-navy">{person.role}</p>
-    ) : (
-      <p className={emphasis === "bold" ? "eyebrow !font-bold !normal-case !text-black" : "eyebrow !normal-case"}>{person.role}</p>
-    );
-  const nameEl = (
-    <h3
-      id={`${person.slug}-name`}
-      className={`${emphasis === "role" ? "mt-1 text-body text-ink-2" : "mt-2 text-h3"} ${emphasis === "bold" ? "font-bold text-black" : ""}`}
-    >
-      {person.name}
-    </h3>
-  );
-
   return (
     <article id={person.slug} aria-labelledby={`${person.slug}-name`} className="scroll-mt-24 text-center">
       <div className={`relative overflow-hidden rounded-2xl ${shape === "square" ? "aspect-square" : "aspect-[4/5]"}`}>
@@ -55,8 +34,11 @@ export function PersonCard({ person, shape = "portrait", emphasis = "default" }:
         )}
       </div>
       <div className="mt-4">
-        {roleEl}
-        {nameEl}
+        {/* One treatment for every tier: role leads, name follows. */}
+        <p className="font-display text-h3 text-navy">{person.role}</p>
+        <h3 id={`${person.slug}-name`} className="mt-1 text-body text-ink-2">
+          {person.name}
+        </h3>
         {meta ? <p className="mt-1 text-caption text-ink-3 tabular">{meta}</p> : null}
         {person.placement ? <p className="mt-1 text-caption text-ink-2">{person.placement}</p> : null}
         {person.linkedin ? (

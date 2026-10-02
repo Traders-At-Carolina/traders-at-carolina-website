@@ -47,7 +47,7 @@ export const team: TeamContent = {
     {
       slug: "jack-zaptin",
       name: "Jack Zaptin",
-      role: "Executive Board",
+      role: "Executive Board Member",
       group: "exec",
       order: 1,
       headshot: jackZaptin,
@@ -56,7 +56,7 @@ export const team: TeamContent = {
     {
       slug: "esther-yu",
       name: "Esther Yu",
-      role: "Executive Board",
+      role: "Executive Board Member",
       group: "exec",
       order: 2,
       headshot: estherYu,

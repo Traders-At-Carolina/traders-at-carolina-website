@@ -56,11 +56,13 @@ describe("TeamPage", () => {
     expect(screen.queryByText("Your first point of contact.")).not.toBeInTheDocument();
   });
 
-  it("sets the executive board in bold black", () => {
-    const { container } = renderTeam({ people: [pres] });
-    const name = within(container.querySelector("#ada-lovelace") as HTMLElement).getByRole("heading", { name: "Ada Lovelace" });
-    expect(name.className).toContain("font-bold");
-    expect(name.className).toContain("text-black");
+  it("uses the same role-then-name treatment for every tier", () => {
+    const { container } = renderTeam({ people: [pres, co, dir] });
+    for (const slug of ["ada-lovelace", "co-one", "dir-one"]) {
+      const card = container.querySelector(`#${slug}`) as HTMLElement;
+      expect(card.querySelector("p")?.className).toContain("text-h3");
+      expect(card.querySelector("h3")?.className).toContain("text-body");
+    }
   });
 
   it("renders directors with square headshots and the role leading", () => {

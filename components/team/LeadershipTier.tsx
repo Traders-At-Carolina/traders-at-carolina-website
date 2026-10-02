@@ -23,12 +23,7 @@ type LeadershipTierProps = {
 
 /** Centered, wrapping rows of fixed-width cards, so headshots stay modest and every row centers. */
 const ROW = "flex flex-wrap justify-center gap-x-6 gap-y-10 md:gap-x-10 md:gap-y-12";
-const CARD: Record<TierVariant, string> = {
-  default: "w-40 sm:w-48",
-  bold: "w-40 sm:w-48",
-  featured: "w-44 sm:w-56",
-  directors: "w-40 sm:w-48",
-};
+const CARD = "w-40 sm:w-48";
 
 /** One tier of the leadership hierarchy (executive board, co-presidents, directors). */
 export function LeadershipTier({ index, eyebrow, title, id, members, variant = "default", emptyText }: LeadershipTierProps) {
@@ -47,12 +42,8 @@ export function LeadershipTier({ index, eyebrow, title, id, members, variant = "
         {members.length > 0 ? (
           <div className={ROW}>
             {members.map((person) => (
-              <div key={person.slug} className={CARD[variant]}>
-                <PersonCard
-                  person={person}
-                  shape={variant === "directors" ? "square" : "portrait"}
-                  emphasis={variant === "bold" ? "bold" : variant === "directors" ? "role" : "default"}
-                />
+              <div key={person.slug} className={CARD}>
+                <PersonCard person={person} shape={variant === "directors" ? "square" : "portrait"} />
               </div>
             ))}
           </div>
