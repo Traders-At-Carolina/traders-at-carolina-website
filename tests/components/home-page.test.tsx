@@ -14,7 +14,7 @@ const photo = (n: number, ratio: HomePhoto["ratio"] = "3:2"): HomePhoto => ({
 });
 
 const base: HomeContent = {
-  hero: { headline: "Rigor, practiced together.", headlineEmphasis: "practiced", subhead: "Prepares UNC students." },
+  hero: { eyebrow: "UNC's Premier Quantitative Finance Club", headline: "Traders at Carolina", headlineEmphasis: "at", subhead: "Prepares UNC students.", figureCaption: "Fig. 1 — Walks." },
   headings: { pillars: "Three ways we build quants.", numbers: "By the numbers title", inside: "Inside title" },
   pillars: [
     { title: "Preparation", body: "P.", link: { label: "See weekly activities", href: "/membership#activities" } },
@@ -34,20 +34,21 @@ describe("HomePage", () => {
     render(<HomePage home={base} recruiting={closed} now={now} />);
     const h1s = screen.getAllByRole("heading", { level: 1 });
     expect(h1s).toHaveLength(1);
-    expect(h1s[0].querySelector("em")).toHaveTextContent("practiced");
+    expect(h1s[0]).toHaveTextContent("Traders at Carolina");
+    expect(h1s[0].querySelector("em")).toHaveTextContent(/^at$/);
   });
 
   it("hides stats and photos sections when there is no real content", () => {
     render(<HomePage home={base} recruiting={closed} now={now} />);
     expect(screen.queryByText("By the numbers title")).not.toBeInTheDocument();
     expect(screen.queryByText("Inside title")).not.toBeInTheDocument();
-    expect(eyebrows()).toEqual(["§ 01 — Quantitative finance at UNC", "§ 02 — What we do"]);
+    expect(eyebrows()).toEqual(["§ 01 — UNC's Premier Quantitative Finance Club", "§ 02 — What we do"]);
   });
 
   it("keeps numbering sequential when stats are hidden but photos show", () => {
     render(<HomePage home={{ ...base, photos: [photo(1), photo(2)] }} recruiting={closed} now={now} />);
     expect(eyebrows()).toEqual([
-      "§ 01 — Quantitative finance at UNC",
+      "§ 01 — UNC's Premier Quantitative Finance Club",
       "§ 02 — What we do",
       "§ 03 — Inside the club",
     ]);
@@ -151,7 +152,8 @@ describe("HomePage", () => {
 
     render(<HomePage home={{ ...withPhotos, upcoming: { ...upcoming, date: "2027-01-02T19:00" } }} recruiting={closed} now={now} />);
     expect(screen.queryByText("Mock trading night")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("figure")).toHaveLength(2);
+    // Photo figures only; the hero's random-walk figure has no image.
+    expect(screen.getAllByRole("figure").filter((f) => f.querySelector("img"))).toHaveLength(2);
   });
 
   it("renders photos with alt text and captions", () => {

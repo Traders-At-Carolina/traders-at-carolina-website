@@ -1,8 +1,8 @@
 import { Button } from "@/components/Button";
 import { Container, Grid } from "@/components/Container";
 import { Eyebrow } from "@/components/Eyebrow";
-import { RandomWalk } from "@/components/RandomWalk";
 import { TextLink } from "@/components/TextLink";
+import { VolSurfaceFigure } from "@/components/home/VolSurfaceFigure";
 import type { ReactNode } from "react";
 import type { HomeContent } from "@/content/types";
 import type { HomeApplyCopy } from "@/lib/home";
@@ -43,28 +43,28 @@ export function HeroActions({ apply }: { apply: HomeApplyCopy["hero"] }) {
   );
 }
 
-/** § 01 — what the club is and how to join, with the random walk on graph paper (spec 01 §3.1). */
+/**
+ * § 01 — the club's name and how to join, beside "Fig. 1": a rotatable, simulatable 3D
+ * implied-volatility surface (spec 01 §3.1). On desktop the text sits on the left and the
+ * figure on the right; on smaller screens the text comes first. Only the figure is a client island.
+ */
 export function Hero({ hero, index, actions }: HeroProps) {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden lg:flex lg:min-h-[clamp(560px,calc(80vh-5rem),760px)] lg:items-center">
+    <section aria-labelledby="hero-title" className="relative overflow-hidden">
       <div aria-hidden="true" className="graph-paper absolute inset-0" />
-      <Container className="relative py-16 md:py-24">
-        <Grid className="items-center gap-y-12">
-          <div className="col-span-12 md:col-span-7">
-            <Eyebrow index={index}>Quantitative finance at UNC</Eyebrow>
-            <h1 id="hero-title" className="mt-4 text-display">
+      <Container className="relative flex flex-col justify-center pt-12 pb-14 md:pt-16 md:pb-20 lg:min-h-[clamp(600px,calc(100svh-5rem),820px)] lg:py-16">
+        <Grid className="gap-y-12 lg:items-center">
+          <div className="col-span-12 lg:col-span-6 lg:col-start-1 lg:row-start-1 xl:pr-6">
+            <Eyebrow index={index} className="text-[0.8125rem] md:text-[0.875rem]">
+              {hero.eyebrow}
+            </Eyebrow>
+            <h1 id="hero-title" className="mt-5 text-hero">
               <Headline headline={hero.headline} emphasis={hero.headlineEmphasis} />
             </h1>
             <p className="mt-6 max-w-[34rem] text-lead text-ink-2">{hero.subhead}</p>
             {actions}
           </div>
-          {/* Decorative, like the walk itself; the caption tells non-quants it's a simulation, not a real chart. */}
-          <figure aria-hidden="true" className="col-span-12 md:col-span-5">
-            <RandomWalk seed={2026} paths={5} size="hero" className="h-32 w-full md:h-64 lg:h-80" />
-            <figcaption className="mt-3 border-t border-rule pt-2 text-caption text-ink-3">
-              Fig. 1 — Five simulated price paths (seeded random walks)
-            </figcaption>
-          </figure>
+          <VolSurfaceFigure caption={hero.figureCaption} className="col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-1" />
         </Grid>
       </Container>
     </section>

@@ -31,7 +31,7 @@ A recruiter or firm visitor should also leave with a sense of an active, serious
 | # | Section | Background | Motif used (00 §3) |
 |---|---|---|---|
 | — | `SiteHeader` | bone | — |
-| 01 | Hero | bone + grid | Random walk + grid (one composition) |
+| 01 | Hero | bone + grid | 3D volatility surface + grid (one composition) |
 | 02 | What we do | bone | — |
 | 03 | By the numbers | white | Stat row |
 | 04 | Inside the club | bone | — (photos) |
@@ -47,27 +47,40 @@ Only these sections appear on Home. No placement section (data isn't available y
 ### 3.1 Hero (§ 01)
 
 **Content**
-- **Eyebrow:** `§ 01 — QUANTITATIVE FINANCE AT UNC`
-- **Headline:** Display role, max about 8 words. It may use one italic word for emphasis (00 §5.2). Working copy: "Rigor, *practiced* together."
-- **Subhead:** Lead role, one sentence, max about 25 words. Working copy: "Traders at Carolina prepares UNC students for careers in quantitative trading, research and engineering — no prior finance experience required."
+- **Eyebrow:** `hero.eyebrow`, shown as `§ 01 — UNC'S PREMIER QUANTITATIVE FINANCE CLUB` and set slightly larger than the standard eyebrow (13–14px).
+- **Headline:** the club name, "Traders *at* Carolina", in the **Hero** role (00 §5.2). This is an exception to the Display role and is used only here. It's the largest text on the page, and the italic "at" mirrors the wordmark.
+- **Subhead:** Lead role, max about 25 words. Working copy: "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
-- **Art:** `RandomWalk` (`size="hero"`, 4–5 paths, fixed seed) over the graph-paper grid.
+- **Art — "Fig. 1":** `VolSurfaceFigure`, a deliberately bare, rotatable 3D implied-volatility surface drawn like a printed figure, easing on its own between market regimes:
+  - Strike (log-moneyness −0.5…0.5) × maturity (0.1–2y) × implied vol (height, from 10%), from an SSVI-style model in `lib/vol-surface.ts`.
+  - A matte 61 × 41 mesh washed in navy (mixed into white), deeper where implied vol is higher — tinted by absolute vol, so a sell-off reads darker than a calm market. Design-token colors, no tone mapping, mostly ambient light.
+  - Navy-ink lines (anti-aliased `LineSegments2`): a faint wire grid every 5th row/column, a thin outline, and a bold **at-the-money line** (K/S = 1) tracing the ATM term structure.
+  - Hairline axes meeting at the front-right corner, with tick marks and values: strike K/S 0.8 / "1.0 ATM" / 1.25, maturity 6M / 1Y / 18M / 2Y, implied vol 20% / 40% / 60%; titled "Strike K/S", "Maturity" and "Implied vol". Each label fades out as its axis turns away from the camera, so far-side numbers never sit over the surface. No floor grid.
+  - **Live readout** above the plot (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the canvas label carries the same information).
+  - `<figcaption>`: `hero.figureCaption` ("Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.")
 
 **Layout**
 - **Desktop (≥ 1024px):**
-  - The text spans columns 1–7. The random walk spans columns 8–12, vertically centered against the text block.
-  - The hero fills about 80vh, min 560px, max 760px, with the grid masked to fade at the edges.
-- **Tablet (768–1023px):** same two-column split at 7/5 with a smaller walk.
+  - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **left** in columns 1–6, and the figure sits on the right in columns 7–12.
+  - The 3D plot is `clamp(380px, 58vh, 600px)` tall (300px mobile, 420px tablet), so the surface fills its column.
+  - The hero is `clamp(600px, 100svh − header, 820px)` tall, with the grid masked to fade at the edges. The whole hero, figure included, should fit in the first viewport at 1024 × 768.
+- **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
   - Single column: eyebrow, headline, subhead, then the actions stacked (Apply full width, link below).
-  - The random walk becomes a short full-width strip, about 120px tall, *below* the actions. It isn't hidden.
+  - The figure is full width at 260px, followed by its caption.
   - No min-height. Content defines the height.
 
 **Behavior**
-- The random walk draws in over 1.2s on load (00 §9.2). Under reduced motion it renders complete.
+- **Framing:** rotation is free in every direction (all the way round, over the top and underneath). Each frame the camera distance eases toward the tightest fit for the current angle and canvas aspect (`fitDistance`), so the surface, axes and titles fill the figure without ever clipping.
+- **Rotate:** drag (OrbitControls; zoom and pan off) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
+- **Hover (pointer over the surface):** a navy marker at the hovered point, its two slices drawn as bold navy curves — the smile across strikes at that maturity and the term structure across maturities at that strike — and a tooltip with implied vol, K/S, maturity and the spread to at-the-money vol in points. Slices and tooltip follow the surface as it morphs; hovering pauses the spin, which resumes 4s after the pointer leaves. All `aria-hidden` (decorative detail).
+- **Idle spin:** while idle the surface turns continuously clockwise (seen from above), one turn every 80s, easing up to speed after a drag, with a gentle tilt sway. It stops on interaction and resumes 4s after it ends.
+- **Market cycle:** each regime is held for 5s (time for the camera to settle), then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.
+- The cycle and the spin pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and the camera stays still.
+- The canvas wrapper is `role="img"` with an `aria-label` naming and summarising the current regime; the axis titles are `aria-hidden`.
 - The headline is the page's only `<h1>`.
-- The hero is the LCP element (text), so the art is inline SVG with no image request.
+- **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island that first renders a static SVG poster of the surface (same math, no layout shift, also the no-WebGL fallback). three.js (`three`, `@react-three/fiber`, `@react-three/drei`, ~245 kB gzipped) loads lazily via `next/dynamic` only once the figure is within 200px of the viewport, so it is never on the LCP path. Budget: LCP stays text, CLS 0.
 
 ### 3.2 What we do (§ 02)
 
@@ -190,7 +203,7 @@ nextApplicationOpenDate?: string;    // ISO "YYYY-MM-DD"; shown when closed
 
 ```ts
 export const home = {
-  hero: { headline: string; headlineEmphasis?: string; subhead: string },
+  hero: { eyebrow: string; headline: string; headlineEmphasis?: string; subhead: string; figureCaption: string },
   pillars: [ { title, body, link: { label, href } } ×3 ],
   stats: {
     members?: number;          // rendered as "{n}+"
@@ -243,7 +256,7 @@ export const home = {
 3. Toggling `applicationsOpen` (or setting `applyDeadline` in the past) in `content/site.ts` switches both the hero and band buttons per §5, with no other code changes.
 4. Removing any stat from `content/home.ts` drops it from the row with no gap or leftover hairline.
 5. Removing `upcoming`, or setting it to a past date, renders the photo-only layout in §3.4 with no empty card.
-6. The random walk is identical across reloads and builds (fixed seed), has `aria-hidden="true"`, and renders fully drawn under `prefers-reduced-motion`.
+6. The hero figure first renders the default regime (poster, then the same surface in WebGL), never shifts layout, and under `prefers-reduced-motion` neither moves the camera nor animates.
 7. All images have non-empty alt text. TypeScript fails the build if `alt` is missing.
 8. Lighthouse (mobile) ≥ 95 in Performance, Accessibility, Best Practices and SEO. LCP < 2.0s and CLS < 0.05.
 9. Keyboard-only: every link and button is reachable in visual order with a visible focus ring (00 §4.3).

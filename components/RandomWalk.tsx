@@ -15,6 +15,14 @@ const sizes = {
   header: { width: 400, height: 200, steps: 44 },
 } as const;
 
+/** Stroke for path `i`: the first is solid navy, the rest alternate muted navy and black (00 §7.2). */
+export function walkStroke(i: number) {
+  if (i === 0) return { className: "stroke-navy", strokeWidth: "1.5", strokeOpacity: undefined };
+  return i % 2 === 1
+    ? { className: "stroke-navy", strokeWidth: "1", strokeOpacity: "0.3" }
+    : { className: "stroke-black", strokeWidth: "1", strokeOpacity: "0.25" };
+}
+
 /** Seeded Brownian paths — the site's signature motif. Decorative only. */
 export function RandomWalk({ seed, paths = 4, size, animate = true, className = "" }: RandomWalkProps) {
   const { width, height, steps } = sizes[size];
@@ -28,24 +36,18 @@ export function RandomWalk({ seed, paths = 4, size, animate = true, className = 
       focusable="false"
       className={`${animate ? "draw-in" : ""} ${className}`}
     >
-      {walks.map((d, i) => {
-        const primary = i === 0;
-        const muted = i % 2 === 1 ? { className: "stroke-navy", opacity: "0.3" } : { className: "stroke-black", opacity: "0.25" };
-        return (
-          <path
-            key={i}
-            d={d}
-            fill="none"
-            pathLength={1}
-            vectorEffect="non-scaling-stroke"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            className={primary ? "stroke-navy" : muted.className}
-            strokeWidth={primary ? "1.5" : "1"}
-            strokeOpacity={primary ? undefined : muted.opacity}
-          />
-        );
-      })}
+      {walks.map((d, i) => (
+        <path
+          key={i}
+          d={d}
+          fill="none"
+          pathLength={1}
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          {...walkStroke(i)}
+        />
+      ))}
     </svg>
   );
 }

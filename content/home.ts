@@ -15,10 +15,12 @@ import generalMeeting from "@/public/images/events/general-meeting.jpg";
  */
 export const home: HomeContent = {
   hero: {
-    headline: "Rigor, practiced together.",
-    headlineEmphasis: "practiced",
+    eyebrow: "UNC's Premier Quantitative Finance Club",
+    headline: "Traders at Carolina",
+    headlineEmphasis: "at",
     subhead:
-      "Traders at Carolina prepares UNC students for careers in quantitative trading, research and engineering — no prior finance experience required.",
+      "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required.",
+    figureCaption: "Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.",
   },
   headings: {
     pillars: "Three ways we build quants.",
