@@ -87,6 +87,15 @@ describe("MembershipPage", () => {
     expect(screen.queryByText(/switch tracks/)).not.toBeInTheDocument();
   });
 
+  it("shows a decorative order-book depth chart in the header instead of a random walk", () => {
+    const { container } = renderPage();
+    const art = container.querySelector("header svg") as SVGElement;
+    expect(art).toHaveAttribute("aria-hidden", "true");
+    // Bid and ask strokes, plus their fills in a fading group; a random walk would be 3 bare paths.
+    expect(art.querySelectorAll(":scope > path")).toHaveLength(2);
+    expect(art.querySelectorAll(".draw-in-fill path")).toHaveLength(2);
+  });
+
   it("keeps its own band title and says when applications are closed", () => {
     renderPage(membership, {}, { ...closed, interestFormUrl: "https://forms.gle/interest" });
     expect(screen.getByRole("heading", { name: "Found your track?" })).toBeInTheDocument();

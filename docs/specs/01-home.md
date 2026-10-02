@@ -4,6 +4,8 @@
 
 > **Revision (2026-10-02, hero):** the live readout moved from above the plot to below it. With the surface drawn low in its canvas, a readout at the top of the figure column floated away from what it describes; under the plot it reads as the figure's data line, and on mobile it brings the top of the surface into the first screen. The gap between the hero text and the figure is also tighter below 1024px (32px, was 48px).
 
+> **Revision (2026-10-02):** two Home sections changed. **By the numbers** no longer shows a one-item stat row: a lone stat becomes the section heading (§3.3). **Inside the club** with three photos now uses one large lead photo with the other two stacked beside it, instead of a 3-up row of equal thumbnails (§3.4). Where this note conflicts with §3 below, this note wins.
+
 All tokens, type roles, motifs and components named here are defined in spec 00. Section references like (00 §7.2) point there.
 
 ---
@@ -117,6 +119,7 @@ Only these sections appear on Home. No placement section (data isn't available y
 
 **Rules**
 - Stats must be real, defensible numbers. If a value is missing, that stat is omitted and the row reflows to two. Never use placeholder or rounded-up numbers.
+- **A stat row needs at least two stats.** With exactly one, the row is dropped and that stat is written as the section heading instead, as a short sentence in the H2 role: "Founded in 2023." The eyebrow changes from `BY THE NUMBERS` to `AT A GLANCE`, since a section with one fact shouldn't promise numbers. The sponsors list stays below. The officer-written H2 (`headings.numbers`) is used only when the stat row shows.
 - The "Founded" stat displays the year (Public Sans, lining figures), not "years active". That way it never goes stale.
 - No partner names in this section.
 
@@ -143,9 +146,9 @@ Only these sections appear on Home. No placement section (data isn't available y
   - A 4:5 photo spans columns 7–9.
   - The Upcoming card spans columns 10–12, top-aligned.
 - **Desktop without the Upcoming card:**
-  - The 3:2 photo spans columns 1–7.
-  - The 4:5 photo spans columns 8–12.
-  - A third photo, if provided, comes first in a 3-up row of 3:2 images.
+  - **Two photos:** the 3:2 photo spans columns 1–7 and the 4:5 photo spans columns 8–12.
+  - **Three photos:** the first is the lead. It is a 3:2 photo spanning columns 1–8 and runs the full height of the group. The other two are 3:2 photos stacked in columns 9–12. One image leads, and the club's best evidence of real activity is never a thumbnail. Put the strongest photo first in `content/home.ts`.
+- **Tablet (768–1023px), three photos, no Upcoming card:** the lead is full width, and the other two sit side by side beneath it.
 - **Mobile:**
   - The first photo is full width.
   - The Upcoming card (if present) comes next.

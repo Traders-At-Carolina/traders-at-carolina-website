@@ -107,6 +107,9 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
 
   const close = () => setOpen(false);
 
+  // With a mouse, the collapsed menu opens when the pointer reaches the menu button and closes when it leaves the header.
+  const canHover = () => window.matchMedia("(hover: hover)").matches;
+
   const applyButton = (props: { fullWidth?: boolean; size?: "compact" | "sm" }) => {
     const button = (href: string, external: boolean) => (
       <Button href={href} external={external} shape="rounded" {...props}>
@@ -124,6 +127,9 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
     <header
       ref={headerRef}
       data-floating={floating}
+      onMouseLeave={() => {
+        if (canHover()) close();
+      }}
       onBlur={(event) => {
         // Tabbing out of the header closes the menu; a press on non-focusable card padding does not.
         if (open && event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) close();
@@ -193,7 +199,14 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((value) => !value)}
+            onMouseEnter={() => {
+              if (canHover()) setOpen(true);
+            }}
+            onClick={(event) => {
+              // A real mouse click on a hover-opened menu keeps it open; keyboard (detail 0) and touch still toggle.
+              if (canHover() && event.detail > 0) setOpen(true);
+              else setOpen((value) => !value);
+            }}
           >
             {open ? <X aria-hidden="true" strokeWidth={1.5} /> : <Menu aria-hidden="true" strokeWidth={1.5} />}
           </button>

@@ -65,7 +65,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
 
 ---
@@ -184,7 +184,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
   - One path is solid `navy` at 1.5px.
   - The others are navy at 30% opacity and black at 25% opacity, each at 1px.
 - **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits.
-- **Placement:** in each `PageHeader`. (The Home hero uses a 3D volatility surface instead; spec 01 §3.1.)
+- **Placement:** in each `PageHeader`, unless the page supplies its own art (`/membership` uses the depth chart, §7.6). (The Home hero uses a 3D volatility surface instead; spec 01 §3.1.)
 - **Motion:** an optional 1.2s stroke draw-in on load (`stroke-dashoffset`), disabled under `prefers-reduced-motion`.
 - **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 
@@ -199,6 +199,14 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 ### 7.5 Firm names
 - Placement firms are set in type by default.
 - If firm logos are used, they are monochrome (black at 60%) and uniform in height, never in full color.
+
+### 7.6 Order-book depth chart (`DepthChart`)
+- **Shape:** stepped cumulative bid and ask depth curves stepping outward from a narrow, centred spread, over a hairline baseline. No labels, axes or prices.
+- **Strokes and fills:** bids take the random walk's lead stroke (solid `navy`, 1.5px), asks its muted stroke (black at 25%, 1px). Each side has a faint fill to the baseline (navy at 6%, black at 3%). Never red/green (§3).
+- **Deterministic:** level sizes come from a fixed seed at build time (`lib/order-book.ts`). Bids and asks use separate streams, so the book is not a mirror image; the deeper side reaches the top.
+- **Placement:** the `/membership` `PageHeader` only (spec 03 §3.1), in place of the random walk.
+- **Motion:** the same 1.2s stroke draw-in as the random walk, growing from the spread outward; fills fade in. Both are disabled under `prefers-reduced-motion`.
+- **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 
 ---
 
@@ -245,7 +253,7 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Effect | Spec |
 |---|---|
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
-| Header random walk | Stroke draw-in over 1.2s on load |
+| Header random walk / depth chart | Stroke draw-in over 1.2s on load (depth-chart fills fade in alongside) |
 | Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 80s, eased in after a drag; stops on interaction, resumes after 4s |
 | Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
 | Home intro | On every full load of Home: graph paper sweeps in, logo and name rise, then it dissolves into the hero grid over ~2.15s; any key, click or scroll skips it (spec 01 §3.6) |
@@ -269,7 +277,7 @@ Page specs reference these by name. Each one is built once and reused.
 - **Docked** until the first line of hero text (Home `Hero` or `PageHeader`) reaches the header, tracked by a 1px `data-nav-float-point` marker at the top of the hero's text column: full-width, sticky, on a `bone` background, 64 / 80px tall. On pages with a hero grid, the same 28px grid shows faintly behind the docked bar (`graph-paper-nav`): lines aligned with the hero's grid below, about 55% strength at the bottom centre, fading toward the sides and the top. It fades out as the bar floats and does not appear on pages without a hero.
 - **Floating** as soon as that text would pass under it (pages without a hero: as soon as the page scrolls): a centred bar inset 8 / 12px from the top, 48px tall on desktop (52px on mobile) and `min(100% − 2rem, 52rem)` wide, with 16px corners, `bone` at 85% with a backdrop blur, a 1px `rule` border and a soft shadow. The header keeps its height, so the page never shifts. It stays floating while the mobile menu is open.
 - **Nav highlight:** a single `wash` highlight (navy at 8%, 10px corners) rests behind the active page's link, springs to whichever link is hovered or focused, and springs back when the pointer or focus leaves. The hovered or active link's text turns `navy`. With no active page (Home) the highlight fades in at the hovered link. Under reduced motion it jumps.
-- The Apply button is a `primary` button with 10px corners (`shape="rounded"`, concentric with the bar's 16px corners and 6px inset), in the bar and in the mobile menu. In the desktop bar it is compact (`size="sm"`, 36px tall, a 6px inset in the 48px bar), the one exception to the 44px minimum height; it is pointer-only there, and the mobile menu's Apply stays 44px. Apply buttons elsewhere stay square.
+- The Apply button is a `primary` button with 10px corners (`shape="rounded"`, concentric with the bar's 16px corners and 6px inset), in the bar and in the mobile menu. In the desktop bar it is compact (`size="sm"`, 32px tall, an 8px inset in the 48px bar), the one exception to the 44px minimum height; it is pointer-only there, and the mobile menu's Apply stays 44px. Apply buttons elsewhere stay square.
 - **Mobile (< 768px):** logo, a compact Apply button (44px tall, `size="compact"`) and a menu button; the compact Apply gives way to the menu's own Apply while the menu is open. The menu opens a dropdown card directly under the bar: `bone`, 1px `rule` border, 16px corners and the bar's shadow, with Georgia (H3-size) links, each at least 48px tall, and a full-width Apply button. It is a disclosure, not a modal: the page behind stays interactive and still scrolls (it is not made `inert`) and there is no focus trap. `Esc`, a press outside the header, tabbing out of the header or choosing a link closes it. The current page's link sits on the `wash` highlight.
 
 ### `SiteFooter`
@@ -285,7 +293,7 @@ Page specs reference these by name. Each one is built once and reused.
   - a UNC student-organization disclaimer, if UNC requires one (§14)
 
 ### `Button`
-All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (36px tall, 8px × 20px padding).
+All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (32px tall, 6px × 20px padding).
 
 | Variant | Rest | Hover / press |
 |---|---|---|
@@ -304,6 +312,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 ### `PageHeader`
 - Used at the top of every page except Home.
 - Eyebrow, H1 and lead, over the graph-paper grid, with a small `RandomWalk` on the right on desktop. The `RandomWalk` is hidden below 768px.
+- An optional `art` prop replaces the `RandomWalk` in that column; `art={null}` leaves the column out. `/membership` uses it for the order-book depth chart (§7.6, spec 03 §3.1). The art stays a single composition with the grid, so the one-motif rule in §3 still holds.
 
 ### `Stat` / `StatRow`
 - `Stat`: a number (Stat role) plus a caption label.

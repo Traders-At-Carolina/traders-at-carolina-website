@@ -103,11 +103,11 @@ describe("SiteHeaderClient", () => {
     expect(apply).not.toHaveClass("rounded-full");
   });
 
-  it("renders the header Apply button compact, at 36px", () => {
+  it("renders the header Apply button compact, at 32px", () => {
     renderHeader();
     const nav = screen.getByRole("navigation", { name: "Primary" });
     const apply = Array.from(nav.querySelectorAll("a")).find((a) => a.textContent === "Apply");
-    expect(apply).toHaveClass("min-h-9");
+    expect(apply).toHaveClass("min-h-8");
     expect(apply).not.toHaveClass("min-h-11");
   });
 
@@ -168,7 +168,7 @@ describe("SiteHeaderClient", () => {
     expect(apply).toHaveClass("rounded-[0.625rem]");
     expect(apply).not.toHaveClass("rounded-full");
     expect(apply).toHaveClass("min-h-11");
-    expect(apply).not.toHaveClass("min-h-9");
+    expect(apply).not.toHaveClass("min-h-8");
   });
 });
 
@@ -361,5 +361,16 @@ describe("SiteHeaderClient sliding highlight", () => {
     fireEvent.pointerEnter(linkNamed("About"));
     expect(indicator()).toHaveAttribute("data-visible", "true");
     expect(indicator()).toHaveAttribute("data-target", "0");
+  });
+
+  it("opens the menu on hover and closes it when the pointer leaves the header", async () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: true, media: query }));
+    const user = userEvent.setup();
+    renderHeader();
+    await user.hover(screen.getByRole("button", { name: "Open menu" }));
+    expect(screen.getByRole("button", { name: "Close menu" })).toHaveAttribute("aria-expanded", "true");
+    await user.unhover(screen.getByRole("banner"));
+    expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
+    vi.unstubAllGlobals();
   });
 });

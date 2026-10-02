@@ -285,6 +285,24 @@ section:has(+ [data-cta-band]) {
   .draw-in path:nth-child(n + 4) {
     animation-delay: 240ms;
   }
+
+  /* Area fills under drawn-in strokes (the Membership depth chart) fade in instead of drawing. */
+  .draw-in .draw-in-fill {
+    opacity: 0;
+    animation: fade-in 1.2s ease-out 200ms forwards;
+  }
+
+  .draw-in .draw-in-fill path {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
 }
 
 /*
