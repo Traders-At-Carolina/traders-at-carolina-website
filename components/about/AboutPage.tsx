@@ -29,7 +29,7 @@ export function AboutPage({ about, timeline, recruiting, now }: AboutPageProps) 
 
   return (
     <>
-      <PageHeader eyebrow="About" title={about.header.h1} lead={about.header.lead} seed={202} />
+      <PageHeader eyebrow="About" title={about.header.h1} lead={about.header.lead} seed={202} trend="up" />
       <MissionVision index={n.mission} title={about.headings.mission} mission={about.mission} vision={about.vision} />
       {keys.includes("story") ? (
         <OurStory index={n.story} title={about.headings.story} story={about.story} timeline={timeline} />

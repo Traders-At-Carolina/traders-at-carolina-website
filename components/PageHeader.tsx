@@ -10,12 +10,14 @@ type PageHeaderProps = {
   lead?: ReactNode;
   /** Random-walk seed; give each page its own so the art differs. */
   seed?: number;
+  /** Pass "up" for a walk that climbs left to right. */
+  trend?: "up";
   /** Extra content under the lead (spec 05 status block). */
   children?: ReactNode;
 };
 
 /** Top of every non-Home page: grid texture, eyebrow, H1, lead and a small random walk (00 §10). */
-export function PageHeader({ eyebrow, title, lead, seed = 1, children }: PageHeaderProps) {
+export function PageHeader({ eyebrow, title, lead, seed = 1, trend, children }: PageHeaderProps) {
   return (
     <header className="relative overflow-hidden">
       <div aria-hidden="true" className="graph-paper absolute inset-0" />
@@ -30,7 +32,7 @@ export function PageHeader({ eyebrow, title, lead, seed = 1, children }: PageHea
             {children ? <div className="mt-8">{children}</div> : null}
           </div>
           <div className="hidden md:col-span-5 md:block">
-            <RandomWalk seed={seed} paths={3} size="header" className="h-48 w-full lg:h-56" />
+            <RandomWalk seed={seed} paths={3} size="header" trend={trend} className="h-48 w-full lg:h-56" />
           </div>
         </Grid>
       </Container>

@@ -23,4 +23,20 @@ describe("RandomWalk", () => {
     expect(second).toHaveAttribute("stroke-opacity", "0.3");
     expect(third).toHaveAttribute("stroke-opacity", "0.25");
   });
+
+  it("trends upward when asked: every path ends higher than it starts", () => {
+    const { container } = render(<RandomWalk seed={202} paths={3} size="header" trend="up" />);
+    const paths = Array.from(container.querySelectorAll("path"));
+    expect(paths).toHaveLength(3);
+    paths.forEach((p) => {
+      const ys = (p.getAttribute("d") ?? "").match(/[ML][\d.]+ ([\d.]+)/g)!.map((m) => Number(m.split(" ")[1]));
+      expect(ys[ys.length - 1]).toBeLessThan(ys[0]);
+    });
+  });
+
+  it("leaves the default walk untouched when no trend is given", () => {
+    const a = render(<RandomWalk seed={202} paths={3} size="header" />).container.innerHTML;
+    const b = render(<RandomWalk seed={202} paths={3} size="header" trend={undefined} />).container.innerHTML;
+    expect(a).toBe(b);
+  });
 });

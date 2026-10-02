@@ -9,6 +9,10 @@ export type WalkGeometry = {
   originRatio?: number;
   /** Per-step standard deviation as a fraction of `height` (default 0.055). */
   sigmaRatio?: number;
+  /** Upward drift per step as a fraction of `height` (default 0 = no trend). */
+  driftRatio?: number;
+  /** Drift for the first (highlighted) path only; falls back to `driftRatio`. */
+  leadDriftRatio?: number;
 };
 
 export type WalkOptions = WalkGeometry & {
@@ -37,8 +41,10 @@ function gaussian(rand: () => number): number {
 
 const round = (n: number) => Math.round(n * 10) / 10;
 
-function geometry({ height, originRatio = 0.6, sigmaRatio = 0.055 }: WalkGeometry) {
+function geometry({ height, originRatio = 0.6, sigmaRatio = 0.055, driftRatio = 0, leadDriftRatio = driftRatio }: WalkGeometry) {
   return {
+    drift: height * driftRatio,
+    leadDrift: height * leadDriftRatio,
     top: height * 0.06,
     bottom: height * 0.94,
     originY: round(height * originRatio),
@@ -49,15 +55,16 @@ function geometry({ height, originRatio = 0.6, sigmaRatio = 0.055 }: WalkGeometr
 /** Brownian paths from a shared origin, reflected to stay inside the box. */
 export function generateWalkPoints({ seed, paths, ...box }: WalkOptions): Point[][] {
   const rand = mulberry32(seed);
-  const { top, bottom, originY, sigma } = geometry(box);
+  const { top, bottom, originY, sigma, drift, leadDrift } = geometry(box);
   const origin: Point = [0, originY];
   const dx = box.width / box.steps;
 
-  return Array.from({ length: paths }, () => {
+  return Array.from({ length: paths }, (_, p) => {
+    const pathDrift = p === 0 ? leadDrift : drift;
     const points: Point[] = [origin];
     let y = origin[1];
     for (let i = 1; i <= box.steps; i++) {
-      y += gaussian(rand) * sigma;
+      y += gaussian(rand) * sigma - pathDrift; // SVG y grows downward, so drift subtracts to climb
       if (y < top) y = top + (top - y);
       if (y > bottom) y = bottom - (y - bottom);
       y = Math.min(bottom, Math.max(top, y));
