@@ -40,7 +40,7 @@ export function PersonCard({ person, sizes = "(min-width: 640px) 192px, 50vw" }:
             alt={person.alt ?? ""}
             fill
             sizes={sizes}
-            placeholder="blur"
+            placeholder={person.headshot.blurDataURL ? "blur" : "empty"}
             className="object-cover object-[50%_25%]"
           />
         ) : (
