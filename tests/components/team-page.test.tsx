@@ -34,7 +34,7 @@ describe("TeamPage", () => {
   it("shows an honest empty state with no people, and hides placements", () => {
     const { container } = renderTeam({ people: [] });
     expect(screen.getByText("Board profiles will be posted here soon.")).toBeInTheDocument();
-    expect(eyebrows()).toEqual(["§ 01 — Executive board"]);
+    expect(eyebrows()).toEqual(["§ 01 — Operations"]);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
   });
@@ -51,18 +51,41 @@ describe("TeamPage", () => {
 
   it("orders tiers executive board, co-presidents, directors, with no track leads section", () => {
     renderTeam({ people: [dir, co, pres] });
-    expect(eyebrows()).toEqual(["§ 01 — Executive board", "§ 02 — Co-Presidents", "§ 03 — Directors"]);
+    // Eyebrows say what each tier does rather than repeating its heading.
+    expect(eyebrows()).toEqual(["§ 01 — Operations", "§ 02 — Leadership", "§ 03 — Programs"]);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent).slice(0, 3)).toEqual([
+      "Executive Board",
+      "Co-Presidents",
+      "Directors",
+    ]);
     expect(screen.queryByText(/track leads/i)).not.toBeInTheDocument();
     expect(screen.queryByText("Your first point of contact.")).not.toBeInTheDocument();
   });
 
-  it("uses the same role-then-name treatment for every tier", () => {
+  it("uses the same role-then-name treatment for every tier, with the name as the prominent line", () => {
     const { container } = renderTeam({ people: [pres, co, dir] });
     for (const slug of ["ada-lovelace", "co-one", "dir-one"]) {
       const card = container.querySelector(`#${slug}`) as HTMLElement;
-      expect(card.querySelector("p")?.className).toContain("text-h3");
-      expect(card.querySelector("h3")?.className).toContain("text-body");
+      expect(card.querySelector("p")?.className).toContain("text-caption");
+      expect(card.querySelector("h3")?.className).toContain("text-h3");
     }
+  });
+
+  it("puts a decorative company icon on the headshot only for people with a company", () => {
+    const logo = { src: "/images/companies/x.png", width: 192, height: 192 } as StaticImageData;
+    const { container } = renderTeam({
+      people: [{ ...dir, placement: "Previously at AWS", company: { name: "AWS", logo } }, { ...co }],
+    });
+    const badge = container.querySelector("#dir-one .group > span[aria-hidden='true']") as HTMLElement;
+    expect(badge).not.toBeNull();
+    expect(badge.className).toContain("group-hover:opacity-100");
+    expect(badge.querySelector("img")).toHaveAttribute("alt", "");
+    expect(container.querySelector("#co-one .group > span[aria-hidden='true']")).toBeNull();
+  });
+
+  it("shows a person's placement line when set", () => {
+    const { container } = renderTeam({ people: [{ ...dir, placement: "Previously at AWS" }] });
+    expect(container.querySelector("#dir-one")).toHaveTextContent("Previously at AWS");
   });
 
   it("renders directors with square headshots and the role leading", () => {

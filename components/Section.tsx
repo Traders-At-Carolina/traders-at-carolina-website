@@ -8,6 +8,8 @@ type SectionProps = {
   tone?: "bone" | "white" | "graphite";
   id?: string;
   labelledBy?: string;
+  /** Compact halves the rhythm (48 / 64px) for runs of short, related sections like the Team tiers. */
+  density?: "default" | "compact";
   className?: string;
 };
 
@@ -18,14 +20,14 @@ const tones = {
 } as const;
 
 /** Page section with standard vertical rhythm: 64px mobile, 96px tablet, 128px desktop. */
-export function Section({ children, tone = "bone", id, labelledBy, className = "" }: SectionProps) {
+export function Section({ children, tone = "bone", id, labelledBy, density = "default", className = "" }: SectionProps) {
   return (
     <section
       id={id}
       data-tone={tone}
       aria-labelledby={labelledBy}
       // scroll-mt clears the sticky header (64 / 80px) when linked to by #id.
-      className={`${tones[tone]} scroll-mt-16 py-16 md:scroll-mt-20 md:py-24 lg:py-32 ${className}`}
+      className={`${tones[tone]} scroll-mt-16 md:scroll-mt-20 ${density === "compact" ? "py-12 md:py-16" : "py-16 md:py-24 lg:py-32"} ${className}`}
     >
       <Container>{children}</Container>
     </section>
