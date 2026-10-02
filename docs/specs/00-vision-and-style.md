@@ -65,7 +65,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In the Home hero and `PageHeader`, the grid and the random walk form a single composition and count as one motif. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
 
 ---
@@ -136,7 +136,8 @@ Text colors are always **solid** values (`ink-2` and `ink-3`), never `opacity` o
 
 | Role | Family / weight | Size | Line height | Notes |
 |---|---|---|---|---|
-| Display | Georgia 400 | `clamp(2.75rem, 6vw, 5rem)` | 1.05 | `letter-spacing: -0.01em`; Home hero only |
+| Hero | Georgia 400 | `clamp(3rem, 7.2vw, 6rem)` | 0.98 | `letter-spacing: -0.02em`; Home hero H1 only (spec 01 §3.1) |
+| Display | Georgia 400 | `clamp(2.75rem, 6vw, 5rem)` | 1.05 | `letter-spacing: -0.01em`; reserved for large statements (the Home hero now uses Hero) |
 | H1 | Georgia 400 | `clamp(2.25rem, 4.5vw, 3.75rem)` | 1.1 | Page titles |
 | H2 | Georgia 400 | `clamp(1.75rem, 3vw, 2.5rem)` | 1.15 | Section headings |
 | H3 | Georgia 400 | `1.375rem` | 1.25 | Card and sub-section headings |
@@ -183,7 +184,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
   - One path is solid `navy` at 1.5px.
   - The others are navy at 30% opacity and black at 25% opacity, each at 1px.
 - **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits.
-- **Placement:** full size in the Home hero, and smaller and quieter in each `PageHeader`.
+- **Placement:** in each `PageHeader`. (The Home hero uses a 3D volatility surface instead; spec 01 §3.1.)
 - **Motion:** an optional 1.2s stroke draw-in on load (`stroke-dashoffset`), disabled under `prefers-reduced-motion`.
 - **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 
@@ -238,7 +239,9 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Effect | Spec |
 |---|---|
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
-| Hero random walk | Stroke draw-in over 1.2s on load |
+| Header random walk | Stroke draw-in over 1.2s on load |
+| Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 80s, eased in after a drag; stops on interaction, resumes after 4s |
+| Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
 | Link underline | Underline scales in from the left on hover, 200ms |
 | Button hover | Background color transition, 150ms |
 
