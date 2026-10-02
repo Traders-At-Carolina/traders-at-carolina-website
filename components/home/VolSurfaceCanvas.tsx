@@ -8,15 +8,13 @@ import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
-import { AXIS_LABELS, CAMERA, NK, NT, SCENE, WIRE_STEP, cameraDirection, fitDistance, toX, toY, toZ } from "@/components/home/volSurfaceScene";
+import { AXIS_LABELS, CAMERA, NK, NT, SCENE, TICKS, WIRE_STEP, cameraDirection, fitDistance, toX, toY, toZ, xFromMoneyness, zFromMaturity } from "@/components/home/volSurfaceScene";
 import { surfaceGrid, type VolParams } from "@/lib/vol-surface";
 
 type VolSurfaceCanvasProps = {
   params: VolParams;
-  /** Whether the camera director runs (off while the user is interacting, offscreen or under reduced motion). */
+  /** Whether the idle spin runs (off while the user is interacting, offscreen or under reduced motion). */
   animate: boolean;
-  /** Azimuth the director steers toward: the angle that best shows the next market change. */
-  view: number;
   label: string;
   onInteractStart: () => void;
   onInteractEnd: () => void;
@@ -173,17 +171,24 @@ function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
 
 const LABELS = AXIS_LABELS;
 
-/** Projects each label's 3D anchor to the canvas and moves its span there. */
+/** Projects each label's 3D anchor to the canvas, moves its span there, and fades it as its axis turns away. */
 function LabelTracker({ spans }: { spans: RefObject<(HTMLSpanElement | null)[]> }) {
   const points = useMemo(() => LABELS.map(({ at }) => new THREE.Vector3(...at)), []);
+  const facings = useMemo(() => LABELS.map(({ facing }) => new THREE.Vector3(...facing)), []);
+  const target = useMemo(() => new THREE.Vector3(...CAMERA.target), []);
   const v = useMemo(() => new THREE.Vector3(), []);
+  const toCamera = useMemo(() => new THREE.Vector3(), []);
   useFrame(({ camera, size }) => {
+    toCamera.copy(camera.position).sub(target).setY(0).normalize();
     points.forEach((p, i) => {
       const el = spans.current[i];
       if (!el) return;
       v.copy(p).project(camera);
       el.style.transform = `translate(${((v.x + 1) / 2) * size.width}px, ${((1 - v.y) / 2) * size.height}px) translate(-50%, -50%)`;
-      el.style.visibility = v.z < 1 ? "visible" : "hidden";
+      // Fully shown while the axis faces the camera (cos > 0.3), gone once it is edge-on or behind.
+      const opacity = Math.min(1, Math.max(0, (toCamera.dot(facings[i]) - 0.05) / 0.25));
+      el.style.opacity = String(opacity);
+      el.style.visibility = v.z < 1 && opacity > 0 ? "visible" : "hidden";
     });
   });
   return null;
@@ -200,10 +205,18 @@ function Lights() {
   );
 }
 
-/** Three hairline axes meeting at the front-right corner: strike along the front, maturity along the right, vol up. */
+const TICK = 0.07;
+
+/** Three hairline axes meeting at the front-right corner (strike along the front, maturity along the right, vol up), with tick marks. */
 function Axes() {
   const colors = useBrandColors();
-  const axesBuf = useMemo(() => new Float32Array([-X, 0, Z, X, 0, Z, X, 0, Z, X, 0, -Z, X, 0, Z, X, H, Z]), []);
+  const axesBuf = useMemo(() => {
+    const a = [-X, 0, Z, X, 0, Z, X, 0, Z, X, 0, -Z, X, 0, Z, X, H, Z];
+    for (const m of TICKS.strike) a.push(xFromMoneyness(m), 0, Z, xFromMoneyness(m), 0, Z + TICK);
+    for (const { T } of TICKS.maturity) a.push(X, 0, zFromMaturity(T), X + TICK, 0, zFromMaturity(T));
+    for (const v of TICKS.vol) a.push(X, toY(v), Z, X + TICK * 0.7, toY(v), Z + TICK * 0.7);
+    return new Float32Array(a);
+  }, []);
   const axes = useLines(axesBuf.length / 6, colors.black, 1, 0.45);
   useEffect(() => writeLines(axes, axesBuf), [axes, axesBuf]);
   return <primitive object={axes} />;
@@ -259,15 +272,11 @@ function FitCamera({ controls }: { controls: RefObject<Controls | null> }) {
 /** Starting camera position along the default view; FitCamera pulls it to the fitted distance on the first frame. */
 const INITIAL_CAMERA = cameraDirection(CAMERA.azimuth, CAMERA.polar).map((d, i) => CAMERA.target[i] + d * 8) as [number, number, number];
 
-/** Shortest signed angle from a to b. */
-const angleDelta = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
-
 /**
- * Slowly steers the camera toward `view` with a critically damped spring (smooth start and stop, capped speed),
- * plus a gentle sway, so each market change is seen from the angle that shows it best and the camera never wanders
- * round to the back or underside.
+ * Idle spin: turns the camera at a constant, slow rate (azimuth increasing, so the surface turns clockwise seen
+ * from above), easing up to speed after a drag, while gently settling the tilt back to the default view.
  */
-function CameraDirector({ controls, view, animate }: { controls: RefObject<Controls | null>; view: number; animate: boolean }) {
+function IdleSpin({ controls, animate }: { controls: RefObject<Controls | null>; animate: boolean }) {
   const state = useRef({ t: 0, va: 0, vp: 0 });
   useFrame((_, delta) => {
     const c = controls.current;
@@ -279,15 +288,10 @@ function CameraDirector({ controls, view, animate }: { controls: RefObject<Contr
     }
     const dt = Math.min(delta, 0.05);
     s.t += dt;
-    const sway = Math.sin((s.t / 26) * 2 * Math.PI);
-    const goalAz = view + 0.1 * sway;
+    s.va += (CAMERA.spin - s.va) * (1 - Math.exp(-dt * 0.8));
     const goalPolar = CAMERA.polar + 0.04 * Math.sin((s.t / 31) * 2 * Math.PI);
-
     const k = 0.9;
-    const maxSpeed = 0.2;
-    const spring = (v: number, offset: number) => Math.max(-maxSpeed, Math.min(maxSpeed, v + (k * k * offset - 2 * k * v) * dt));
-    s.va = spring(s.va, angleDelta(c.getAzimuthalAngle(), goalAz));
-    s.vp = spring(s.vp, goalPolar - c.getPolarAngle());
+    s.vp = Math.max(-0.2, Math.min(0.2, s.vp + (k * k * (goalPolar - c.getPolarAngle()) - 2 * k * s.vp) * dt));
     c.setAzimuthalAngle(c.getAzimuthalAngle() + s.va * dt);
     c.setPolarAngle(c.getPolarAngle() + s.vp * dt);
   });
@@ -308,7 +312,7 @@ function TouchScroll() {
 }
 
 /** The interactive WebGL volatility surface (spec 01 §3.1). Loaded lazily by VolSurfaceFigure. */
-export default function VolSurfaceCanvas({ params, animate, view, label, onInteractStart, onInteractEnd }: VolSurfaceCanvasProps) {
+export default function VolSurfaceCanvas({ params, animate, label, onInteractStart, onInteractEnd }: VolSurfaceCanvasProps) {
   const controls = useRef<Controls>(null);
   const labelSpans = useRef<(HTMLSpanElement | null)[]>([]);
 
@@ -343,18 +347,20 @@ export default function VolSurfaceCanvas({ params, animate, view, label, onInter
         <Axes />
         <FreeControls controls={controls} animate={animate} onInteractStart={onInteractStart} onInteractEnd={onInteractEnd} />
         <FitCamera controls={controls} />
-        <CameraDirector controls={controls} view={view} animate={animate} />
+        <IdleSpin controls={controls} animate={animate} />
         <TouchScroll />
         <LabelTracker spans={labelSpans} />
       </Canvas>
-      {LABELS.map(({ text }, i) => (
+      {LABELS.map(({ text, kind }, i) => (
         <span
           key={text}
           ref={(el) => {
             labelSpans.current[i] = el;
           }}
           aria-hidden="true"
-          className="pointer-events-none invisible absolute top-0 left-0 font-sans text-[11px] leading-none whitespace-nowrap text-ink-3"
+          className={`pointer-events-none invisible absolute top-0 left-0 font-sans leading-none whitespace-nowrap tabular ${
+            kind === "title" ? "text-[11px] font-medium text-ink-2" : "text-[10px] text-ink-3"
+          }`}
         >
           {text}
         </span>

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { AXIS_LABELS, CAMERA, SCENE, VIEWS, cameraDirection, fitDistance, viewForChange } from "@/components/home/volSurfaceScene";
-import { MARKET_REGIMES } from "@/lib/vol-surface";
+import { AXIS_LABELS, CAMERA, SCENE, cameraDirection, fitDistance, xFromMoneyness, zFromMaturity } from "@/components/home/volSurfaceScene";
 
 const { halfX: X, halfZ: Z, height: H } = SCENE;
 const points = [
@@ -32,7 +31,7 @@ describe("fitDistance", () => {
   });
 
   it("frames as tightly as each view allows", () => {
-    for (const azimuth of [VIEWS.skew, VIEWS.level, VIEWS.term]) {
+    for (const azimuth of [0.3, 0.72, 1.15]) {
       expect(maxNdc(1.3, azimuth, CAMERA.polar)).toBeGreaterThan(0.9);
     }
   });
@@ -42,26 +41,15 @@ describe("fitDistance", () => {
   });
 });
 
-describe("viewForChange", () => {
-  const base = MARKET_REGIMES[0].params;
-
-  it("faces the strike axis when the skew changes most", () => {
-    expect(viewForChange(base, { ...base, skew: base.skew + 0.6 })).toBe(VIEWS.skew);
+describe("axis ticks", () => {
+  it("puts K/S 1.0 at the centre column, where the ATM line runs, and maturities along the right edge", () => {
+    expect(xFromMoneyness(1)).toBeCloseTo(0);
+    expect(zFromMaturity(2)).toBeCloseTo(-SCENE.halfZ);
+    expect(zFromMaturity(0.1)).toBeCloseTo(SCENE.halfZ);
   });
 
-  it("faces the maturity axis when the term structure changes most", () => {
-    expect(viewForChange(base, { ...base, termSlope: base.termSlope - 0.5 })).toBe(VIEWS.term);
-  });
-
-  it("uses the three-quarter view when the overall level changes most", () => {
-    expect(viewForChange(base, { ...base, atmVol: base.atmVol + 0.3 })).toBe(VIEWS.level);
-  });
-
-  it("keeps every planned view (plus its sway) in the front-right quadrant, where the axes face the camera", () => {
-    MARKET_REGIMES.forEach(({ params }, i) => {
-      const view = viewForChange(params, MARKET_REGIMES[(i + 1) % MARKET_REGIMES.length].params);
-      expect(view - 0.1).toBeGreaterThanOrEqual(0);
-      expect(view + 0.1).toBeLessThanOrEqual(Math.PI / 2);
-    });
+  it("labels every tick and the three axes", () => {
+    const texts = AXIS_LABELS.map((l) => l.text);
+    expect(texts).toEqual(expect.arrayContaining(["1.0 ATM", "6M", "2Y", "20%", "60%", "Strike K/S", "Maturity", "Implied vol"]));
   });
 });

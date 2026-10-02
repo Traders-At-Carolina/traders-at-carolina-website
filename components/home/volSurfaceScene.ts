@@ -1,4 +1,4 @@
-import type { VolParams } from "@/lib/vol-surface";
+import { DOMAIN } from "@/lib/vol-surface";
 
 /** Grid resolution of the hero's volatility surface (strike columns × maturity rows). */
 export const NK = 61;
@@ -12,16 +12,51 @@ const { halfX: X, halfZ: Z, height: H } = SCENE;
 
 type Vec3 = [number, number, number];
 
+/** Scene height for an implied vol: the axis runs from 10% to 80%, so the surface sits on its axes. */
+export function toY(vol: number) {
+  return ((Math.min(Math.max(vol, SCENE.volMin), SCENE.volMax) - SCENE.volMin) / (SCENE.volMax - SCENE.volMin)) * SCENE.height;
+}
+
 /**
  * The axes meet at the front-right corner, the corner nearest the camera across the director's front views, so in
  * normal viewing the axes and their titles sit in front of the surface.
  */
 export const AXIS_ORIGIN: Vec3 = [X, 0, Z];
 
-/** Axis titles, anchored in scene space (the camera fit keeps them in frame too). Height is implied vol, named in the caption. */
-export const AXIS_LABELS: { text: string; at: Vec3 }[] = [
-  { text: "Strike", at: [0, 0, Z + 0.24] },
-  { text: "Maturity", at: [X + 0.34, 0, 0] },
+/** Scene x for a strike given as K/S, and scene z for a maturity in years. */
+export const xFromMoneyness = (m: number) => -X + ((Math.log(m) - DOMAIN.k[0]) / (DOMAIN.k[1] - DOMAIN.k[0])) * 2 * X;
+export const zFromMaturity = (T: number) => Z - ((T - DOMAIN.T[0]) / (DOMAIN.T[1] - DOMAIN.T[0])) * 2 * Z;
+
+/** Tick values on each axis. K/S 1.0 is the at-the-money strike, where the bold ATM line runs. */
+export const TICKS = {
+  strike: [0.8, 1, 1.25],
+  maturity: [
+    { T: 0.5, text: "6M" },
+    { T: 1, text: "1Y" },
+    { T: 1.5, text: "18M" },
+    { T: 2, text: "2Y" },
+  ],
+  vol: [0.2, 0.4, 0.6],
+} as const;
+
+/**
+ * `facing` is the outward direction of the label's axis: the label is shown while the camera is on that side and
+ * fades out as the axis turns away, so far-side numbers never float over the surface during the spin.
+ */
+export type AxisLabel = { text: string; at: Vec3; kind: "tick" | "title"; facing: Vec3 };
+
+const FRONT: Vec3 = [0, 0, 1];
+const RIGHT: Vec3 = [1, 0, 0];
+const CORNER: Vec3 = [Math.SQRT1_2, 0, Math.SQRT1_2];
+
+/** Tick values and axis titles, anchored in scene space (the camera fit keeps them all in frame). */
+export const AXIS_LABELS: AxisLabel[] = [
+  ...TICKS.strike.map((m): AxisLabel => ({ text: m === 1 ? "1.0 ATM" : String(m), at: [xFromMoneyness(m), 0, Z + 0.2], kind: "tick", facing: FRONT })),
+  ...TICKS.maturity.map(({ T, text }): AxisLabel => ({ text, at: [X + 0.22, 0, zFromMaturity(T)], kind: "tick", facing: RIGHT })),
+  ...TICKS.vol.map((v): AxisLabel => ({ text: `${Math.round(v * 100)}%`, at: [X + 0.17, toY(v), Z + 0.17], kind: "tick", facing: CORNER })),
+  { text: "Strike K/S", at: [-X + 0.25, 0, Z + 0.44], kind: "title", facing: FRONT },
+  { text: "Maturity", at: [X + 0.28, 0, -Z - 0.3], kind: "title", facing: RIGHT },
+  { text: "Implied vol", at: [X, H + 0.2, Z], kind: "title", facing: CORNER },
 ];
 
 /**
@@ -33,39 +68,15 @@ export const CAMERA = {
   fov: 38,
   azimuth: 0.66,
   polar: 1.12,
+  /** Idle spin: clockwise seen from above (camera azimuth increasing), one turn every 80 seconds. */
+  spin: (2 * Math.PI) / 80,
   /** Dragging is free in every direction (all the way round, over the top and underneath). */
   minPolar: 0.02,
   maxPolar: Math.PI - 0.02,
 };
 
-/** Best viewing angle for each kind of market change (spec 01 §3.1). */
-export const VIEWS = {
-  /** Face the strike axis: the smile / skew reads as a curve across the screen. */
-  skew: 0.3,
-  /** Three-quarter view: overall level of the surface. */
-  level: 0.72,
-  /** Face the maturity axis: the term structure reads as a slope across the screen. */
-  term: 1.15,
-} as const;
-
-/**
- * Picks the view that best shows the move from one regime to the next, by which normalized parameter changes
- * most: skew (smile shape), term slope (term structure) or ATM vol (overall level).
- */
-export function viewForChange(from: VolParams, to: VolParams): number {
-  const skew = Math.abs(to.skew - from.skew) / 1.2;
-  const term = Math.abs(to.termSlope - from.termSlope) / 0.8;
-  const level = Math.abs(to.atmVol - from.atmVol) / 0.5;
-  if (skew >= term && skew >= level) return VIEWS.skew;
-  if (term >= level) return VIEWS.term;
-  return VIEWS.level;
-}
-
 export const toX = (ik: number) => -X + (2 * X * ik) / (NK - 1);
 export const toZ = (iT: number) => Z - (2 * Z * iT) / (NT - 1);
-/** Vol axis starts at 10% (no tick values are shown), so the surface sits on its axes rather than floating. */
-export const toY = (vol: number) =>
-  ((Math.min(Math.max(vol, SCENE.volMin), SCENE.volMax) - SCENE.volMin) / (SCENE.volMax - SCENE.volMin)) * H;
 
 const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];

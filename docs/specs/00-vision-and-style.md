@@ -240,7 +240,7 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 |---|---|
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
 | Header random walk | Stroke draw-in over 1.2s on load |
-| Hero 3D surface — camera | Eases (≤ ~11°/s, critically damped) to the view that best shows the next market change, with a gentle sway; stops on interaction, resumes after 4s |
+| Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 80s, eased in after a drag; stops on interaction, resumes after 4s |
 | Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
 | Link underline | Underline scales in from the left on hover, 200ms |
 | Button hover | Background color transition, 150ms |

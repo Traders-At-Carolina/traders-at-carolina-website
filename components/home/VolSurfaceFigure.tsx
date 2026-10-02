@@ -3,8 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
-import { viewForChange } from "@/components/home/volSurfaceScene";
-import { MARKET_REGIMES, describeSurface, easeInOut, lerpParams, type VolParams } from "@/lib/vol-surface";
+import { MARKET_REGIMES, describeSurface, easeInOut, impliedVol, lerpParams, type VolParams } from "@/lib/vol-surface";
 
 // three.js stays out of the initial bundle: the canvas loads after hydration, once the figure is near the viewport.
 const VolSurfaceCanvas = dynamic(() => import("@/components/home/VolSurfaceCanvas"), {
@@ -12,7 +11,7 @@ const VolSurfaceCanvas = dynamic(() => import("@/components/home/VolSurfaceCanva
   loading: () => <VolSurfacePoster />,
 });
 
-/** How long each market is held (long enough for the camera to settle on the next view), and the morph length. */
+/** How long each market is held, and how long the surface takes to morph into the next. */
 const HOLD_MS = 5000;
 const MORPH_MS = 2600;
 const IDLE_MS = 4000;
@@ -38,6 +37,38 @@ function usePageVisible() {
     },
     () => !document.hidden,
     () => true,
+  );
+}
+
+const pct = (v: number) => (v * 100).toFixed(1);
+
+/**
+ * Live numbers for the surface on screen, recomputed every frame of a morph: ATM vol at 3M, 1Y and 2Y (the term
+ * structure) and 1Y skew as the vol spread between the 90% and 110% strikes. Decorative duplicate of the canvas
+ * label, so hidden from assistive tech.
+ */
+function Readout({ name, params }: { name: string; params: VolParams }) {
+  const atm = [0.25, 1, 2].map((T) => pct(impliedVol(0, T, params)));
+  const skew = (impliedVol(Math.log(0.9), 1, params) - impliedVol(Math.log(1.1), 1, params)) * 100;
+  return (
+    <div aria-hidden="true" className="mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 text-caption tabular">
+      <p className="font-medium text-navy">{name}</p>
+      <dl className="flex flex-wrap gap-x-5 gap-y-1 text-ink-3">
+        <div className="flex gap-2">
+          <dt>ATM 3M / 1Y / 2Y</dt>
+          <dd className="text-ink-2">
+            {atm.join(" / ")}%
+          </dd>
+        </div>
+        <div className="flex gap-2">
+          <dt>1Y skew 90–110</dt>
+          <dd className="text-ink-2">
+            {skew < 0 ? "−" : "+"}
+            {Math.abs(skew).toFixed(1)} pts
+          </dd>
+        </div>
+      </dl>
+    </div>
   );
 }
 
@@ -118,18 +149,16 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
   }, []);
 
   const regime = MARKET_REGIMES[index];
-  // During each hold the camera turns to the angle that best shows the change that is coming next.
-  const view = viewForChange(regime.params, MARKET_REGIMES[(index + 1) % MARKET_REGIMES.length].params);
   const animateCamera = idle && !reducedMotion && inView && pageVisible;
 
   return (
     <figure className={className}>
+      <Readout name={regime.name} params={params} />
       <div ref={box} className="relative h-[300px] md:h-[420px] lg:h-[clamp(380px,58vh,600px)]">
         {nearViewport ? (
           <VolSurfaceCanvas
             params={params}
             animate={animateCamera}
-            view={view}
             label={`${regime.name}. ${describeSurface(regime.params)}`}
             onInteractStart={onInteractStart}
             onInteractEnd={onInteractEnd}

@@ -38,7 +38,7 @@ describe("VolSurfaceFigure", () => {
     vi.restoreAllMocks();
   });
 
-  it("shows only the surface and a one-line caption", () => {
+  it("shows the surface, its live numbers and a caption, with no controls", () => {
     const { container } = render(<VolSurfaceFigure caption={caption} />);
     expect(container.querySelector("svg[aria-hidden='true']")).not.toBeNull();
     expect(screen.getByRole("figure")).toHaveTextContent(caption);
@@ -46,6 +46,9 @@ describe("VolSurfaceFigure", () => {
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByRole("slider")).toBeNull();
     expect(screen.queryByRole("list")).toBeNull();
+    // Calm market: ATM 16% at 1Y, term slope +0.2 → 13.6% at 3M and 19.2% at 2Y.
+    expect(screen.getByText("13.6 / 16.0 / 19.2%")).toBeInTheDocument();
+    expect(screen.getByText(/pts$/)).toBeInTheDocument();
   });
 
   it("moves on to the next market by itself while visible", async () => {

@@ -56,9 +56,9 @@ Only these sections appear on Home. No placement section (data isn't available y
   - Strike (log-moneyness −0.5…0.5) × maturity (0.1–2y) × implied vol (height, from 10%), from an SSVI-style model in `lib/vol-surface.ts`.
   - A matte 61 × 41 mesh washed in navy (mixed into white), deeper where implied vol is higher — tinted by absolute vol, so a sell-off reads darker than a calm market. Design-token colors, no tone mapping, mostly ambient light.
   - Navy-ink lines (anti-aliased `LineSegments2`): a faint wire grid every 5th row/column, a thin outline, and a bold **at-the-money line** (K/S = 1) tracing the ATM term structure.
-  - Hairline axes from the front-right corner (nearest the camera across the reachable arc), titled "Strike" and "Maturity"; the vertical axis is untitled — the caption names it. No floor grid, ticks or values.
-  - Six regimes (`MARKET_REGIMES`) cycle unlabelled; their names appear only in the accessible label.
-  - `<figcaption>`: just `hero.figureCaption` ("Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.").
+  - Hairline axes meeting at the front-right corner, with tick marks and values: strike K/S 0.8 / "1.0 ATM" / 1.25, maturity 6M / 1Y / 18M / 2Y, implied vol 20% / 40% / 60%; titled "Strike K/S", "Maturity" and "Implied vol". Each label fades out as its axis turns away from the camera, so far-side numbers never sit over the surface. No floor grid.
+  - **Live readout** above the plot (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the canvas label carries the same information).
+  - `<figcaption>`: `hero.figureCaption` ("Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.")
 
 **Layout**
 - **Desktop (≥ 1024px):**
@@ -74,9 +74,9 @@ Only these sections appear on Home. No placement section (data isn't available y
 **Behavior**
 - **Framing:** rotation is free in every direction (all the way round, over the top and underneath). Each frame the camera distance eases toward the tightest fit for the current angle and canvas aspect (`fitDistance`), so the surface, axes and titles fill the figure without ever clipping.
 - **Rotate:** drag (OrbitControls; zoom and pan off) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
-- **Camera director (while idle):** before each market change the camera turns slowly (critically damped spring, ≤ ~11°/s) to the angle that best shows it: face-on to strike when the skew changes most, face-on to maturity when the term structure does, three-quarter when the overall level does — with a gentle sway. It stops on interaction and resumes 4s after it ends.
+- **Idle spin:** while idle the surface turns continuously clockwise (seen from above), one turn every 80s, easing up to speed after a drag, with a gentle tilt sway. It stops on interaction and resumes 4s after it ends.
 - **Market cycle:** each regime is held for 5s (time for the camera to settle), then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.
-- The cycle and camera director pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and the camera stays still.
+- The cycle and the spin pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and the camera stays still.
 - The canvas wrapper is `role="img"` with an `aria-label` naming and summarising the current regime; the axis titles are `aria-hidden`.
 - The headline is the page's only `<h1>`.
 - **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island that first renders a static SVG poster of the surface (same math, no layout shift, also the no-WebGL fallback). three.js (`three`, `@react-three/fiber`, `@react-three/drei`, ~245 kB gzipped) loads lazily via `next/dynamic` only once the figure is within 200px of the viewport, so it is never on the LCP path. Budget: LCP stays text, CLS 0.
