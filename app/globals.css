@@ -54,6 +54,7 @@
 @theme inline {
   --font-display: "Georgia Pro", Georgia, var(--font-gelasio), "Times New Roman", serif;
   --font-sans: var(--font-public-sans), system-ui, sans-serif;
+  --font-title: var(--font-chivo), "Arial Black", system-ui, sans-serif;
 }
 
 @layer base {

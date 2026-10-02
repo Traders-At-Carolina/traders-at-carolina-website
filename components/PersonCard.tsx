@@ -3,22 +3,50 @@ import { LinkedInIcon } from "@/components/LinkedInIcon";
 import type { Person } from "@/content/types";
 import { initials, personMeta } from "@/lib/team";
 
+type PersonCardProps = {
+  person: Person;
+  /** "portrait" is 4:5 (default); "square" is 1:1. */
+  shape?: "portrait" | "square";
+  /**
+   * "default": eyebrow role above a regular name.
+   * "bold": heavy black role and name (executive board).
+   * "role": the role leads, set large above a smaller name (directors).
+   */
+  emphasis?: "default" | "bold" | "role";
+};
+
 /**
- * Headshot, role, name, class year and major, optional placement and LinkedIn (spec 04 §3.1).
+ * Full-colour headshot, role, name, class year and major, optional placement and LinkedIn (spec 04 §3.1).
  * Only the LinkedIn icon is interactive; the card is the /team#{slug} anchor target.
  */
-export function PersonCard({ person }: { person: Person }) {
+export function PersonCard({ person, shape = "portrait", emphasis = "default" }: PersonCardProps) {
+  const meta = personMeta(person);
+  const roleEl =
+    emphasis === "role" ? (
+      <p className="font-display text-h3 text-navy">{person.role}</p>
+    ) : (
+      <p className={emphasis === "bold" ? "eyebrow !font-bold !normal-case !text-black" : "eyebrow !normal-case"}>{person.role}</p>
+    );
+  const nameEl = (
+    <h3
+      id={`${person.slug}-name`}
+      className={`${emphasis === "role" ? "mt-1 text-body text-ink-2" : "mt-2 text-h3"} ${emphasis === "bold" ? "font-bold text-black" : ""}`}
+    >
+      {person.name}
+    </h3>
+  );
+
   return (
-    <article id={person.slug} aria-labelledby={`${person.slug}-name`} className="scroll-mt-24">
-      <div className="relative aspect-[4/5] overflow-hidden">
+    <article id={person.slug} aria-labelledby={`${person.slug}-name`} className="scroll-mt-24 text-center">
+      <div className={`relative overflow-hidden rounded-2xl ${shape === "square" ? "aspect-square" : "aspect-[4/5]"}`}>
         {person.headshot ? (
           <Image
             src={person.headshot}
             alt={person.alt ?? ""}
             fill
-            sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+            sizes="(min-width: 640px) 240px, 192px"
             placeholder="blur"
-            className="object-cover grayscale"
+            className="object-cover"
           />
         ) : (
           <div aria-hidden="true" className="flex h-full items-center justify-center border border-rule bg-white">
@@ -27,11 +55,9 @@ export function PersonCard({ person }: { person: Person }) {
         )}
       </div>
       <div className="mt-4">
-        <p className="eyebrow">{person.role}</p>
-        <h3 id={`${person.slug}-name`} className="mt-2 text-h3">
-          {person.name}
-        </h3>
-        {personMeta(person) ? <p className="mt-1 text-caption text-ink-3 tabular">{personMeta(person)}</p> : null}
+        {roleEl}
+        {nameEl}
+        {meta ? <p className="mt-1 text-caption text-ink-3 tabular">{meta}</p> : null}
         {person.placement ? <p className="mt-1 text-caption text-ink-2">{person.placement}</p> : null}
         {person.linkedin ? (
           <a
@@ -39,7 +65,7 @@ export function PersonCard({ person }: { person: Person }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${person.name} on LinkedIn`}
-            className="-ml-3 mt-1 inline-flex min-h-11 min-w-11 items-center justify-center text-navy hover:text-navy-press"
+            className="mt-1 inline-flex min-h-11 min-w-11 items-center justify-center text-navy hover:text-navy-press"
           >
             <LinkedInIcon />
           </a>
