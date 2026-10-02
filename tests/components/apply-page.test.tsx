@@ -18,25 +18,23 @@ afterEach(() => {
 });
 
 describe("ApplyPage", () => {
-  it("renders the open state with one h1 and the form link in the header and band", () => {
+  it("renders the open state with one h1 and the form link in the header, and no navy band", () => {
     const { container } = render(<ApplyPage apply={apply} recruiting={open} now={before} />);
     expect(screen.getAllByRole("heading", { level: 1 }).map((h) => h.textContent)).toEqual(["Applications are open."]);
     expect(screen.getByText("Due Sat, Feb 6 at 11:59 PM ET")).toBeInTheDocument();
     const applyLinks = screen.getAllByRole("link", { name: /^Apply/ });
-    expect(applyLinks).toHaveLength(2);
-    applyLinks.forEach((link) => {
-      expect(link).toHaveAttribute("href", "https://forms.gle/apply");
-      expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    });
-    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
+    expect(applyLinks).toHaveLength(1);
+    expect(applyLinks[0]).toHaveAttribute("href", "https://forms.gle/apply");
+    expect(applyLinks[0]).toHaveAttribute("rel", "noopener noreferrer");
+    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
   });
 
   it("renders the closed state with the interest form", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Applications are closed.");
     const notify = screen.getAllByRole("link", { name: /^Get notified/ });
-    expect(notify).toHaveLength(2);
-    notify.forEach((link) => expect(link).toHaveAttribute("href", "https://forms.gle/notify"));
+    expect(notify).toHaveLength(1);
+    expect(notify[0]).toHaveAttribute("href", "https://forms.gle/notify");
   });
 
   it("is closed at build time once the deadline has passed", () => {
@@ -52,7 +50,6 @@ describe("ApplyPage", () => {
       vi.advanceTimersByTime(2 * 60_000);
     });
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Applications are closed.");
-    expect(screen.getByRole("heading", { name: "Applications are closed for now." })).toBeInTheDocument();
   });
 
   it("renders FAQ items as details with links and FAQPage JSON-LD", () => {

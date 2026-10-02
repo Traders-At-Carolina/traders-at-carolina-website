@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { apply } from "@/content/apply";
 import type { Recruiting } from "@/content/types";
-import { applyBandCopy, applyStatusCopy, formatDateRange, stageDates } from "@/lib/apply";
+import { applyStatusCopy, formatDateRange, stageDates } from "@/lib/apply";
 import { getApplicationState } from "@/lib/applications";
 import { inlineToPlainText, parseInline } from "@/lib/inline-markdown";
 import { validateApply } from "@/lib/validate-apply";
@@ -48,16 +48,6 @@ describe("applyStatusCopy", () => {
     expect(copy.action).toBeUndefined();
     expect(copy.statusLine).toBe("We recruit each fall and spring.");
     expect(copy.secondary.href).toBe("#faq");
-  });
-});
-
-describe("applyBandCopy", () => {
-  it("matches the state", () => {
-    expect(applyBandCopy(getApplicationState(now, open), open, undefined)).toMatchObject({
-      title: "Ready when you are.",
-      lead: "Applications close Sat, Feb 6.",
-    });
-    expect(applyBandCopy(getApplicationState(now, closed), closed, undefined).action.label).toBe("Read the FAQ");
   });
 });
 

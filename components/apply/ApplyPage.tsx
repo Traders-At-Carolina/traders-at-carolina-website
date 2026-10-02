@@ -2,11 +2,9 @@ import type { ReactNode } from "react";
 import { ApplyHeader } from "@/components/apply/ApplyHeader";
 import { Faq } from "@/components/apply/Faq";
 import { Process } from "@/components/apply/Process";
-import { Button } from "@/components/Button";
-import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import type { ApplyContent, Recruiting } from "@/content/types";
-import { applyBandCopy, applyStatusCopy, stageDates } from "@/lib/apply";
+import { applyStatusCopy, stageDates } from "@/lib/apply";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 
 type ApplyPageProps = {
@@ -34,20 +32,6 @@ export function ApplyPage({ apply, recruiting, contactEmail, now }: ApplyPagePro
   const process = (s: ApplicationState) => (
     <Process stages={apply.stages} dates={stageDates(s, recruiting)} lead={processLead(s, recruiting.cycleLabel)} />
   );
-  const band = (s: ApplicationState) => {
-    const copy = applyBandCopy(s, recruiting, contactEmail);
-    return (
-      <CTABand
-        title={copy.title}
-        lead={copy.lead}
-        action={
-          <Button href={copy.action.href} external={copy.action.external} variant="inverse">
-            {copy.action.label}
-          </Button>
-        }
-      />
-    );
-  };
 
   const deadline = state.status === "open" ? state.deadline : undefined;
   const live = (render: (s: ApplicationState) => ReactNode) =>
@@ -58,7 +42,6 @@ export function ApplyPage({ apply, recruiting, contactEmail, now }: ApplyPagePro
       <div aria-live="polite">{live(header)}</div>
       {live(process)}
       <Faq faq={apply.faq} contactEmail={contactEmail} />
-      {live(band)}
     </>
   );
 }
