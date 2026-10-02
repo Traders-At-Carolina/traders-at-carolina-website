@@ -66,7 +66,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 **Restraint rules**
 
 - At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
-- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
+- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** the footer's `BitWordmark` (a decorative field of 0s and 1s, drawn in the site's own sans, [spec 06](06-footer-bit-wordmark.md)) is allowed. It counts as a motif and appears nowhere else.
 
 ---
 
@@ -291,6 +291,7 @@ Page specs reference these by name. Each one is built once and reused.
   - Apply link
   - `© {year} Traders at Carolina`
   - a UNC student-organization disclaimer, if UNC requires one (§14)
+  - the `BitWordmark` band at the very bottom: a decorative, scroll-triggered field of 0s and 1s that resolves into "Traders at Carolina" and lights up around the cursor ([spec 06](06-footer-bit-wordmark.md))
 
 ### `Button`
 All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (32px tall, 6px × 20px padding).
@@ -395,6 +396,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 03 | `03-membership.md` | Club structure, tracks, weekly cadence, expectations |
 | 04 | `04-team.md` | Executive board, track leads, placements (firm names) |
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
+| 06 | `06-footer-bit-wordmark.md` | Footer 0s-and-1s wordmark: scroll-in scramble, cursor-radius hover |
 
 **Every page spec contains:**
 1. The page's goal, and the visitor questions it answers.
