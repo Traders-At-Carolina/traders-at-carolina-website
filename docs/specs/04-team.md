@@ -4,6 +4,8 @@
 
 All tokens, type roles, motifs and components are defined in spec 00. References like (00 §7.2) point there.
 
+> **Revision (2026-10-01):** `/team` now shows Executive board (heavy black type), Co-Presidents, then Directors (square 1:1 headshots, role set large above the name), in that order. The Track leads section (§4.3) and the "Led by" dual-role line were removed; the Placements section follows the leadership tiers. Headshots are now full colour, smaller (fixed-width cards, 160–224px), headshots have rounded corners, section spacing is tighter, and cards are centered with centered text. Where this note conflicts with §2–§4 below, this note wins. See `components/team/TeamPage.tsx`.
+
 ---
 
 ## 1. Goal
