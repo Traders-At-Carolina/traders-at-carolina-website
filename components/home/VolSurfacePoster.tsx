@@ -1,5 +1,5 @@
 import { NK, NT, SCENE, project, toX, toY, toZ } from "@/components/home/volSurfaceScene";
-import { DEFAULT_PARAMS, surfaceGrid, type VolParams } from "@/lib/vol-surface";
+import { MARKET_REGIMES, surfaceGrid, type VolParams } from "@/lib/vol-surface";
 
 type Pt = [number, number];
 
@@ -24,7 +24,7 @@ const toPath = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixe
  * Static wireframe of the volatility surface from the default camera. Shown before the WebGL
  * figure loads and as its fallback, so the hero never shifts and still makes sense without WebGL.
  */
-export function VolSurfacePoster({ params = DEFAULT_PARAMS }: { params?: VolParams }) {
+export function VolSurfacePoster({ params = MARKET_REGIMES[0].params }: { params?: VolParams }) {
   const { values } = surfaceGrid(params, NK, NT);
   const point = (ik: number, iT: number) => project([toX(ik), toY(values[iT * NK + ik]), toZ(iT)]);
 

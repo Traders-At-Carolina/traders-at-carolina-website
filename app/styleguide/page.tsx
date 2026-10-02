@@ -129,7 +129,7 @@ export default function StyleguidePage() {
             <RandomWalk seed={42} paths={3} size="header" className="h-full w-full" />
           </div>
         </Reveal>
-        <VolSurfaceFigure caption="Fig. 1 — Home hero volatility surface: drag to rotate, play to simulate." className="mt-16" />
+        <VolSurfaceFigure caption="Fig. 1 — Home hero volatility surface: cycles through market regimes; drag to rotate." className="mt-16" />
       </Section>
 
       <CTABand title="Ready to start?" lead="One navy band per page, with the shared Apply button." />

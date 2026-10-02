@@ -1,55 +1,65 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { act, render, screen } from "@testing-library/react";
 import { VolSurfaceFigure } from "@/components/home/VolSurfaceFigure";
 
-// The WebGL canvas only mounts once an IntersectionObserver fires, which never happens in jsdom;
-// these tests cover the poster, controls and simulation state around it.
+// The WebGL canvas itself is mocked out; these tests cover the poster, captions and the regime cycle.
+vi.mock("@/components/home/VolSurfaceCanvas", () => ({ default: () => null }));
+
 const caption = "Fig. 1 — An implied volatility surface.";
 
-describe("VolSurfaceFigure", () => {
-  afterEach(() => vi.restoreAllMocks());
+/** An IntersectionObserver that reports the figure as visible immediately. */
+function figureInView() {
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      constructor(private cb: IntersectionObserverCallback) {}
+      observe(el: Element) {
+        this.cb([{ isIntersecting: true, target: el } as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+      }
+      disconnect() {}
+    },
+  );
+}
 
-  it("renders the static poster, caption and default regime", () => {
+describe("VolSurfaceFigure", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("starts on the first market with the static poster and no controls", () => {
     const { container } = render(<VolSurfaceFigure caption={caption} />);
     expect(container.querySelector("svg[aria-hidden='true']")).not.toBeNull();
     expect(screen.getByRole("figure")).toHaveTextContent(caption);
-    expect(screen.getByText("Default regime")).toHaveAttribute("aria-live", "polite");
+    expect(screen.getByText("Calm market")).toBeInTheDocument();
+    expect(screen.queryByRole("slider")).toBeNull();
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.getByText("Calm market (showing)")).toBeInTheDocument();
   });
 
-  it("updates the readout when a slider moves", () => {
+  it("moves on to the next market by itself while visible", () => {
+    vi.useFakeTimers();
+    figureInView();
     render(<VolSurfaceFigure caption={caption} />);
-    const atm = screen.getByLabelText("ATM vol");
-    expect(atm).toHaveValue("0.24");
-    fireEvent.change(atm, { target: { value: "0.4" } });
-    expect(screen.getByText("40%")).toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(4500 + 2600 + 100));
+
+    expect(screen.getByText("Sell-off")).toBeInTheDocument();
+    expect(screen.getByText("Sell-off (showing)")).toBeInTheDocument();
   });
 
-  it("draws a new regime with its seed", async () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.5);
-    render(<VolSurfaceFigure caption={caption} />);
-    const skewBefore = (screen.getByLabelText("Skew ρ") as HTMLInputElement).value;
-
-    await userEvent.click(screen.getByRole("button", { name: "New regime" }));
-
-    expect(screen.getByText("Regime 5500")).toBeInTheDocument();
-    expect((screen.getByLabelText("Skew ρ") as HTMLInputElement).value).not.toBe(skewBefore);
-  });
-
-  it("toggles play with aria-pressed", async () => {
-    render(<VolSurfaceFigure caption={caption} />);
-    const play = screen.getByRole("button", { name: "Play market" });
-    expect(play).toHaveAttribute("aria-pressed", "false");
-    await userEvent.click(play);
-    expect(screen.getByRole("button", { name: "Pause market" })).toHaveAttribute("aria-pressed", "true");
-  });
-
-  it("disables play under reduced motion", () => {
+  it("stays on one market under reduced motion", () => {
+    vi.useFakeTimers();
+    figureInView();
     vi.spyOn(window, "matchMedia").mockImplementation(
       (query) => ({ matches: query.includes("reduce"), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
     );
     render(<VolSurfaceFigure caption={caption} />);
-    expect(screen.getByRole("button", { name: "Play market" })).toBeDisabled();
+
+    act(() => vi.advanceTimersByTime(20000));
+
+    expect(screen.getByText("Calm market")).toBeInTheDocument();
     expect(screen.getByText(/prefers reduced motion/)).toBeInTheDocument();
   });
 });

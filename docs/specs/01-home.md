@@ -52,15 +52,16 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Subhead:** Lead role, max about 25 words. Working copy: "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
-- **Art — "Fig. 1":** `VolSurfaceFigure`, a rotatable, simulatable 3D implied-volatility surface, presented like a figure in a paper:
+- **Art — "Fig. 1":** `VolSurfaceFigure`, a rotatable 3D implied-volatility surface that moves on its own between market regimes, presented like a figure in a paper:
   - Strike (log-moneyness −0.5…0.5, labelled K/S) × maturity (0.1–2y) × implied vol, from an SSVI-style model in `lib/vol-surface.ts`.
   - A navy-tinted mesh (lighter = low vol, deeper = high vol; colors read from the design tokens) with a bone wire grid, a faint navy floor grid and black hairline axes labelled "Strike K/S →", "Maturity →", "Implied vol" (80% top).
-  - Controls in the `<figcaption>`: sliders for **ATM vol** (10–60%), **Skew ρ** (−0.9…0.3) and **Term slope** (−0.4…0.4); **Play market** / **Pause market** (`aria-pressed`); **New regime**; the regime text (`aria-live="polite"`); `hero.figureCaption`; a low→high vol legend.
+  - Six named regimes (`MARKET_REGIMES`): Calm market, Sell-off, Recovery, Event risk, Speculative rally, Quiet carry.
+  - `<figcaption>`: a row of six square progress markers (current one navy), the regime name and a one-line note (two lines reserved so the layout never shifts), `hero.figureCaption`, and a low→high vol legend. There are no user controls besides rotation.
 
 **Layout**
 - **Desktop (≥ 1024px):**
   - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **left** in columns 1–6, and the figure sits on the right in columns 7–12.
-  - The 3D plot is `clamp(260px, 38vh, 400px)` tall (260px mobile, 340px tablet). Sliders sit in three columns when the figure is at least 32rem wide (container query), otherwise stacked.
+  - The 3D plot is `clamp(300px, 46vh, 460px)` tall (260px mobile, 340px tablet).
   - The hero is `clamp(600px, 100svh − header, 820px)` tall, with the grid masked to fade at the edges. The whole hero, figure included, should fit in the first viewport at 1024 × 768.
 - **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
@@ -71,9 +72,9 @@ Only these sections appear on Home. No placement section (data isn't available y
 **Behavior**
 - **Rotate:** drag (OrbitControls; zoom and pan off; polar angle limited) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
 - **Auto-rotate:** slow spin while idle; it stops on interaction and resumes 4s after it ends.
-- **Simulate:** sliders reshape the surface instantly. **Play market** ticks every 80ms: ATM vol, skew and term slope follow Ornstein–Uhlenbeck processes that mean-revert to the slider/regime values, so the surface breathes without drifting. **New regime** draws seeded random parameters.
+- **Market cycle:** each regime is held for 4.5s, then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.
 - **Hover (fine pointers):** a readout of σ, K/S and T at the pointer.
-- Play and auto-rotate pause when the figure is offscreen or the tab is hidden. Under reduced motion there is no auto-rotate and Play is disabled with a note; sliders and New regime still work.
+- The cycle and auto-rotate pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and does not auto-rotate.
 - The canvas wrapper is `role="img"` with an `aria-label` summarising the current regime; the readout and axis labels are `aria-hidden`.
 - The headline is the page's only `<h1>`.
 - **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island that first renders a static SVG poster of the surface (same math, no layout shift, also the no-WebGL fallback). three.js (`three`, `@react-three/fiber`, `@react-three/drei`, ~245 kB gzipped) loads lazily via `next/dynamic` only once the figure is within 200px of the viewport, so it is never on the LCP path. Budget: LCP stays text, CLS 0.

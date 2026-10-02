@@ -1,5 +1,3 @@
-import { mulberry32 } from "@/lib/random-walk";
-
 /** Parameters of the stylised implied-volatility surface on the Home hero (spec 01 §3.1). */
 export type VolParams = {
   /** At-the-money implied vol at T = 1 year, e.g. 0.24 for 24%. */
@@ -12,6 +10,7 @@ export type VolParams = {
   curvature: number;
 };
 
+/** Sensible bounds for each parameter; every regime stays inside them. */
 export const RANGES = {
   atmVol: [0.1, 0.6],
   skew: [-0.9, 0.3],
@@ -21,20 +20,6 @@ export const RANGES = {
 
 /** Log-moneyness k = ln(K/S) and maturity T (years) covered by the surface. */
 export const DOMAIN = { k: [-0.5, 0.5], T: [0.1, 2] } as const;
-
-export const DEFAULT_PARAMS: VolParams = { atmVol: 0.24, skew: -0.6, termSlope: 0.15, curvature: 1.2 };
-
-const clamp = (v: number, [lo, hi]: readonly [number, number]) => Math.min(hi, Math.max(lo, v));
-
-/** Keeps every parameter inside its range, so the surface stays positive and well-behaved. */
-export function clampParams(p: VolParams): VolParams {
-  return {
-    atmVol: clamp(p.atmVol, RANGES.atmVol),
-    skew: clamp(p.skew, RANGES.skew),
-    termSlope: clamp(p.termSlope, RANGES.termSlope),
-    curvature: clamp(p.curvature, RANGES.curvature),
-  };
-}
 
 /** ATM implied vol at maturity T, floored so the term structure never goes non-positive. */
 function atmVolAt(T: number, p: VolParams): number {
@@ -85,39 +70,32 @@ export function surfaceGrid(p: VolParams, nk: number, nT: number, out?: Float32A
   return { nk, nT, values, min, max };
 }
 
-const lerp = ([lo, hi]: readonly [number, number], t: number) => lo + (hi - lo) * t;
+/** A named market the hero cycles through (spec 01 §3.1). */
+export type MarketRegime = { name: string; note: string; params: VolParams };
 
-/** A deterministic "market regime" for a seed. */
-export function randomParams(seed: number): VolParams {
-  const rand = mulberry32(seed);
-  return clampParams({
-    atmVol: lerp([0.14, 0.45], rand()),
-    skew: lerp([-0.85, 0.1], rand()),
-    termSlope: lerp([-0.3, 0.3], rand()),
-    curvature: lerp([0.7, 1.5], rand()),
-  });
+export const MARKET_REGIMES: readonly MarketRegime[] = [
+  { name: "Calm market", note: "low vol, gentle smirk, upward term structure", params: { atmVol: 0.16, skew: -0.55, termSlope: 0.2, curvature: 1 } },
+  { name: "Sell-off", note: "vol spikes, steep downside skew, inverted term structure", params: { atmVol: 0.42, skew: -0.85, termSlope: -0.3, curvature: 1.4 } },
+  { name: "Recovery", note: "vol settles, skew eases, curve normalises", params: { atmVol: 0.26, skew: -0.6, termSlope: 0.1, curvature: 1.2 } },
+  { name: "Event risk", note: "short-dated vol bid ahead of earnings", params: { atmVol: 0.3, skew: -0.35, termSlope: -0.25, curvature: 1.5 } },
+  { name: "Speculative rally", note: "call skew as upside demand builds", params: { atmVol: 0.38, skew: 0.15, termSlope: -0.1, curvature: 1.1 } },
+  { name: "Quiet carry", note: "near-symmetric smile, steep term structure", params: { atmVol: 0.2, skew: -0.1, termSlope: 0.3, curvature: 0.8 } },
+];
+
+/** Linear blend of two parameter sets, t ∈ [0, 1]. */
+export function lerpParams(a: VolParams, b: VolParams, t: number): VolParams {
+  // a·(1 − t) + b·t lands exactly on each end, so the surface settles precisely on a regime.
+  const mix = (x: number, y: number) => x * (1 - t) + y * t;
+  return {
+    atmVol: mix(a.atmVol, b.atmVol),
+    skew: mix(a.skew, b.skew),
+    termSlope: mix(a.termSlope, b.termSlope),
+    curvature: mix(a.curvature, b.curvature),
+  };
 }
 
-function gaussian(rand: () => number): number {
-  const u = 1 - rand();
-  const v = rand();
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-}
-
-/**
- * One "market tick": ATM vol and skew follow Ornstein–Uhlenbeck processes that mean-revert to
- * `anchor` (the regime the user set), so the surface breathes without drifting away.
- */
-export function stepParams(p: VolParams, anchor: VolParams, dt: number, rand: () => number): VolParams {
-  const ou = (x: number, mu: number, kappa: number, sigma: number) =>
-    x + kappa * (mu - x) * dt + sigma * Math.sqrt(dt) * gaussian(rand);
-  return clampParams({
-    atmVol: ou(p.atmVol, anchor.atmVol, 1.5, 0.12),
-    skew: ou(p.skew, anchor.skew, 1.2, 0.35),
-    termSlope: ou(p.termSlope, anchor.termSlope, 1, 0.15),
-    curvature: p.curvature,
-  });
-}
+/** Cubic ease-in-out, so regime changes start and settle gently. */
+export const easeInOut = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 
 /** Short plain-language summary, used as the figure's accessible name. */
 export function describeSurface(p: VolParams): string {
