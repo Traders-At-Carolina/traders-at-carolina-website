@@ -45,7 +45,6 @@ export function TeamPage({ team, placements, wall, recruiting, now }: TeamPagePr
       eyebrow: "Leadership",
       title: "Co-Presidents",
       members: presidents,
-      variant: "featured",
     },
     {
       id: "directors-title",

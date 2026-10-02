@@ -92,6 +92,17 @@ describe("TeamPage", () => {
     expect(screen.queryByText("Your first point of contact.")).not.toBeInTheDocument();
   });
 
+  it("sizes every headshot the same, whichever tier the person is in", () => {
+    const { container } = renderTeam({ people: [pres, co, dir] });
+    // The width class on each card's wrapper sets the headshot size; the photo itself is always square.
+    const widths = ["ada-lovelace", "co-one", "dir-one"].map((slug) => (container.querySelector(`#${slug}`) as HTMLElement).parentElement?.className);
+    expect(new Set(widths).size).toBe(1);
+    expect(widths[0]).toContain("sm:w-48");
+    for (const slug of ["ada-lovelace", "co-one", "dir-one"]) {
+      expect((container.querySelector(`#${slug} > div`) as HTMLElement).className).toContain("aspect-square");
+    }
+  });
+
   it("uses the same role-then-name treatment for every tier, with the name as the prominent line", () => {
     const { container } = renderTeam({ people: [pres, co, dir] });
     for (const slug of ["ada-lovelace", "co-one", "dir-one"]) {
