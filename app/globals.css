@@ -58,6 +58,11 @@
 }
 
 @layer base {
+  /* Photos always render in standard dynamic range, never HDR-boosted. */
+  img {
+    dynamic-range-limit: standard;
+  }
+
   html {
     background-color: var(--color-bone);
     color: var(--color-black);

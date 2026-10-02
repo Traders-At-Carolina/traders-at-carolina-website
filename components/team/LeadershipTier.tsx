@@ -43,7 +43,7 @@ export function LeadershipTier({ index, eyebrow, title, id, members, variant = "
           <div className={ROW}>
             {members.map((person) => (
               <div key={person.slug} className={CARD}>
-                <PersonCard person={person} shape={variant === "directors" ? "square" : "portrait"} />
+                <PersonCard person={person} />
               </div>
             ))}
           </div>

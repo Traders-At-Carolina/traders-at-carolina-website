@@ -5,19 +5,17 @@ import { initials, personMeta } from "@/lib/team";
 
 type PersonCardProps = {
   person: Person;
-  /** "portrait" is 4:5 (default); "square" is 1:1. */
-  shape?: "portrait" | "square";
 };
 
 /**
  * Full-colour headshot, role, name, class year and major, optional placement and LinkedIn (spec 04 §3.1).
  * Only the LinkedIn icon is interactive; the card is the /team#{slug} anchor target.
  */
-export function PersonCard({ person, shape = "portrait" }: PersonCardProps) {
+export function PersonCard({ person }: PersonCardProps) {
   const meta = personMeta(person);
   return (
     <article id={person.slug} aria-labelledby={`${person.slug}-name`} className="scroll-mt-24 text-center">
-      <div className={`relative overflow-hidden rounded-2xl ${shape === "square" ? "aspect-square" : "aspect-[4/5]"}`}>
+      <div className={`relative overflow-hidden rounded-2xl aspect-square`}>
         {person.headshot ? (
           <Image
             src={person.headshot}
@@ -25,7 +23,7 @@ export function PersonCard({ person, shape = "portrait" }: PersonCardProps) {
             fill
             sizes="(min-width: 640px) 240px, 192px"
             placeholder="blur"
-            className="object-cover"
+            className="object-cover object-[50%_25%]"
           />
         ) : (
           <div aria-hidden="true" className="flex h-full items-center justify-center border border-rule bg-white">
