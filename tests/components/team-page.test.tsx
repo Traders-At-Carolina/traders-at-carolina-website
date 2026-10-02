@@ -41,7 +41,7 @@ describe("TeamPage", () => {
 
   it("renders person cards with colour headshots, anchors and LinkedIn links", () => {
     const { container } = renderTeam({ academicYear: "2026–27", people: [pres] });
-    expect(screen.getByRole("heading", { name: "Leadership, 2026–27." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Leadership, 2026–27" })).toBeInTheDocument();
     const card = container.querySelector("#ada-lovelace") as HTMLElement;
     expect(within(card).getByRole("img", { name: "Portrait of Ada Lovelace" }).className).not.toContain("grayscale");
     expect(within(card).getByText("'27 · Mathematics")).toBeInTheDocument();

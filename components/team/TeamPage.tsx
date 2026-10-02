@@ -34,21 +34,21 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
     {
       id: "exec-title",
       eyebrow: "Executive board",
-      title: "The Executive Board.",
+      title: "Executive Board",
       members: board,
       variant: "bold",
     },
     {
       id: "presidents-title",
       eyebrow: "Co-Presidents",
-      title: "Co-Presidents.",
+      title: "Co-Presidents",
       members: presidents,
       variant: "featured",
     },
     {
       id: "directors-title",
       eyebrow: "Directors",
-      title: "Directors.",
+      title: "Directors",
       members: directorList,
       variant: "directors",
     },
@@ -56,7 +56,7 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
   const tiers = allTiers
     .filter((tier) => tier.members.length > 0)
     // The first tier on the page carries the academic-year heading.
-    .map((tier, i) => (i === 0 && team.academicYear ? { ...tier, title: `Leadership, ${team.academicYear}.` } : tier));
+    .map((tier, i) => (i === 0 && team.academicYear ? { ...tier, title: `Leadership, ${team.academicYear}` } : tier));
   const nextIndex = noLeadership ? 2 : tiers.length + 1;
 
   return (
@@ -72,7 +72,7 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
           index={1}
           id="exec-title"
           eyebrow="Executive board"
-          title={team.academicYear ? `Leadership, ${team.academicYear}.` : "Leadership."}
+          title={team.academicYear ? `Leadership, ${team.academicYear}` : "Leadership"}
           members={[]}
           emptyText="Board profiles will be posted here soon."
         />
