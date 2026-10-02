@@ -32,7 +32,7 @@ const SHELL_FLOATING =
 
 /**
  * Sticky header that docks over the hero and floats as a rounded bar once the hero's text reaches it,
- * with a pill highlight that springs between the nav links and a dropdown card for mobile (00 §10).
+ * with a boxy highlight that springs between the nav links and a dropdown card for mobile (00 §10).
  */
 export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeaderClientProps) {
   const pathname = usePathname();
@@ -66,7 +66,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
     return () => window.removeEventListener("resize", measure);
   }, [measure, links]);
 
-  // The highlight springs between links, but snaps into place when it first appears.
+  // The highlight trails the pointer (70ms delay, gentle spring) between links, but snaps into place when it first appears.
   const target = pointed ?? (activeIndex >= 0 ? activeIndex : null);
   const shown = boxes ? target : null;
   const [line, setLine] = useState<{ shown: number | null; at: number | null; snap: boolean }>({
@@ -126,12 +126,12 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
               data-testid="nav-indicator"
               data-target={line.at ?? ""}
               data-visible={line.shown !== null}
-              className={`pointer-events-none absolute inset-y-0 left-0 w-0 rounded-full bg-wash ${
+              className={`pointer-events-none absolute inset-y-0 left-0 w-0 rounded-[0.625rem] bg-wash ${
                 line.shown !== null ? "opacity-100" : "opacity-0"
               } ${
                 line.snap
                   ? "motion-safe:[transition:opacity_150ms_ease-out]"
-                  : "motion-safe:[transition:transform_650ms_var(--ease-bounce),width_650ms_var(--ease-bounce),opacity_150ms_ease-out]"
+                  : "motion-safe:[transition:transform_700ms_var(--ease-spring)_70ms,width_700ms_var(--ease-spring)_70ms,opacity_150ms_ease-out]"
               }`}
               style={box ? { transform: `translateX(${box.x}px)`, width: `${box.w}px` } : undefined}
             />
@@ -153,7 +153,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
                     aria-current={i === activeIndex ? "page" : undefined}
                     onPointerEnter={() => setPointed(i)}
                     onFocus={() => setPointed(i)}
-                    className={`flex min-h-9 items-center rounded-full px-3.5 text-nav font-medium transition-colors duration-150 ${
+                    className={`flex min-h-9 items-center rounded-[0.625rem] px-3.5 text-nav font-medium transition-colors duration-150 ${
                       i === target ? "text-navy" : "hover:text-navy"
                     }`}
                   >
@@ -163,7 +163,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
               ))}
             </ul>
           </div>
-          <Button href={applyHref} external={applyExternal} shape="pill" size="sm">
+          <Button href={applyHref} external={applyExternal} shape="rounded" size="sm">
             Apply
           </Button>
         </nav>
@@ -194,7 +194,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
                     href={link.href}
                     onClick={close}
                     aria-current={isActive(link.href) ? "page" : undefined}
-                    className={`-mx-3 flex min-h-12 items-center rounded-[0.75rem] px-3 font-display text-h3 active:bg-wash ${
+                    className={`-mx-3 flex min-h-12 items-center rounded-[0.625rem] px-3 font-display text-h3 active:bg-wash ${
                       isActive(link.href) ? "bg-wash text-navy" : ""
                     }`}
                   >
@@ -205,7 +205,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
             </ul>
           </nav>
           <div className="mt-4" onClick={close}>
-            <Button href={applyHref} external={applyExternal} shape="pill" fullWidth>
+            <Button href={applyHref} external={applyExternal} shape="rounded" fullWidth>
               Apply
             </Button>
           </div>

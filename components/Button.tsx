@@ -12,8 +12,8 @@ type ButtonProps = {
   /** Trailing → on internal links (external links always show ↗). */
   arrow?: boolean;
   fullWidth?: boolean;
-  /** `pill` is reserved for the header's Apply button (00 §10 SiteHeader). */
-  shape?: "square" | "pill";
+  /** `rounded` (10px corners) is reserved for the header's Apply button (00 §10 SiteHeader). */
+  shape?: "square" | "rounded";
   /** `sm` (36px) is reserved for the desktop header's Apply button (00 §10 SiteHeader). */
   size?: "md" | "sm";
   className?: string;
@@ -46,7 +46,7 @@ export function Button({
     "inline-flex items-center justify-center gap-2 whitespace-nowrap text-button font-semibold transition-colors duration-150",
     sizes[size],
     variants[variant],
-    shape === "pill" ? "rounded-full" : "",
+    shape === "rounded" ? "rounded-[0.625rem]" : "",
     fullWidth ? "w-full" : "",
     className,
   ].join(" ");

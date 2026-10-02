@@ -95,11 +95,12 @@ describe("SiteHeaderClient", () => {
     expect(current).toHaveTextContent("Membership");
   });
 
-  it("renders the header Apply button as a pill", () => {
+  it("renders the header Apply button with boxy 10px corners", () => {
     renderHeader();
     const nav = screen.getByRole("navigation", { name: "Primary" });
     const apply = Array.from(nav.querySelectorAll("a")).find((a) => a.textContent === "Apply");
-    expect(apply).toHaveClass("rounded-full");
+    expect(apply).toHaveClass("rounded-[0.625rem]");
+    expect(apply).not.toHaveClass("rounded-full");
   });
 
   it("renders the header Apply button compact, at 36px", () => {
@@ -133,13 +134,14 @@ describe("SiteHeaderClient", () => {
     expect(screen.getByRole("button", { name: "Open menu" })).toHaveFocus();
   });
 
-  it("renders the mobile-menu Apply button as a pill", async () => {
+  it("renders the mobile-menu Apply button with boxy 10px corners", async () => {
     const user = userEvent.setup();
     renderHeader();
     await user.click(screen.getByRole("button", { name: "Open menu" }));
     const menu = document.getElementById("mobile-menu");
     const apply = Array.from(menu?.querySelectorAll("a") ?? []).find((a) => a.textContent === "Apply");
-    expect(apply).toHaveClass("rounded-full");
+    expect(apply).toHaveClass("rounded-[0.625rem]");
+    expect(apply).not.toHaveClass("rounded-full");
     expect(apply).toHaveClass("min-h-11");
     expect(apply).not.toHaveClass("min-h-9");
   });
@@ -258,6 +260,25 @@ describe("SiteHeaderClient sliding highlight", () => {
       window.dispatchEvent(new Event("resize"));
     });
   }
+
+  it("is a boxy 10px-cornered highlight, not a pill", () => {
+    renderHeader();
+    expect(indicator()).toHaveClass("rounded-[0.625rem]");
+    expect(indicator()).not.toHaveClass("rounded-full");
+    expect(linkNamed("About")).toHaveClass("rounded-[0.625rem]");
+  });
+
+  it("trails the pointer: a gentle spring that starts after a short delay", () => {
+    renderHeader();
+    measure();
+    // First appearance snaps into place, with no travel and no delay.
+    expect(indicator().className).not.toContain("--ease-spring");
+
+    fireEvent.pointerEnter(linkNamed("Team"));
+    expect(indicator().className).toContain("transform_700ms_var(--ease-spring)_70ms");
+    expect(indicator().className).toContain("width_700ms_var(--ease-spring)_70ms");
+    expect(indicator().className).not.toContain("--ease-bounce");
+  });
 
   it("rests behind the active page", () => {
     renderHeader();
