@@ -172,6 +172,25 @@ describe("SiteHeaderClient", () => {
   });
 });
 
+describe("SiteHeaderClient docked grid", () => {
+  it("has a decorative graph-paper layer that continues the hero's grid behind the docked bar", () => {
+    renderHeader();
+    const grid = banner().querySelector("[data-nav-grid]");
+    expect(grid).not.toBeNull();
+    expect(grid).toHaveAttribute("aria-hidden", "true");
+    expect(grid).toHaveClass("graph-paper-nav");
+  });
+
+  it("sits behind the bar's content and never takes pointer events", () => {
+    renderHeader();
+    // The grid comes first and the bar is positioned too, so DOM order paints the bar's content over it.
+    const [grid, shell] = Array.from(banner().children);
+    expect(grid).toHaveAttribute("data-nav-grid");
+    expect(grid).toHaveClass("pointer-events-none");
+    expect(shell).toHaveClass("relative");
+  });
+});
+
 describe("SiteHeaderClient mobile menu card", () => {
   async function openMenu() {
     const user = userEvent.setup();

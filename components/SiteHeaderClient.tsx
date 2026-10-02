@@ -21,7 +21,7 @@ type SiteHeaderClientProps = {
 type LinkBox = { x: number; w: number };
 
 const SHELL_BASE =
-  "mx-auto flex max-w-page items-center justify-between border motion-safe:duration-[450ms] motion-safe:ease-soft " +
+  "relative mx-auto flex max-w-page items-center justify-between border motion-safe:duration-[450ms] motion-safe:ease-soft " +
   "motion-safe:[transition-property:width,height,margin,padding,border-radius,background-color,border-color,box-shadow,backdrop-filter]";
 
 const SHELL_DOCKED =
@@ -132,6 +132,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
         floating ? "pointer-events-none bg-transparent" : "bg-bone"
       }`}
     >
+      <div aria-hidden="true" data-nav-grid className="graph-paper-nav pointer-events-none absolute inset-0" />
       <div className={`${SHELL_BASE} ${floating ? SHELL_FLOATING : SHELL_DOCKED}`}>
         <Wordmark />
 

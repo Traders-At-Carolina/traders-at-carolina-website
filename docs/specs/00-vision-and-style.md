@@ -190,7 +190,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 
 ### 7.3 Graph-paper grid
 - 28px cells drawn in the `grid` color with `mask-image`, fading out toward the edges.
-- Used only behind the Home hero and inside `PageHeader`.
+- Used only behind the Home hero and inside `PageHeader`, plus a faint continuation behind the docked `SiteHeader` (§10) so the grid seems to run up into the nav bar.
 
 ### 7.4 Stat rows
 - Large `Stat`-role numbers in navy with caption-sized labels underneath.
@@ -265,7 +265,7 @@ Page specs reference these by name. Each one is built once and reused.
 
 ### `SiteHeader`
 - Logo on the left (links to `/`). Nav on the right: **About · Membership · Team**, then an **Apply** `Button` (`primary`).
-- **Docked** until the first line of hero text (Home `Hero` or `PageHeader`) reaches the header, tracked by a 1px `data-nav-float-point` marker at the top of the hero's text column: full-width, sticky, on a `bone` background, 64 / 80px tall.
+- **Docked** until the first line of hero text (Home `Hero` or `PageHeader`) reaches the header, tracked by a 1px `data-nav-float-point` marker at the top of the hero's text column: full-width, sticky, on a `bone` background, 64 / 80px tall. On pages with a hero grid, the same 28px grid shows faintly behind the docked bar (`graph-paper-nav`): lines aligned with the hero's grid below, about 55% strength at the bottom centre, fading toward the sides and the top. It fades out as the bar floats and does not appear on pages without a hero.
 - **Floating** as soon as that text would pass under it (pages without a hero: as soon as the page scrolls): a centred bar inset 8 / 12px from the top, 48px tall on desktop (52px on mobile) and `min(100% − 2rem, 52rem)` wide, with 16px corners, `bone` at 85% with a backdrop blur, a 1px `rule` border and a soft shadow. The header keeps its height, so the page never shifts. It stays floating while the mobile menu is open.
 - **Nav highlight:** a single `wash` highlight (navy at 8%, 10px corners) rests behind the active page's link, springs to whichever link is hovered or focused, and springs back when the pointer or focus leaves. The hovered or active link's text turns `navy`. With no active page (Home) the highlight fades in at the hovered link. Under reduced motion it jumps.
 - The Apply button is a `primary` button with 10px corners (`shape="rounded"`, concentric with the bar's 16px corners and 6px inset), in the bar and in the mobile menu. In the desktop bar it is compact (`size="sm"`, 36px tall, a 6px inset in the 48px bar), the one exception to the 44px minimum height; it is pointer-only there, and the mobile menu's Apply stays 44px. Apply buttons elsewhere stay square.

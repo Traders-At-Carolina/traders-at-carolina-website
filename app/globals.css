@@ -144,6 +144,37 @@
   mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 100%);
 }
 
+/*
+ * The same grid, drawn faintly behind the docked header so the hero's graph paper seems to run up
+ * into it (00 §7.3, §10). Anchored to the bottom edge so its lines continue the hero's grid, which
+ * starts right below. Centre-weighted: about 55% strength at the bottom centre (what the hero's own
+ * mask gives at its top edge), fading toward the sides and the top.
+ */
+@utility graph-paper-nav {
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: 0 100%;
+  mask-image: radial-gradient(ellipse 60% 140% at 50% 100%, rgb(0 0 0 / 0.55), transparent);
+}
+
+/* Visible only while the header is docked, and only on pages that have a hero grid to continue. */
+[data-nav-grid] {
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-nav-grid] {
+    transition: none;
+  }
+}
+
 /* Graphite contrast section: remaps the ink, accent and rule tokens so every utility inside it
    (text-ink-2, text-navy, border-rule, link underlines…) reads light-on-dark without per-component tones.
    Navy accents become bone, matching the inverse eyebrow on the navy band and footer. */
