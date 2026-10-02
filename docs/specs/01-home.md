@@ -161,6 +161,16 @@ Only these sections appear on Home. No placement section (data isn't available y
 - Button behavior per §5.
 - This is the page's single navy band.
 
+### 3.6 Intro
+
+A short branded intro each time the Home page loads.
+
+- **When it plays:** on every full page load of `/`, including reloads and new tabs. Client-side navigation to Home from another page (header logo, nav links) doesn't replay it, since the head script only runs on full loads.
+- **Timeline (~2.15s):** on a `bone` screen, 28px graph-paper rows sweep in top to bottom and columns left to right (0–0.9s). The full-colour logo, then the Georgia name, fade in and rise 8px (0.45–1.2s). After a short hold they fade (1.5–1.75s), then the bone and the lines fade away (1.65–2.15s). The overlay's grid starts at the hero's top edge, so its lines hand over to the hero's graph paper.
+- **Skip:** any key, click, tap or scroll cuts to a 200ms fade.
+- **Robustness:** an inline `<head>` script (`lib/intro.ts`) decides before first paint, and it also ends the intro on a timer, so the overlay can never stay up. The overlay itself is CSS-only.
+- **Accessibility:** decorative (`aria-hidden`). It never plays under `prefers-reduced-motion` or without JavaScript.
+
 ---
 
 ## 4. Copy guidelines (Home-specific)

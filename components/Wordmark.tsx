@@ -7,8 +7,8 @@ const MARKS = {
 } as const;
 
 // The mark's natural size (public/brand/*.svg); the rendered height comes from `size`.
-const MARK_WIDTH = 305;
-const MARK_HEIGHT = 322;
+export const MARK_WIDTH = 305;
+export const MARK_HEIGHT = 322;
 
 // `md` is the header, a touch smaller on phones so the mark, name, Apply and menu button all fit.
 const SIZES = {

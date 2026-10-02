@@ -248,6 +248,7 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Header random walk | Stroke draw-in over 1.2s on load |
 | Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 80s, eased in after a drag; stops on interaction, resumes after 4s |
 | Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
+| Home intro | On every full load of Home: graph paper sweeps in, logo and name rise, then it dissolves into the hero grid over ~2.15s; any key, click or scroll skips it (spec 01 §3.6) |
 | Link underline | Underline scales in from the left on hover, 200ms |
 | Button hover | Background color transition, 150ms |
 | Header float | Docked bar morphs into the floating bar over 450ms, `--ease-soft` (no overshoot) |

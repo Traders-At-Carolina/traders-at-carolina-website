@@ -5,6 +5,7 @@ import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import { ByTheNumbers } from "@/components/home/ByTheNumbers";
 import { Hero, HeroActions } from "@/components/home/Hero";
 import { InsideTheClub } from "@/components/home/InsideTheClub";
+import { IntroOverlay } from "@/components/home/IntroOverlay";
 import { Pillars } from "@/components/home/Pillars";
 import type { StatItem } from "@/components/Stat";
 import type { HomeContent, Partner, Recruiting } from "@/content/types";
@@ -56,6 +57,7 @@ export function HomePage({ home, recruiting, sponsors = [], now }: HomePageProps
 
   return (
     <>
+      <IntroOverlay />
       <Hero hero={home.hero} index={n.hero} actions={<div aria-live="polite">{live((c) => <HeroActions apply={c.hero} />)}</div>} />
       <Pillars index={n.pillars} title={home.headings.pillars} pillars={home.pillars} />
       {showNumbers ? <ByTheNumbers index={n.numbers} title={home.headings.numbers} stats={stats} sponsors={sponsors} /> : null}

@@ -30,6 +30,11 @@ const open: Recruiting = { applicationsOpen: true, applyUrl: "https://forms.gle/
 const eyebrows = () => screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent);
 
 describe("HomePage", () => {
+  it("carries the intro overlay, which only the head script reveals", () => {
+    const { container } = render(<HomePage home={base} recruiting={closed} now={now} />);
+    expect(container.querySelector(".intro-overlay")).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("renders one h1 with the italic emphasis", () => {
     render(<HomePage home={base} recruiting={closed} now={now} />);
     const h1s = screen.getAllByRole("heading", { level: 1 });
