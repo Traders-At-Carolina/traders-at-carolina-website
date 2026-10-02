@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { TeamPage } from "@/components/team/TeamPage";
 import { placements } from "@/content/placements";
+import { placementWall } from "@/content/placement-wall";
 import { site } from "@/content/site";
 import { team } from "@/content/team";
 import { validateTeam } from "@/lib/validate-team";
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TeamPage team={team} placements={placements} recruiting={site.recruiting} now={new Date()} />;
+  return <TeamPage team={team} placements={placements} wall={placementWall} recruiting={site.recruiting} now={new Date()} />;
 }

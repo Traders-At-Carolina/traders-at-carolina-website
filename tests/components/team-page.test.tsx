@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import type { StaticImageData } from "next/image";
 import { TeamPage } from "@/components/team/TeamPage";
-import type { Person, Placement, Recruiting, TeamContent } from "@/content/types";
+import type { CompanyMark, Person, Placement, Recruiting, TeamContent } from "@/content/types";
 
 const now = new Date("2027-01-05T17:00:00Z");
 const closed: Recruiting = { applicationsOpen: false, applyUrl: "" };
@@ -23,14 +23,44 @@ const pres: Person = {
 };
 const firms = (n: number): Placement[] => Array.from({ length: n }, (_, i) => ({ firm: `Firm ${String.fromCharCode(69 - i)}` }));
 
-const renderTeam = (team: TeamContent, placements: Placement[] = []) =>
-  render(<TeamPage team={team} placements={placements} recruiting={closed} now={now} />);
+const renderTeam = (team: TeamContent, placements: Placement[] = [], wall: CompanyMark[] = []) =>
+  render(<TeamPage team={team} placements={placements} wall={wall} recruiting={closed} now={now} />);
 const eyebrows = () => screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent);
 
 const co: Person = { slug: "co-one", name: "Co One", role: "Co-President, Trading", group: "co-president", order: 1 };
 const dir: Person = { slug: "dir-one", name: "Dir One", role: "Director of Education", group: "director", order: 1, headshot: image, alt: "Portrait of Dir One" };
 
+const mark = (name: string): CompanyMark => ({ name, logo: { ...image, src: `/images/companies/${name}.png` } as StaticImageData });
+
 describe("TeamPage", () => {
+  it("shows the wall's firms in a looping header strip instead of the random walk", () => {
+    const wall = ["Citadel", "JPMorgan Chase", "AWS", "Infragrid"].map(mark);
+    const { container } = renderTeam({ people: [pres] }, [], wall);
+    const header = container.querySelector("header") as HTMLElement;
+    expect(within(header).getByText("Where we've worked")).toBeInTheDocument();
+    // Each mark carries its name as a visible caption (Infragrid's mark is a bare square); the image itself is decorative.
+    expect(within(header).getAllByRole("listitem").map((cell) => cell.textContent)).toEqual([
+      "Citadel",
+      "JPMorgan Chase",
+      "AWS",
+      "Infragrid",
+    ]);
+    // The strip loops by repeating the list once; the copy is hidden from assistive tech so firms are announced once.
+    const lists = header.querySelectorAll("ul");
+    expect(lists).toHaveLength(2);
+    expect(lists[0]).not.toHaveAttribute("aria-hidden");
+    expect(lists[1]).toHaveAttribute("aria-hidden", "true");
+    expect(header.querySelectorAll("img[alt='']")).toHaveLength(8);
+    expect(header.querySelector("svg")).not.toBeInTheDocument();
+  });
+
+  it("leaves the header art out when the wall has no firms", () => {
+    const { container } = renderTeam({ people: [pres] });
+    const header = container.querySelector("header") as HTMLElement;
+    expect(within(header).queryByText("Where we've worked")).not.toBeInTheDocument();
+    expect(header.querySelector("svg")).not.toBeInTheDocument();
+  });
+
   it("shows an honest empty state with no people, and hides placements", () => {
     const { container } = renderTeam({ people: [] });
     expect(screen.getByText("Board profiles will be posted here soon.")).toBeInTheDocument();
@@ -60,6 +90,17 @@ describe("TeamPage", () => {
     ]);
     expect(screen.queryByText(/track leads/i)).not.toBeInTheDocument();
     expect(screen.queryByText("Your first point of contact.")).not.toBeInTheDocument();
+  });
+
+  it("sizes every headshot the same, whichever tier the person is in", () => {
+    const { container } = renderTeam({ people: [pres, co, dir] });
+    // The width class on each card's wrapper sets the headshot size; the photo itself is always square.
+    const widths = ["ada-lovelace", "co-one", "dir-one"].map((slug) => (container.querySelector(`#${slug}`) as HTMLElement).parentElement?.className);
+    expect(new Set(widths).size).toBe(1);
+    expect(widths[0]).toContain("sm:w-48");
+    for (const slug of ["ada-lovelace", "co-one", "dir-one"]) {
+      expect((container.querySelector(`#${slug} > div`) as HTMLElement).className).toContain("aspect-square");
+    }
   });
 
   it("uses the same role-then-name treatment for every tier, with the name as the prominent line", () => {
