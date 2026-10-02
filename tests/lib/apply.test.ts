@@ -34,8 +34,10 @@ describe("applyStatusCopy", () => {
   it("offers the interest form when closed", () => {
     const r = { ...closed, interestFormUrl: "https://forms.gle/notify", nextApplicationOpenDate: "2027-08-25" };
     const copy = applyStatusCopy(getApplicationState(now, r), r, "hi@club.org", now);
-    expect(copy.statusLine).toBe("The next cycle opens Wed, Aug 25.");
-    expect(copy.action).toEqual({ label: "Get notified", href: "https://forms.gle/notify", external: true });
+    expect(copy.title).toBe("We're between cycles.");
+    expect(copy.statusLine).toBe("Applications aren't open right now. Our next cycle opens Wed, Aug 25.");
+    expect(copy.lead).toBe("Leave your email and we'll tell you the moment the next cycle opens.");
+    expect(copy.action).toEqual({ label: "Keep me posted", href: "https://forms.gle/notify", external: true });
     expect(copy.secondary.href).toBe("#faq");
   });
 
@@ -46,7 +48,8 @@ describe("applyStatusCopy", () => {
     });
     const copy = applyStatusCopy(getApplicationState(now, closed), closed, undefined, now);
     expect(copy.action).toBeUndefined();
-    expect(copy.statusLine).toBe("We recruit each fall and spring.");
+    expect(copy.statusLine).toBe("Applications aren't open right now. We open applications each fall and spring.");
+    expect(copy.lead).toBeUndefined();
     expect(copy.secondary.href).toBe("#faq");
   });
 });

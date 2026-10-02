@@ -92,20 +92,20 @@ describe("HomePage", () => {
     expect(screen.queryByRole("heading", { name: "Ready to start?" })).not.toBeInTheDocument();
   });
 
-  it("says applications are closed in the hero and links Get notified to the interest form", () => {
+  it("says we're between cycles in the hero and links Keep me posted to the interest form", () => {
     const interest = "https://forms.gle/interest";
     render(<HomePage home={base} recruiting={{ ...closed, interestFormUrl: interest, nextApplicationOpenDate: "2027-01-12" }} now={now} />);
-    expect(screen.getByText("Applications are closed. The next cycle opens Tue, Jan 12.")).toBeInTheDocument();
-    const notify = screen.getAllByRole("link", { name: /^Get notified/ });
+    expect(screen.getByText("We're between cycles. Our next cycle opens Tue, Jan 12.")).toBeInTheDocument();
+    const notify = screen.getAllByRole("link", { name: /^Keep me posted/ });
     expect(notify).toHaveLength(1);
     expect(notify[0]).toHaveAttribute("href", interest);
-    expect(screen.queryByRole("heading", { name: "Applications are closed for now." })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "We're between cycles." })).not.toBeInTheDocument();
   });
 
-  it("never shows Get notified without an interest form", () => {
+  it("never shows Keep me posted without an interest form", () => {
     render(<HomePage home={base} recruiting={closed} now={now} />);
-    expect(screen.queryByRole("link", { name: /Get notified/ })).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /^How to apply/ })).toHaveLength(1);
+    expect(screen.queryByRole("link", { name: /Keep me posted/ })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /^See how it works/ })).toHaveLength(1);
   });
 
   it("flips open-state buttons to the closed state once the deadline passes in the browser", async () => {
@@ -119,7 +119,7 @@ describe("HomePage", () => {
         vi.advanceTimersByTime(2 * 60 * 60 * 1000);
       });
       expect(screen.queryByRole("link", { name: /^Apply/ })).not.toBeInTheDocument();
-      expect(screen.getAllByRole("link", { name: /^Get notified/ })).toHaveLength(1);
+      expect(screen.getAllByRole("link", { name: /^Keep me posted/ })).toHaveLength(1);
     } finally {
       vi.useRealTimers();
     }

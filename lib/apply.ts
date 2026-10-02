@@ -36,10 +36,12 @@ export function applyStatusCopy(state: ApplicationState, recruiting: Recruiting,
   const interest = recruiting.interestFormUrl;
   return {
     eyebrow: "Apply",
-    title: "Applications are closed.",
-    statusLine: nextOpen ? `The next cycle opens ${formatWeekdayMonthDay(nextOpen)}.` : "We recruit each fall and spring.",
-    lead: interest ? "Leave your email and we'll tell you when applications open." : undefined,
-    action: interest ? { label: "Get notified", href: interest, external: true } : undefined,
+    title: "We're between cycles.",
+    statusLine: `Applications aren't open right now. ${
+      nextOpen ? `Our next cycle opens ${formatWeekdayMonthDay(nextOpen)}.` : "We open applications each fall and spring."
+    }`,
+    lead: interest ? "Leave your email and we'll tell you the moment the next cycle opens." : undefined,
+    action: interest ? { label: "Keep me posted", href: interest, external: true } : undefined,
     secondary:
       !interest && contactEmail
         ? { label: "Email us", href: `mailto:${contactEmail}` }

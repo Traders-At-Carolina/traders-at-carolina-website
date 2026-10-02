@@ -24,7 +24,8 @@ export type HomeApplyCopy = {
 
 /**
  * Hero and Apply-band copy for each application state (spec 01 §5). When closed, both buttons go
- * straight to the interest form if there is one, so "Get notified" never lands on a dead end.
+ * straight to the interest form if there is one, so "Keep me posted" never lands on a dead end. The closed copy is
+ * warm and student-voiced, but always says plainly that applications aren't open.
  */
 export function homeApplyCopy(state: ApplicationState, recruiting: Recruiting, now: Date): HomeApplyCopy {
   if (state.status === "open") {
@@ -40,16 +41,17 @@ export function homeApplyCopy(state: ApplicationState, recruiting: Recruiting, n
   }
 
   const nextOpen = state.nextOpen && state.nextOpen.getTime() > now.getTime() ? state.nextOpen : undefined;
-  const when = nextOpen ? `The next cycle opens ${formatWeekdayMonthDay(nextOpen)}.` : "We recruit each fall and spring.";
+  const when = nextOpen ? `Our next cycle opens ${formatWeekdayMonthDay(nextOpen)}.` : "We open applications each fall and spring.";
   const action: HomeAction = recruiting.interestFormUrl
-    ? { label: "Get notified", href: recruiting.interestFormUrl, external: true, arrow: false }
-    : { label: "How to apply", href: "/apply", external: false, arrow: true };
+    ? { label: "Keep me posted", href: recruiting.interestFormUrl, external: true, arrow: false }
+    : { label: "See how it works", href: "/apply", external: false, arrow: true };
+  const notOpen = `Applications aren't open right now. ${when}`;
   return {
-    hero: { ...action, status: `Applications are closed. ${when}` },
+    hero: { ...action, status: `We're between cycles. ${when}` },
     band: {
       ...action,
-      title: "Applications are closed for now.",
-      lead: recruiting.interestFormUrl ? `${when} Leave your email and we'll tell you when they open.` : when,
+      title: "We're between cycles.",
+      lead: recruiting.interestFormUrl ? `${notOpen} Leave your email and we'll tell you the moment the next one opens.` : notOpen,
     },
   };
 }

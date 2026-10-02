@@ -104,7 +104,7 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
               {recruiting.interestFormUrl ? (
                 <li className={itemClasses}>
                   <TextLink href={recruiting.interestFormUrl} external arrow tone="inverse" className="max-md:hit-target">
-                    Get notified
+                    Keep me posted
                   </TextLink>
                 </li>
               ) : null}

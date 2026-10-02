@@ -45,13 +45,13 @@ One `SiteFooter` component: a navy CTA zone on top of a black base made of three
 
 ```
 ┌─ navy ─────────────────────────────────────────────┐
-│ Applications are closed for now.                    │
-│ The next cycle opens … Leave your email …           │
-│ [Get notified]                                      │
+│ We're between cycles.                               │
+│ Applications aren't open right now. Our next …      │
+│ [Keep me posted]                                    │
 ├─ black ────────────────────────────────────────────┤
 │ ⌐ Traders at Carolina    Club     Join      Reach   │
 │   mission line           About    Apply     email   │
-│                          Members. Get noti. Instagram│
+│                          Members. Keep me.  Instagram│
 │                          Team               LinkedIn │
 │ ─────────────────────────────────────────────────── │
 │ WHERE WE'VE WORKED                                  │
@@ -83,8 +83,10 @@ The footer is a server component rendered by the root layout, so it cannot read 
 | State | H2 | Lead | Button |
 |---|---|---|---|
 | Open | "Ready to start?" | "Applications close {Fri, Feb 6}." (omitted with no deadline) | `inverse` "Apply" → `applyUrl` ↗ |
-| Closed, interest form set | "Applications are closed for now." | "{next cycle sentence} Leave your email and we'll tell you when they open." | `inverse` "Get notified" → `interestFormUrl` ↗ |
-| Closed, no interest form | "Applications are closed for now." | "{next cycle sentence}" | `inverse` "How to apply →" → `/apply` |
+| Closed, interest form set | "We're between cycles." | "Applications aren't open right now. {when} Leave your email and we'll tell you the moment the next one opens." | `inverse` "Keep me posted" → `interestFormUrl` ↗ |
+| Closed, no interest form | "We're between cycles." | "Applications aren't open right now. {when}" | `inverse` "See how it works →" → `/apply` |
+
+`{when}` is "Our next cycle opens {Tue, Jan 12}." or, with no date, "We open applications each fall and spring." The closed copy is warm and student-voiced (reframed 2026-10-02), but always says plainly that applications aren't open.
 
 - **Deadline flip.** Both variants are rendered on the server and wrapped in `DeadlineSwitch` (spec 05 §3) when a deadline exists, so a static page built before the deadline still flips to closed in the browser. This extends the browser re-check from `/apply` only to every page, because the footer now carries the site's primary CTA. The footer's nav-level Apply link already used `DeadlineSwitch`.
 - **Spacing above the zone.** The rule that gives the last section before the band extra bottom padding (00 §10, `section:has(+ [data-cta-band])` in `app/globals.css`) can no longer match, because the zone is outside `<main>`. It becomes `main:has(+ footer [data-cta-band]) > section:last-child` with the same 96 / 128 / 160px values, so the last section's tone still runs right up to the navy. The selector only matches when the CTA zone is actually rendered, so on `/apply` (no zone) the page's last section keeps its normal padding instead of leaving a 160px gap before the black base.
@@ -94,7 +96,7 @@ The footer is a server component rendered by the root layout, so it cannot read 
 - Left to right on desktop: brand block, Club, Join, Reach.
 - **Brand block:** the existing `Wordmark` (bone, `lg`) and the mission line (`site.mission`, max `36ch`).
 - **Club** (heading: eyebrow style in `bone` at 70%, i.e. `text-bone/70`, because `ink-3` is too dim on black; links in `text-nav`): About, Membership, Team, from `primaryNav` so the footer keeps mirroring the header (00 §11).
-- **Join:** "Apply" (state-aware, exactly as today: `getApplyTarget()`, wrapped in `DeadlineSwitch` when a deadline exists) and "Get notified ↗" → `interestFormUrl`, shown only when an interest form is configured.
+- **Join:** "Apply" (state-aware, exactly as today: `getApplyTarget()`, wrapped in `DeadlineSwitch` when a deadline exists) and "Keep me posted ↗" → `interestFormUrl`, shown only when an interest form is configured.
 - **Reach:** contact email (`mailto:`), Instagram ↗, LinkedIn ↗. Each row renders only when its value exists in `content/site.ts`; **the whole column, including its heading, is omitted when none exist** (today's behavior). Email addresses may wrap at any character and never truncate.
 - **Hover and focus:** links keep the footer's current underline-on-hover with `underline-offset-4`. Focus ring is `bone` on navy and black (00 §4.3).
 - **Touch:** on touch layouts every row is at least 44px tall (`max-md:hit-target`), as today.
@@ -195,7 +197,7 @@ Work in this order so each step is shippable: `PlacementWall` tone → footer re
 ## 9. Open items
 
 - [ ] **Confirm the loss of per-page closing headlines** (§6). One site-wide message is simpler and removes duplicate work; per-page copy would need a way for each page to hand text to a layout-level footer.
-- [ ] **Join column contents.** "Apply" plus "Get notified" is a starting point. Is a "How recruiting works" link to `/apply` worth adding when applications are open?
+- [ ] **Join column contents.** "Apply" plus "Keep me posted" is a starting point. Is a "How recruiting works" link to `/apply` worth adding when applications are open?
 - [ ] Contact email, Instagram URL, LinkedIn URL and the UNC disclaimer are still pending from the club (00 §14). Reach and the disclaimer stay hidden until then.
 - [ ] Placement strip at four firms: confirm it looks full enough in the footer, or whether it should wait for more marks.
 
@@ -204,9 +206,9 @@ Work in this order so each step is shippable: `PlacementWall` tone → footer re
 ## 10. Acceptance criteria
 
 1. Every page except `/apply` ends with the navy CTA zone directly above the black link grid; `/apply` ends bone straight into black. No page component renders `CTABand`.
-2. With `applicationsOpen: false` and an interest form, the CTA zone reads "Applications are closed for now." with "Get notified" opening `interestFormUrl`; without one, it offers "How to apply →" to `/apply`. With `applicationsOpen: true`, it reads "Ready to start?" with "Apply" opening `applyUrl`, plus the deadline lead when one is set.
+2. With `applicationsOpen: false` and an interest form, the CTA zone reads "We're between cycles." (with a lead that says applications aren't open right now) and "Keep me posted" opens `interestFormUrl`; without one, it offers "See how it works →" to `/apply`. With `applicationsOpen: true`, it reads "Ready to start?" with "Apply" opening `applyUrl`, plus the deadline lead when one is set.
 3. With a deadline in the past at build time, the zone renders closed; with a future deadline it renders open and flips to closed in the browser at the deadline, on any page, with no flash.
-4. Club shows About, Membership, Team. Join shows Apply (state-aware), and Get notified only when an interest form exists. Reach and its heading are absent until a contact value is set, and each row appears only when its own value is set.
+4. Club shows About, Membership, Team. Join shows Apply (state-aware), and Keep me posted only when an interest form exists. Reach and its heading are absent until a contact value is set, and each row appears only when its own value is set.
 5. The placement strip shows on every page except `/team` when `placementWall` is non-empty; marks are bone on black; it is static under reduced motion; adding an entry to `placement-wall.ts` updates both the Team header and the footer.
 6. The Team header strip is visually unchanged.
 7. On every page that shows the CTA zone, the last section of `<main>` has the extra bottom padding and its tone runs up to the navy zone. On `/apply` it has its normal padding.

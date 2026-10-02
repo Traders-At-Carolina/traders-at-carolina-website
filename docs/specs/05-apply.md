@@ -17,7 +17,7 @@ Turn a student who's interested into an applicant, or into someone notified abou
 | Can I apply right now? By when? | Status header |
 | What happens after I apply? | Process and dates |
 | Am I eligible? Do I need experience? How do interviews work? | FAQ |
-| Applications are closed. How do I hear about the next cycle? | Status header (closed) |
+| Applications aren't open. How do I hear about the next cycle? | Status header (closed) |
 
 ---
 
@@ -69,10 +69,12 @@ getApplicationState(now: Date): ApplicationState
 | Element | Open | Closed |
 |---|---|---|
 | Eyebrow | `APPLY · {CYCLE LABEL}`, e.g. `APPLY · SPRING 2027` | `APPLY` |
-| H1 | "Applications are open." | "Applications are closed." |
-| Status line (Public Sans 500, navy, tabular) | "Due {Fri, Feb 6} at {11:59 PM} ET". Omitted if there's no deadline | "The next cycle opens {Mon, Jan 12}." If there's no date: "We recruit each fall and spring." |
-| Lead (`ink-2`) | "The application takes about {n} minutes. Every application is read by the board." | "Leave your email and we'll tell you when applications open." |
-| Button | `primary` "Apply ↗", opens `applyUrl` in a new tab | `primary` "Get notified ↗", opens `interestFormUrl` in a new tab |
+| H1 | "Applications are open." | "We're between cycles." |
+| Status line (Public Sans 500, navy, tabular) | "Due {Fri, Feb 6} at {11:59 PM} ET". Omitted if there's no deadline | "Applications aren't open right now. Our next cycle opens {Mon, Jan 12}." If there's no date: "Applications aren't open right now. We open applications each fall and spring." |
+| Lead (`ink-2`) | "The application takes about {n} minutes. Every application is read by the board." | "Leave your email and we'll tell you the moment the next cycle opens." (only with an interest form) |
+| Button | `primary` "Apply ↗", opens `applyUrl` in a new tab | `primary` "Keep me posted ↗", opens `interestFormUrl` in a new tab |
+
+The closed copy is deliberately warm and student-voiced, but every closed surface says plainly that applications aren't open.
 | Secondary (`TextLink`) | "Review the process →" (anchor to `#process`) | "Read the FAQ →" (anchor to `#faq`) |
 
 - **Closed with no `interestFormUrl`:** hide the button. The secondary link becomes "Email us →" (`mailto:` the contact email).
@@ -82,7 +84,7 @@ getApplicationState(now: Date): ApplicationState
 ### 4.2 Process and dates (§ 01)
 
 - `SectionHeader`: eyebrow `§ 01 — PROCESS AND DATES`, H2 (working copy: "What happens after you apply."), and a lead: "We recruit each fall and spring. Here's how the {cycle label} cycle works."
-  - When closed, the lead reads: "We recruit each fall and spring. Here's how a typical cycle works."
+  - When closed, the lead reads: "We open applications each fall and spring. Here's how a typical cycle works."
 - `id="process"` on the section.
 - Three stages, as an `<ol>`, each a row:
 
@@ -139,7 +141,7 @@ The closing Apply call to action now lives in the footer on every other page (sp
 // Recruiting
 applicationsOpen: boolean;
 applyUrl: string;                       // Google Form
-interestFormUrl?: string;               // Google Form for "Get notified"
+interestFormUrl?: string;               // Google Form for "Keep me posted"
 cycleLabel?: string;                    // "Spring 2027"
 applyDeadline?: string;                 // ISO "YYYY-MM-DDTHH:mm", America/New_York
 interviewWindow?: { start: string; end: string };   // ISO "YYYY-MM-DD"
@@ -176,7 +178,7 @@ export const apply = {
 
 ## 6. Content the club must supply
 
-- [ ] Google Form URL for applications, plus a second short Google Form for "Get notified" (name and email).
+- [ ] Google Form URL for applications, plus a second short Google Form for "Keep me posted" (name and email).
 - [ ] The current or next cycle: label, deadline (date and time), interview window, decision date, and the next open date when closed.
 - [ ] Roughly how long the application takes, in minutes.
 - [ ] Stage descriptions (or approve the working copy), and generic timing for each stage.
@@ -199,14 +201,14 @@ export const apply = {
 ## 8. Cross-spec sync (applied with this spec)
 
 - **00 §10:** Apply config now lives in this spec's §5. `applyDeadline` is an ISO date-time in America/New_York.
-- **01 §5:** Home buttons use `getApplicationState()` (§3), not `applicationsOpen` directly. The closed band button "Get notified" still links to `/apply`, where the interest form lives.
+- **01 §5:** Home buttons use `getApplicationState()` (§3), not `applicationsOpen` directly. The closed sign-up button ("Keep me posted") opens the interest form; without one, "See how it works →" links to `/apply`.
 
 ---
 
 ## 9. Acceptance criteria
 
 1. With `applicationsOpen: true` and a future deadline, the header shows the open state, and Apply opens `applyUrl` in a new tab with `rel="noopener noreferrer"`.
-2. With `applicationsOpen: false`, the status header shows the closed state, and "Get notified" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
+2. With `applicationsOpen: false`, the status header shows the closed state, and "Keep me posted" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
 3. With `applicationsOpen: true` but a deadline in the past *at build time*, every page renders the closed state.
 4. With the deadline passing *after* the build, `/apply` swaps to the closed state in the browser, the change is announced via `aria-live`, and there's no layout shift beyond the swapped text.
 5. All dates render from ISO values in America/New_York with the formats shown in §4. No typed display strings appear in content.

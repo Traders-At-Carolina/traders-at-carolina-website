@@ -31,15 +31,15 @@ describe("ApplyPage", () => {
 
   it("renders the closed state with the interest form", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Applications are closed.");
-    const notify = screen.getAllByRole("link", { name: /^Get notified/ });
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("We're between cycles.");
+    const notify = screen.getAllByRole("link", { name: /^Keep me posted/ });
     expect(notify).toHaveLength(1);
     expect(notify[0]).toHaveAttribute("href", "https://forms.gle/notify");
   });
 
   it("is closed at build time once the deadline has passed", () => {
     render(<ApplyPage apply={apply} recruiting={open} now={new Date("2027-02-08T00:00:00Z")} />);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Applications are closed.");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("We're between cycles.");
   });
 
   it("switches to closed in the browser when the deadline passes after the build", () => {
@@ -49,7 +49,7 @@ describe("ApplyPage", () => {
     act(() => {
       vi.advanceTimersByTime(2 * 60_000);
     });
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Applications are closed.");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("We're between cycles.");
   });
 
   it("renders FAQ items as details with links and FAQPage JSON-LD", () => {
@@ -65,7 +65,7 @@ describe("ApplyPage", () => {
 
   it("shows generic process copy and no dates when closed", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
-    expect(screen.getByText("We recruit each fall and spring. Here's how a typical cycle works.")).toBeInTheDocument();
+    expect(screen.getByText("We open applications each fall and spring. Here's how a typical cycle works.")).toBeInTheDocument();
     expect(screen.queryByText(/^Due /)).not.toBeInTheDocument();
   });
 });

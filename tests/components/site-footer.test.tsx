@@ -30,17 +30,18 @@ afterEach(() => {
 });
 
 describe("SiteFooter CTA zone", () => {
-  it("says applications are closed and sends Get notified to the interest form", () => {
+  it("says we're between cycles, plainly says applications aren't open, and sends Keep me posted to the interest form", () => {
     const { container } = renderFooter(settings({ interestFormUrl: form }));
     const band = zone(container);
-    expect(within(band).getByRole("heading", { name: "Applications are closed for now." })).toBeInTheDocument();
-    expect(within(band).getByRole("link", { name: /^Get notified/ })).toHaveAttribute("href", form);
+    expect(within(band).getByRole("heading", { name: "We're between cycles." })).toBeInTheDocument();
+    expect(within(band).getByText(/^Applications aren't open right now\./)).toBeInTheDocument();
+    expect(within(band).getByRole("link", { name: /^Keep me posted/ })).toHaveAttribute("href", form);
   });
 
-  it("offers How to apply when closed without an interest form", () => {
+  it("offers See how it works when closed without an interest form", () => {
     const { container } = renderFooter();
-    expect(within(zone(container)).getByRole("link", { name: /^How to apply/ })).toHaveAttribute("href", "/apply");
-    expect(within(zone(container)).queryByRole("link", { name: /Get notified/ })).not.toBeInTheDocument();
+    expect(within(zone(container)).getByRole("link", { name: /^See how it works/ })).toHaveAttribute("href", "/apply");
+    expect(within(zone(container)).queryByRole("link", { name: /Keep me posted/ })).not.toBeInTheDocument();
   });
 
   it("invites visitors to apply when applications are open, with the deadline", () => {
@@ -63,7 +64,7 @@ describe("SiteFooter CTA zone", () => {
     await act(async () => {
       vi.advanceTimersByTime(2 * 60 * 60 * 1000);
     });
-    expect(within(zone(container)).getByRole("heading", { name: "Applications are closed for now." })).toBeInTheDocument();
+    expect(within(zone(container)).getByRole("heading", { name: "We're between cycles." })).toBeInTheDocument();
     expect(within(screen.getByRole("list", { name: "Join" })).getByRole("link", { name: /^Apply/ })).toHaveAttribute("href", "/apply");
   });
 
@@ -90,17 +91,17 @@ describe("SiteFooter link grid", () => {
     expect(within(club).getAllByRole("link").map((a) => a.textContent)).toEqual(primaryNav.map((l) => l.label));
   });
 
-  it("puts a state-aware Apply link under Join, and Get notified only with an interest form", () => {
+  it("puts a state-aware Apply link under Join, and Keep me posted only with an interest form", () => {
     const closedNoForm = renderFooter();
     const join = screen.getByRole("list", { name: "Join" });
     expect(within(join).getByRole("link", { name: "Apply" })).toHaveAttribute("href", "/apply");
-    expect(within(join).queryByRole("link", { name: /Get notified/ })).not.toBeInTheDocument();
+    expect(within(join).queryByRole("link", { name: /Keep me posted/ })).not.toBeInTheDocument();
     closedNoForm.unmount();
 
     renderFooter(settings({ applicationsOpen: true, applyUrl: "https://forms.gle/apply", interestFormUrl: form }));
     const openJoin = screen.getByRole("list", { name: "Join" });
     expect(within(openJoin).getByRole("link", { name: /^Apply/ })).toHaveAttribute("href", "https://forms.gle/apply");
-    expect(within(openJoin).getByRole("link", { name: /^Get notified/ })).toHaveAttribute("href", form);
+    expect(within(openJoin).getByRole("link", { name: /^Keep me posted/ })).toHaveAttribute("href", form);
   });
 
   it("omits the whole Reach column until a contact value exists", () => {

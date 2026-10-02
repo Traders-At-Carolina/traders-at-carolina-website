@@ -189,10 +189,10 @@ The hero button and the footer's CTA zone both use `getApplicationState()` (spec
 | State | Hero button | Footer CTA H2 | Footer CTA button |
 |---|---|---|---|
 | `open` | "Apply ↗", opens `applyUrl` in a new tab | "Ready to start?" | "Apply ↗", opens `applyUrl` |
-| `closed` | "Applications open {Mon D}", links to `/apply` (`primary` style kept) | "Applications are closed for now." | "Get notified", links to `/apply` |
+| `closed` | "Applications open {Mon D}", links to `/apply` (`primary` style kept) | "We're between cycles." | "Keep me posted", opens `interestFormUrl` (or "See how it works →" to `/apply` without one) |
 
 - `{Mon D}` comes from `nextApplicationOpenDate` (ISO date).
-- If the state is closed *and* `nextApplicationOpenDate` is missing, the button reads "How to apply →" and links to `/apply`.
+- If the state is closed *and* `nextApplicationOpenDate` is missing, the button reads "See how it works →" and links to `/apply`. The hero note reads "We're between cycles. We open applications each fall and spring." (or "… Our next cycle opens {Mon, Jan 12}.").
 - What `/apply` shows in the closed state is defined in spec 05.
 
 ---

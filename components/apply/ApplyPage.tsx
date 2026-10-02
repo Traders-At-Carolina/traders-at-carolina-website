@@ -18,7 +18,7 @@ type ApplyPageProps = {
 const processLead = (state: ApplicationState, cycleLabel?: string) =>
   state.status === "open" && cycleLabel
     ? `We recruit each fall and spring. Here's how the ${cycleLabel} cycle works.`
-    : "We recruit each fall and spring. Here's how a typical cycle works.";
+    : "We open applications each fall and spring. Here's how a typical cycle works.";
 
 /**
  * Composes /apply (spec 05). When open with a deadline, each state-dependent part renders both
