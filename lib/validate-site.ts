@@ -1,10 +1,11 @@
 import type { Site } from "@/content/types";
 import { parseEasternDateTime } from "@/lib/eastern-time";
+import { assertNoProblems } from "@/lib/validation";
 
 const GOOGLE_FORM = /^https:\/\/(docs\.google\.com\/forms\/|forms\.gle\/)/;
 
-/** Fails the build with every content problem listed at once. */
-export function validateSite(site: Site): void {
+/** Every content/site.ts problem; empty when valid. */
+export function collectSiteProblems(site: Site): string[] {
   const problems: string[] = [];
   const r = site.recruiting;
 
@@ -39,7 +40,10 @@ export function validateSite(site: Site): void {
     }
   }
 
-  if (problems.length > 0) {
-    throw new Error(`Invalid content/site.ts:\n- ${problems.join("\n- ")}`);
-  }
+  return problems;
+}
+
+/** Fails the build with every content problem listed at once. */
+export function validateSite(site: Site): void {
+  assertNoProblems("content/site.ts", collectSiteProblems(site));
 }

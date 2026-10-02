@@ -4,7 +4,7 @@ import type { Recruiting } from "@/content/types";
 import { applyBandCopy, applyStatusCopy, formatDateRange, stageDates } from "@/lib/apply";
 import { getApplicationState } from "@/lib/applications";
 import { inlineToPlainText, parseInline } from "@/lib/inline-markdown";
-import { validateApply } from "@/lib/validate-apply";
+import { collectApplyProblems, validateApply } from "@/lib/validate-apply";
 
 const now = new Date("2027-01-20T17:00:00Z");
 const open: Recruiting = {
@@ -97,5 +97,15 @@ describe("validateApply", () => {
       validateApply({ stages: apply.stages.slice(0, 2), faq: [{ question: "Q?", answer: "[x](javascript:alert(1))" }] }),
     ).toThrow(/stages[\s\S]*must start with/);
     expect(() => validateApply({ ...apply, faq: [] })).toThrow(/faq/);
+  });
+});
+
+describe("collectApplyProblems", () => {
+  it("returns no problems for the shipped content", () => {
+    expect(collectApplyProblems(apply)).toEqual([]);
+  });
+
+  it("returns problems instead of throwing", () => {
+    expect(collectApplyProblems({ ...apply, faq: [] })).toEqual(["faq must have at least 1 entry"]);
   });
 });

@@ -1,8 +1,9 @@
 import type { HomeContent } from "@/content/types";
 import { parseEasternDateTime } from "@/lib/eastern-time";
+import { assertNoProblems } from "@/lib/validation";
 
-/** Fails the build with every content/home.ts problem listed at once (spec 01 §6). */
-export function validateHome(home: HomeContent): void {
+/** Every content/home.ts problem (spec 01 §6); empty when valid. Admin saves show these as form errors (spec 06 §5). */
+export function collectHomeProblems(home: HomeContent): string[] {
   const problems: string[] = [];
 
   if (home.pillars.length !== 3) {
@@ -31,7 +32,10 @@ export function validateHome(home: HomeContent): void {
     }
   }
 
-  if (problems.length > 0) {
-    throw new Error(`Invalid content/home.ts:\n- ${problems.join("\n- ")}`);
-  }
+  return problems;
+}
+
+/** Fails the build with every content/home.ts problem listed at once (spec 01 §6). */
+export function validateHome(home: HomeContent): void {
+  assertNoProblems("content/home.ts", collectHomeProblems(home));
 }
