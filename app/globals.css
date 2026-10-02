@@ -279,10 +279,11 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
 }
 
 /*
- * Extra room above the navy CTA band (00 §10): one step up the section rhythm, added to the
- * section before it so that section's tone (bone or white) carries down to the band.
+ * Extra room above the footer's navy CTA zone (00 §10, spec 07 §3.1): one step up the section rhythm, added to the
+ * last section of the page so its tone (bone or white) carries down to the navy. Only matches when the zone
+ * renders, so /apply (no zone) keeps its normal padding.
  */
-section:has(+ [data-cta-band]) {
+main:has(+ footer [data-cta-band]) > section:last-child {
   padding-bottom: 6rem;
 
   @variant md {
