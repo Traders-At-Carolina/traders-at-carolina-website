@@ -27,11 +27,13 @@ function Headline({ headline, emphasis }: { headline: string; emphasis?: string 
 /** § 01 — what the club is and how to join, with the random walk on graph paper (spec 01 §3.1). */
 export function Hero({ hero, index, apply }: HeroProps) {
   return (
-    <section data-nav-hero aria-labelledby="hero-title" className="relative overflow-hidden lg:flex lg:min-h-[clamp(560px,calc(80vh-5rem),760px)] lg:items-center">
+    <section aria-labelledby="hero-title" className="relative overflow-hidden lg:flex lg:min-h-[clamp(560px,calc(80vh-5rem),760px)] lg:items-center">
       <div aria-hidden="true" className="graph-paper absolute inset-0" />
       <Container className="relative py-14 md:py-20">
         <Grid className="items-center gap-y-10">
           <div className="col-span-12 md:col-span-7">
+            {/* Header floats as soon as the first line of text reaches it (00 §10). */}
+            <span aria-hidden="true" data-nav-float-point className="-mb-px block h-px" />
             <Eyebrow index={index}>Quantitative finance at UNC</Eyebrow>
             <h1 id="hero-title" className="mt-4 text-display">
               <Headline headline={hero.headline} emphasis={hero.headlineEmphasis} />

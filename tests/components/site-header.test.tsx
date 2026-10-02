@@ -25,20 +25,25 @@ class MockIntersectionObserver {
   }
 }
 
-/** Reports the hero as on screen (or scrolled away) to every live observer. */
-function setHeroVisible(visible: boolean) {
+/** Reports the float point's position to every live observer. */
+function reportPoint({ intersecting, top }: { intersecting: boolean; top: number }) {
   act(() => {
     for (const { callback, targets } of observers) {
       for (const target of targets) {
         const entry = {
           target,
-          isIntersecting: visible,
-          boundingClientRect: { top: visible ? 0 : -500 } as DOMRectReadOnly,
+          isIntersecting: intersecting,
+          boundingClientRect: { top } as DOMRectReadOnly,
         } as IntersectionObserverEntry;
         callback([entry], {} as IntersectionObserver);
       }
     }
   });
+}
+
+/** Shorthand: the float point is on screen, or scrolled well past the top. */
+function setHeroVisible(visible: boolean) {
+  reportPoint(visible ? { intersecting: true, top: 300 } : { intersecting: false, top: -500 });
 }
 
 /** jsdom has no layout, so give each nav link a deterministic box. */
@@ -54,7 +59,7 @@ function renderHeader({ withHero = true } = {}) {
   return render(
     <>
       <SiteHeaderClient links={primaryNav} applyHref="/apply" applyExternal={false} />
-      {withHero ? <section data-nav-hero>Hero</section> : null}
+      {withHero ? <span data-nav-float-point /> : null}
     </>,
   );
 }
@@ -70,6 +75,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
   window.scrollY = 0;
 });
 
@@ -143,17 +149,31 @@ describe("SiteHeaderClient floating state", () => {
     expect(banner()).toHaveAttribute("data-floating", "false");
   });
 
-  it("observes the element marked data-nav-hero", () => {
+  it("observes the float point placed halfway down the hero", () => {
     renderHeader();
-    const hero = document.querySelector("[data-nav-hero]");
-    expect(observers.some((o) => o.targets.includes(hero as Element))).toBe(true);
+    const point = document.querySelector("[data-nav-float-point]");
+    expect(observers.some((o) => o.targets.includes(point as Element))).toBe(true);
   });
 
-  it("falls back to a scroll offset on pages without a hero", () => {
+  it("floats as soon as the float point slips under the header, before it leaves the viewport", () => {
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(80);
+    renderHeader();
+    reportPoint({ intersecting: false, top: 40 });
+    expect(banner()).toHaveAttribute("data-floating", "true");
+  });
+
+  it("stays docked when the float point is below the fold", () => {
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(80);
+    renderHeader();
+    reportPoint({ intersecting: false, top: 2000 });
+    expect(banner()).toHaveAttribute("data-floating", "false");
+  });
+
+  it("floats as soon as the page scrolls on pages without a hero", () => {
     renderHeader({ withHero: false });
     expect(banner()).toHaveAttribute("data-floating", "false");
     act(() => {
-      window.scrollY = 200;
+      window.scrollY = 1;
       window.dispatchEvent(new Event("scroll"));
     });
     expect(banner()).toHaveAttribute("data-floating", "true");

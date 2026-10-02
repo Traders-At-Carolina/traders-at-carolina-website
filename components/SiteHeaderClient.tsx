@@ -28,7 +28,7 @@ const SHELL_DOCKED =
   "h-16 w-full rounded-none border-transparent bg-transparent px-5 md:h-20 md:px-8 lg:px-12";
 
 const SHELL_FLOATING =
-  "pointer-events-auto mt-2 h-[3.25rem] w-[calc(100%-1.5rem)] rounded-[2rem] border-rule bg-bone/85 pr-1 pl-5 " +
+  "pointer-events-auto mt-2 h-[3.25rem] w-[calc(100%-1.5rem)] rounded-[1rem] border-rule bg-bone/85 pr-1 pl-5 " +
   "shadow-[0_10px_30px_-12px_rgb(0_0_0/0.25)] backdrop-blur-md md:mt-3 md:h-14 md:w-[min(calc(100%-2rem),64rem)] md:pr-1.5 md:pl-6";
 
 /**

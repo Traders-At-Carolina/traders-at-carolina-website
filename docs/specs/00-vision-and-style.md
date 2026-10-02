@@ -255,8 +255,8 @@ Page specs reference these by name. Each one is built once and reused.
 
 ### `SiteHeader`
 - Logo on the left (links to `/`). Nav on the right: **About · Membership · Team**, then an **Apply** `Button` (`primary`).
-- **Docked** while the page's hero (Home `Hero` or `PageHeader`, marked `data-nav-hero`) is on screen: full-width, sticky, on a `bone` background, 64 / 80px tall.
-- **Floating** once the hero scrolls behind it (pages without a hero: after 80px): a centred capsule inset 8 / 12px from the top, `min(100% − 2rem, 64rem)` wide, fully rounded, `bone` at 85% with a backdrop blur, a 1px `rule` border and a soft shadow. The header keeps its height, so the page never shifts. Opening the mobile menu docks it again.
+- **Docked** until the first line of hero text (Home `Hero` or `PageHeader`) reaches the header, tracked by a 1px `data-nav-float-point` marker at the top of the hero's text column: full-width, sticky, on a `bone` background, 64 / 80px tall.
+- **Floating** as soon as that text would pass under it (pages without a hero: as soon as the page scrolls): a centred bar inset 8 / 12px from the top, `min(100% − 2rem, 64rem)` wide, with 16px corners, `bone` at 85% with a backdrop blur, a 1px `rule` border and a soft shadow. The header keeps its height, so the page never shifts. Opening the mobile menu docks it again.
 - **Nav underline:** a single 1px `navy` line rests under the active page's link, springs to whichever link is hovered or focused, and springs back when the pointer or focus leaves. With no active page (Home) it fades in at the hovered link. Under reduced motion it jumps.
 - The Apply button is a `primary` **pill** (`shape="pill"`), in the bar and in the mobile menu. Apply buttons elsewhere stay square.
 - **Mobile (< 768px):** logo and a menu button. The menu opens a full-screen `bone` overlay with large Georgia (H2-size) links and a full-width Apply button. Focus is trapped while it's open, and `Esc` closes it.
