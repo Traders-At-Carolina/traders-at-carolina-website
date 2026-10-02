@@ -209,30 +209,21 @@ function Axes() {
   return <primitive object={axes} />;
 }
 
-/**
- * Orbit controls locked to the fitted distance for the canvas's aspect ratio (see fitDistance), so the surface,
- * axes and titles stay in frame from every angle. OrbitControls clamps the camera to that distance on update.
- */
-function FittedControls({
+/** Orbit controls with free rotation in every direction; zoom and pan stay off (distance is managed by FitCamera). */
+function FreeControls({
   controls,
   animate,
   onInteractStart,
   onInteractEnd,
 }: Pick<VolSurfaceCanvasProps, "animate" | "onInteractStart" | "onInteractEnd"> & { controls: RefObject<Controls | null> }) {
-  const size = useThree((s) => s.size);
-  const distance = useMemo(() => fitDistance(size.width / size.height), [size.width, size.height]);
   return (
     <OrbitControls
       ref={controls}
       target={CAMERA.target}
-      minDistance={distance}
-      maxDistance={distance}
       enableZoom={false}
       enablePan={false}
       // Damping is for hand-dragging only: it would smear the director's per-frame angle updates.
       enableDamping={!animate}
-      minAzimuthAngle={CAMERA.minAzimuth}
-      maxAzimuthAngle={CAMERA.maxAzimuth}
       minPolarAngle={CAMERA.minPolar}
       maxPolarAngle={CAMERA.maxPolar}
       onStart={onInteractStart}
@@ -241,7 +232,31 @@ function FittedControls({
   );
 }
 
-/** Starting camera position along the default view; FittedControls pulls it to the fitted distance. */
+/**
+ * Each frame, eases the camera distance toward the tightest fit for the current angle and canvas aspect
+ * (fitDistance), so the surface fills the figure from any viewpoint without ever clipping.
+ */
+function FitCamera({ controls }: { controls: RefObject<Controls | null> }) {
+  const size = useThree((s) => s.size);
+  const invalidate = useThree((s) => s.invalidate);
+  const settled = useRef(false);
+  useFrame((_, delta) => {
+    const c = controls.current;
+    if (!c) return;
+    const goal = fitDistance(size.width / size.height, c.getAzimuthalAngle(), c.getPolarAngle());
+    const current = c.getDistance();
+    // Snap on the first frame, then ease (≈ 0.25s time constant) so distance changes never look like a zoom jump.
+    const next = settled.current ? current + (goal - current) * (1 - Math.exp(-Math.min(delta, 0.05) * 4)) : goal;
+    settled.current = true;
+    if (Math.abs(next - current) > 1e-4) {
+      c.dollyOut(current / next);
+      invalidate();
+    }
+  });
+  return null;
+}
+
+/** Starting camera position along the default view; FitCamera pulls it to the fitted distance on the first frame. */
 const INITIAL_CAMERA = cameraDirection(CAMERA.azimuth, CAMERA.polar).map((d, i) => CAMERA.target[i] + d * 8) as [number, number, number];
 
 /** Shortest signed angle from a to b. */
@@ -326,7 +341,8 @@ export default function VolSurfaceCanvas({ params, animate, view, label, onInter
         <Lights />
         <Surface params={params} />
         <Axes />
-        <FittedControls controls={controls} animate={animate} onInteractStart={onInteractStart} onInteractEnd={onInteractEnd} />
+        <FreeControls controls={controls} animate={animate} onInteractStart={onInteractStart} onInteractEnd={onInteractEnd} />
+        <FitCamera controls={controls} />
         <CameraDirector controls={controls} view={view} animate={animate} />
         <TouchScroll />
         <LabelTracker spans={labelSpans} />

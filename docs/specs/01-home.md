@@ -63,7 +63,7 @@ Only these sections appear on Home. No placement section (data isn't available y
 **Layout**
 - **Desktop (≥ 1024px):**
   - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **left** in columns 1–6, and the figure sits on the right in columns 7–12.
-  - The 3D plot is `clamp(320px, 46vh, 440px)` tall (260px mobile, 340px tablet).
+  - The 3D plot is `clamp(380px, 58vh, 600px)` tall (300px mobile, 420px tablet), so the surface fills its column.
   - The hero is `clamp(600px, 100svh − header, 820px)` tall, with the grid masked to fade at the edges. The whole hero, figure included, should fit in the first viewport at 1024 × 768.
 - **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
@@ -72,7 +72,7 @@ Only these sections appear on Home. No placement section (data isn't available y
   - No min-height. Content defines the height.
 
 **Behavior**
-- **Framing:** the camera distance is solved numerically for the canvas aspect ratio (`fitDistance`) so the whole box, axes and titles stay inside the frame from every reachable angle; rotation is limited to the front-right quadrant (azimuth ≈ 3°–86°, tilt 57°–69° from vertical), where the surface reads well and the axes stay in front of it.
+- **Framing:** rotation is free in every direction (all the way round, over the top and underneath). Each frame the camera distance eases toward the tightest fit for the current angle and canvas aspect (`fitDistance`), so the surface, axes and titles fill the figure without ever clipping.
 - **Rotate:** drag (OrbitControls; zoom and pan off) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
 - **Camera director (while idle):** before each market change the camera turns slowly (critically damped spring, ≤ ~11°/s) to the angle that best shows it: face-on to strike when the skew changes most, face-on to maturity when the term structure does, three-quarter when the overall level does — with a gentle sway. It stops on interaction and resumes 4s after it ends.
 - **Market cycle:** each regime is held for 5s (time for the camera to settle), then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.

@@ -13,8 +13,8 @@ const { halfX: X, halfZ: Z, height: H } = SCENE;
 type Vec3 = [number, number, number];
 
 /**
- * The axes meet at the front-right corner, which is the corner nearest the camera across the whole reachable arc,
- * so the axes and their titles always sit in front of the surface.
+ * The axes meet at the front-right corner, the corner nearest the camera across the director's front views, so in
+ * normal viewing the axes and their titles sit in front of the surface.
  */
 export const AXIS_ORIGIN: Vec3 = [X, 0, Z];
 
@@ -33,11 +33,9 @@ export const CAMERA = {
   fov: 38,
   azimuth: 0.66,
   polar: 1.12,
-  /** Reachable angles (director and drag alike): the front-right quadrant, where the surface reads well. */
-  minAzimuth: 0.05,
-  maxAzimuth: 1.5,
-  minPolar: 1.0,
-  maxPolar: 1.2,
+  /** Dragging is free in every direction (all the way round, over the top and underneath). */
+  minPolar: 0.02,
+  maxPolar: Math.PI - 0.02,
 };
 
 /** Best viewing angle for each kind of market change (spec 01 §3.1). */
@@ -97,29 +95,23 @@ const FIT_POINTS: Vec3[] = [
 ];
 
 /**
- * Smallest camera distance at which every fit point stays inside the frame (with `margin` as a fraction of the
- * half-frame) from every reachable azimuth and polar angle, for a perspective camera of the given vertical fov
- * and aspect. The surface therefore never clips, however it is rotated within the allowed arc.
+ * Smallest camera distance at which every fit point (box corners and axis titles) stays inside the frame for this
+ * view, with `margin` as a fraction of the half-frame. Recomputed as the camera moves, so the surface is framed as
+ * tightly as each angle allows and never clips, however far it is dragged.
  */
-export function fitDistance(aspect: number, fovDeg = CAMERA.fov, margin = 0.98): number {
+export function fitDistance(aspect: number, azimuth: number, polar: number, fovDeg = CAMERA.fov, margin = 0.96): number {
   const tanV = Math.tan(((fovDeg / 2) * Math.PI) / 180) * margin;
   const tanH = tanV * aspect;
-  const views: { forward: Vec3; right: Vec3; up: Vec3 }[] = [];
-  for (let a = 0; a <= 24; a++) {
-    const azimuth = CAMERA.minAzimuth + ((CAMERA.maxAzimuth - CAMERA.minAzimuth) * a) / 24;
-    for (const polar of [CAMERA.minPolar, CAMERA.polar, CAMERA.maxPolar]) views.push(viewBasis(azimuth, polar));
-  }
+  const { forward, right, up } = viewBasis(azimuth, polar);
   const fits = (d: number) =>
-    views.every(({ forward, right, up }) =>
-      FIT_POINTS.every((p) => {
-        const rel = sub(p, CAMERA.target);
-        const depth = d + dot(rel, forward);
-        return depth > 0.1 && Math.abs(dot(rel, right)) <= depth * tanH && Math.abs(dot(rel, up)) <= depth * tanV;
-      }),
-    );
+    FIT_POINTS.every((p) => {
+      const rel = sub(p, CAMERA.target);
+      const depth = d + dot(rel, forward);
+      return depth > 0.1 && Math.abs(dot(rel, right)) <= depth * tanH && Math.abs(dot(rel, up)) <= depth * tanV;
+    });
   let lo = 1;
   let hi = 40;
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 24; i++) {
     const mid = (lo + hi) / 2;
     if (fits(mid)) hi = mid;
     else lo = mid;

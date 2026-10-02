@@ -124,7 +124,7 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
 
   return (
     <figure className={className}>
-      <div ref={box} className="relative h-[260px] md:h-[340px] lg:h-[clamp(320px,46vh,440px)]">
+      <div ref={box} className="relative h-[300px] md:h-[420px] lg:h-[clamp(380px,58vh,600px)]">
         {nearViewport ? (
           <VolSurfaceCanvas
             params={params}

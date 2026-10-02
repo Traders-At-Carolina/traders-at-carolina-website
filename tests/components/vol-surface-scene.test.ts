@@ -11,7 +11,7 @@ const points = [
 
 /** Projects every fit point through a real three.js camera and returns the largest |NDC| coordinate. */
 function maxNdc(aspect: number, azimuth: number, polar: number) {
-  const distance = fitDistance(aspect);
+  const distance = fitDistance(aspect, azimuth, polar);
   const camera = new THREE.PerspectiveCamera(CAMERA.fov, aspect, 0.1, 100);
   const target = new THREE.Vector3(...CAMERA.target);
   camera.position.copy(target).add(new THREE.Vector3(...cameraDirection(azimuth, polar)).multiplyScalar(distance));
@@ -21,19 +21,24 @@ function maxNdc(aspect: number, azimuth: number, polar: number) {
 }
 
 describe("fitDistance", () => {
-  it("keeps the whole box and its axis titles inside the frame from every reachable angle", () => {
+  it("keeps the whole box and its axis titles inside the frame from any angle, including over and under", () => {
     for (const aspect of [0.9, 1.4, 1.8]) {
-      for (let a = 0; a <= 40; a++) {
-        const azimuth = CAMERA.minAzimuth + ((CAMERA.maxAzimuth - CAMERA.minAzimuth) * a) / 40;
-        for (const polar of [CAMERA.minPolar, (CAMERA.minPolar + CAMERA.polar) / 2, CAMERA.polar, CAMERA.maxPolar]) {
-          expect(maxNdc(aspect, azimuth, polar)).toBeLessThanOrEqual(0.99);
+      for (let a = 0; a < 36; a++) {
+        for (const polar of [CAMERA.minPolar, 0.6, CAMERA.polar, 1.8, 2.6, CAMERA.maxPolar]) {
+          expect(maxNdc(aspect, (a / 36) * 2 * Math.PI, polar)).toBeLessThanOrEqual(0.97);
         }
       }
     }
   });
 
+  it("frames as tightly as each view allows", () => {
+    for (const azimuth of [VIEWS.skew, VIEWS.level, VIEWS.term]) {
+      expect(maxNdc(1.3, azimuth, CAMERA.polar)).toBeGreaterThan(0.9);
+    }
+  });
+
   it("pulls back for narrower canvases", () => {
-    expect(fitDistance(0.9)).toBeGreaterThan(fitDistance(1.6));
+    expect(fitDistance(0.9, CAMERA.azimuth, CAMERA.polar)).toBeGreaterThan(fitDistance(1.6, CAMERA.azimuth, CAMERA.polar));
   });
 });
 
@@ -52,11 +57,11 @@ describe("viewForChange", () => {
     expect(viewForChange(base, { ...base, atmVol: base.atmVol + 0.3 })).toBe(VIEWS.level);
   });
 
-  it("keeps every planned view (plus its sway) inside the reachable front arc", () => {
+  it("keeps every planned view (plus its sway) in the front-right quadrant, where the axes face the camera", () => {
     MARKET_REGIMES.forEach(({ params }, i) => {
       const view = viewForChange(params, MARKET_REGIMES[(i + 1) % MARKET_REGIMES.length].params);
-      expect(view - 0.1).toBeGreaterThanOrEqual(CAMERA.minAzimuth);
-      expect(view + 0.1).toBeLessThanOrEqual(CAMERA.maxAzimuth);
+      expect(view - 0.1).toBeGreaterThanOrEqual(0);
+      expect(view + 0.1).toBeLessThanOrEqual(Math.PI / 2);
     });
   });
 });
