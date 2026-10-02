@@ -1,5 +1,7 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Chivo, Gelasio, Public_Sans } from "next/font/google";
+import { ClickTracker } from "@/components/ClickTracker";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/content/site";
@@ -56,6 +58,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <SiteFooter />
+        <ClickTracker applyUrl={site.recruiting.applyUrl} interestFormUrl={site.recruiting.interestFormUrl} />
+        <Analytics />
       </body>
     </html>
   );
