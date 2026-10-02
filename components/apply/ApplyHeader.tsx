@@ -9,7 +9,7 @@ export function ApplyHeader({ copy }: { copy: StatusCopy }) {
     <PageHeader eyebrow={copy.eyebrow} title={copy.title} seed={505}>
       {copy.statusLine ? <p className="-mt-2 font-medium text-navy tabular">{copy.statusLine}</p> : null}
       {copy.lead ? <p className="mt-4 text-lead text-ink-2">{copy.lead}</p> : null}
-      <div data-track-location="apply-header" className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-5">
+      <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-5">
         {copy.action ? (
           <Button href={copy.action.href} external={copy.action.external} className="w-full sm:w-auto">
             {copy.action.label}

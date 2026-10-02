@@ -41,10 +41,6 @@ The build fails with a clear message if the recruiting config is invalid (for ex
 
 FAQ answers in `content/apply.ts` marked `draft: true` show in development and on Vercel preview deployments, never on production. To publish one, correct the answer and delete `draft: true`.
 
-### Measuring Apply clicks
-
-The site uses Vercel Web Analytics (enable it under the project's **Analytics** tab). Page views work on every plan. Clicks on Apply and "Get notified" are sent as custom events (`apply_click`, `notify_click`, `apply_page_click`, each with `location` and `page`), and those events appear only on a Vercel Pro plan. On Hobby, compare Google Form responses with `/apply` page views.
-
 ## Specs
 
 Design and page specs live in `docs/specs/`:

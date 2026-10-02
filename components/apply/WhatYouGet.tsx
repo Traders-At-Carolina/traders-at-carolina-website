@@ -29,7 +29,7 @@ export function WhatYouGet({ benefits, action }: WhatYouGetProps) {
             </li>
           ))}
         </ul>
-        <div data-track-location="apply-benefits" className="mt-12 md:mt-16">
+        <div className="mt-12 md:mt-16">
           {action}
         </div>
       </Reveal>

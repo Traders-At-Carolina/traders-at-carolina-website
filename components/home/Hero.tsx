@@ -30,7 +30,7 @@ function Headline({ headline, emphasis }: { headline: string; emphasis?: string 
 export function HeroActions({ apply }: { apply: HomeApplyCopy["hero"] }) {
   return (
     <>
-      <div data-track-location="home-hero" className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
+      <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
         <Button href={apply.href} external={apply.external} arrow={apply.arrow} className="w-full sm:w-auto">
           {apply.label}
         </Button>

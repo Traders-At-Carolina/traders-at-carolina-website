@@ -39,8 +39,8 @@ describe("ApplyPage", () => {
     const notify = screen.getAllByRole("link", { name: /^Get notified/ });
     expect(notify).toHaveLength(3);
     notify.forEach((link) => expect(link).toHaveAttribute("href", "https://forms.gle/notify"));
-    const header = container.querySelector('[data-track-location="apply-header"]')!;
-    expect(within(header as HTMLElement).getAllByRole("link")).toHaveLength(1);
+    const header = screen.getByRole("heading", { level: 1 }).closest("header")!;
+    expect(within(header).getAllByRole("link")).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 2, name: "Don't miss the next cycle." })).toBeInTheDocument();
   });
 

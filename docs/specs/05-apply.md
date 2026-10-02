@@ -149,9 +149,7 @@ getApplicationState(now: Date): ApplicationState
 
 ### 4.6 Measurement
 
-- Vercel Web Analytics (`<Analytics />` in the root layout). It's cookieless, so no consent banner is needed.
-- One delegated client listener (`components/ClickTracker.tsx`) sends a custom event when a link's href is the application form (`apply_click`), the interest form (`notify_click`) or `/apply` (`apply_page_click`), with `location` (the nearest `data-track-location`, else `site-header` / `footer` / `band` / `page`) and `page` (pathname).
-- Custom events need a Vercel Pro plan. On Hobby, conversion is estimated as Google Form responses ÷ `/apply` views.
+Analytics are defined in [spec 06 §7](06-admin.md). Every Apply and "Get notified" action on this page carries the §7.1 tracking attributes, with placements `apply-header`, `apply-benefits` and `band`, so the dashboard can compare clicks by section.
 
 ---
 
@@ -244,4 +242,4 @@ export const apply = {
 9. Lighthouse (mobile) ≥ 95 in all categories. The client island adds no more than about 2 KB of gzipped JavaScript.
 10. No hard-coded hex values or font stacks. Only spec-00 tokens.
 11. Draft FAQ answers render on preview deployments and never on production.
-12. Clicking Apply or Get notified anywhere on the site sends one analytics event with its `location` and `page`. Other links send none.
+12. Every Apply and Get notified action on `/apply` carries the spec 06 §7.1 tracking attributes with its placement.
