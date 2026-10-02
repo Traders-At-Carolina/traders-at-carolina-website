@@ -65,7 +65,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
 
 ---
@@ -184,7 +184,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
   - One path is solid `navy` at 1.5px.
   - The others are navy at 30% opacity and black at 25% opacity, each at 1px.
 - **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits.
-- **Placement:** in each `PageHeader`. (The Home hero uses a 3D volatility surface instead; spec 01 §3.1.)
+- **Placement:** in each `PageHeader`, unless the page supplies its own art (`/membership` uses the depth chart, §7.6). (The Home hero uses a 3D volatility surface instead; spec 01 §3.1.)
 - **Motion:** an optional 1.2s stroke draw-in on load (`stroke-dashoffset`), disabled under `prefers-reduced-motion`.
 - **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 
@@ -199,6 +199,14 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 ### 7.5 Firm names
 - Placement firms are set in type by default.
 - If firm logos are used, they are monochrome (black at 60%) and uniform in height, never in full color.
+
+### 7.6 Order-book depth chart (`DepthChart`)
+- **Shape:** stepped cumulative bid and ask depth curves stepping outward from a narrow, centred spread, over a hairline baseline. No labels, axes or prices.
+- **Strokes and fills:** bids take the random walk's lead stroke (solid `navy`, 1.5px), asks its muted stroke (black at 25%, 1px). Each side has a faint fill to the baseline (navy at 6%, black at 3%). Never red/green (§3).
+- **Deterministic:** level sizes come from a fixed seed at build time (`lib/order-book.ts`). Bids and asks use separate streams, so the book is not a mirror image; the deeper side reaches the top.
+- **Placement:** the `/membership` `PageHeader` only (spec 03 §3.1), in place of the random walk.
+- **Motion:** the same 1.2s stroke draw-in as the random walk, growing from the spread outward; fills fade in. Both are disabled under `prefers-reduced-motion`.
+- **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 
 ---
 
@@ -245,7 +253,7 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Effect | Spec |
 |---|---|
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
-| Header random walk | Stroke draw-in over 1.2s on load |
+| Header random walk / depth chart | Stroke draw-in over 1.2s on load (depth-chart fills fade in alongside) |
 | Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 80s, eased in after a drag; stops on interaction, resumes after 4s |
 | Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
 | Home intro | On every full load of Home: graph paper sweeps in, logo and name rise, then it dissolves into the hero grid over ~2.15s; any key, click or scroll skips it (spec 01 §3.6) |
@@ -304,6 +312,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 ### `PageHeader`
 - Used at the top of every page except Home.
 - Eyebrow, H1 and lead, over the graph-paper grid, with a small `RandomWalk` on the right on desktop. The `RandomWalk` is hidden below 768px.
+- An optional `art` prop replaces the `RandomWalk` in that column; `art={null}` leaves the column out. `/membership` uses it for the order-book depth chart (§7.6, spec 03 §3.1). The art stays a single composition with the grid, so the one-motif rule in §3 still holds.
 
 ### `Stat` / `StatRow`
 - `Stat`: a number (Stat role) plus a caption label.

@@ -1,6 +1,7 @@
 import { Button } from "@/components/Button";
 import { CTABand } from "@/components/CTABand";
 import { Activities } from "@/components/membership/Activities";
+import { DepthChart } from "@/components/membership/DepthChart";
 import { Expectations } from "@/components/membership/Expectations";
 import { HowItWorks } from "@/components/membership/HowItWorks";
 import { Tracks } from "@/components/membership/Tracks";
@@ -38,7 +39,12 @@ export function MembershipPage({ membership, leadNames, recruiting, now }: Membe
 
   return (
     <>
-      <PageHeader eyebrow="Membership" title={membership.header.h1} lead={membership.header.lead} seed={303} />
+      <PageHeader
+        eyebrow="Membership"
+        title={membership.header.h1}
+        lead={membership.header.lead}
+        art={<DepthChart seed={303} className="h-48 w-full lg:h-56" />}
+      />
       <HowItWorks index={n.how} title={headings.how} steps={membership.steps} switchingPolicy={membership.switchingPolicy} />
       <Tracks index={n.tracks} title={headings.tracks} tracks={membership.tracks} leadNames={leadNames} />
       {withExpectations ? (
