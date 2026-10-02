@@ -1,4 +1,4 @@
-import { NK, NT, SCENE, project, toX, toY, toZ } from "@/components/home/volSurfaceScene";
+import { NK, NT, SCENE, WIRE_STEP, project, toX, toY, toZ } from "@/components/home/volSurfaceScene";
 import { MARKET_REGIMES, surfaceGrid, type VolParams } from "@/lib/vol-surface";
 
 type Pt = [number, number];
@@ -29,8 +29,8 @@ export function VolSurfacePoster({ params = MARKET_REGIMES[0].params }: { params
   const point = (ik: number, iT: number) => project([toX(ik), toY(values[iT * NK + ik]), toZ(iT)]);
 
   const lines: string[] = [];
-  for (let iT = 0; iT < NT; iT += 2) lines.push(toPath(Array.from({ length: NK }, (_, ik) => point(ik, iT))));
-  for (let ik = 0; ik < NK; ik += 2) lines.push(toPath(Array.from({ length: NT }, (_, iT) => point(ik, iT))));
+  for (let iT = 0; iT < NT; iT += WIRE_STEP) lines.push(toPath(Array.from({ length: NK }, (_, ik) => point(ik, iT))));
+  for (let ik = 0; ik < NK; ik += WIRE_STEP) lines.push(toPath(Array.from({ length: NT }, (_, iT) => point(ik, iT))));
 
   return (
     <svg

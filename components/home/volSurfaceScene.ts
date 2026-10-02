@@ -1,8 +1,10 @@
 import { DOMAIN } from "@/lib/vol-surface";
 
 /** Grid resolution of the hero's volatility surface (strike columns × maturity rows). */
-export const NK = 25;
-export const NT = 17;
+export const NK = 61;
+export const NT = 41;
+/** Wire-grid spacing in grid steps: every 4th column and row is drawn as a line. */
+export const WIRE_STEP = 4;
 
 /** Scene box: strikes run along x, maturities along z (short dates in front), implied vol up y. */
 export const SCENE = { halfX: 1.6, halfZ: 1.2, height: 1.6, volMax: 0.8 } as const;

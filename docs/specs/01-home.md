@@ -54,7 +54,9 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
 - **Art — "Fig. 1":** `VolSurfaceFigure`, a rotatable 3D implied-volatility surface that moves on its own between market regimes, presented like a figure in a paper:
   - Strike (log-moneyness −0.5…0.5, labelled K/S) × maturity (0.1–2y) × implied vol, from an SSVI-style model in `lib/vol-surface.ts`.
-  - A navy-tinted mesh (lighter = low vol, deeper = high vol; colors read from the design tokens) with a bone wire grid, a faint navy floor grid and black hairline axes labelled "Strike K/S →", "Maturity →", "Implied vol" (80% top).
+  - A smooth 61 × 41 mesh shaded with a three-stop navy ramp (pale = low vol, deep = high vol; colors read from the design tokens, no tone mapping), lit by a white/bone hemisphere light plus key and rim lights.
+  - Anti-aliased, fixed-pixel-width lines (three.js `LineSegments2`): a bone wire grid every 4th row/column, a 1.75px deep-navy outline, a faint navy floor grid, and black axes with tick marks.
+  - Axes and ticks: strike K/S (0.7, 1.0, 1.4) along the front edge, maturity (0.5–2y) along the left edge, implied vol (20–80%) rising from the front-left corner so the surface never hides it.
   - Six named regimes (`MARKET_REGIMES`): Calm market, Sell-off, Recovery, Event risk, Speculative rally, Quiet carry.
   - `<figcaption>`: a row of six square progress markers (current one navy), the regime name and a one-line note (two lines reserved so the layout never shifts), `hero.figureCaption`, and a low→high vol legend. There are no user controls besides rotation.
 
