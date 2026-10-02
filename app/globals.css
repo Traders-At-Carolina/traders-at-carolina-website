@@ -287,6 +287,114 @@ section:has(+ [data-cta-band]) {
   }
 }
 
+/*
+ * Home intro (01 §3.6, 00 §9.2). The overlay is in the Home markup on every visit but shows only while
+ * the head script (lib/intro.ts) holds html.intro: on every full load of /, never under reduced motion. Its grid
+ * starts where the hero's does (below the 4rem / 5rem header) so the lines hand over to the hero's graph
+ * paper. Timeline, 2.15s: rows and columns sweep in (0–0.9s); the logo, then the name, rise (0.45–1.2s);
+ * hold; logo and name fade (1.5–1.75s); then the bone (1.65–2.15s) and the lines (1.8–2.15s) fade away.
+ * html.intro-skip (any key, click or scroll) cuts to a 200ms fade.
+ */
+.intro-overlay {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.intro .intro-overlay {
+    /* Twice the hero grid's strength, so the lines settle into its fainter graph paper. */
+    --intro-line: color-mix(in srgb, var(--color-navy) 12%, transparent);
+    --intro-grid-y: 4rem;
+    --intro-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --intro-sweep: cubic-bezier(0.65, 0, 0.35, 1);
+    display: grid;
+    animation: intro-bone-out 500ms ease-in-out 1650ms forwards;
+
+    @variant md {
+      --intro-grid-y: 5rem;
+    }
+  }
+
+  html.intro .intro-rows {
+    background-image: linear-gradient(var(--intro-line) 1px, transparent 1px);
+    background-size: 100% 28px;
+    background-position: 0 var(--intro-grid-y);
+    animation:
+      intro-rows-in 800ms var(--intro-sweep) both,
+      intro-fade 350ms ease-out 1800ms forwards;
+  }
+
+  html.intro .intro-cols {
+    background-image: linear-gradient(90deg, var(--intro-line) 1px, transparent 1px);
+    background-size: 28px 100%;
+    animation:
+      intro-cols-in 800ms var(--intro-sweep) 100ms both,
+      intro-fade 350ms ease-out 1800ms forwards;
+  }
+
+  html.intro .intro-mark {
+    animation:
+      intro-rise 600ms var(--intro-ease) 450ms both,
+      intro-fade 250ms ease-in 1500ms forwards;
+  }
+
+  html.intro .intro-name {
+    animation:
+      intro-rise 600ms var(--intro-ease) 600ms both,
+      intro-fade 250ms ease-in 1500ms forwards;
+  }
+
+  html.intro-skip .intro-overlay {
+    animation: intro-skip 200ms ease-out forwards;
+  }
+}
+
+@keyframes intro-rows-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  /* Explicit end: clip-path can't interpolate to the implicit `none`. */
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes intro-cols-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  /* Explicit end: clip-path can't interpolate to the implicit `none`. */
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes intro-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes intro-bone-out {
+  to {
+    background-color: transparent;
+    visibility: hidden;
+  }
+}
+
+@keyframes intro-skip {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 /* Mobile menu card entrance (00 §10 SiteHeader). Exit is instant. */
 @keyframes menu-in {
   from {
