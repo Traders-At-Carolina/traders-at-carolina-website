@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { type Track, trackAttrs } from "@/lib/analytics/attributes";
 
 export type ButtonVariant = "primary" | "secondary" | "inverse";
 
@@ -20,6 +21,8 @@ type ButtonProps = {
    */
   size?: "default" | "compact" | "sm";
   className?: string;
+  /** Names the click in analytics (spec 06 §7.1). */
+  track?: Track;
 };
 
 const variants: Record<ButtonVariant, string> = {
@@ -53,12 +56,13 @@ export function buttonClasses({
 }
 
 /** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
-export function Button({ href, children, variant = "primary", external, arrow, fullWidth, shape, size, className = "" }: ButtonProps) {
+export function Button({ href, children, variant = "primary", external, arrow, fullWidth, shape, size, className = "", track }: ButtonProps) {
   const classes = buttonClasses({ variant, fullWidth, shape, size, className });
+  const tracking = trackAttrs(track);
 
   if (external) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+      <a href={href} target="_blank" rel="noopener noreferrer" className={classes} {...tracking}>
         {children}
         <span aria-hidden="true">↗</span>
         <span className="sr-only">(opens in a new tab)</span>
@@ -67,7 +71,7 @@ export function Button({ href, children, variant = "primary", external, arrow, f
   }
 
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} className={classes} {...tracking}>
       {children}
       {arrow ? <span aria-hidden="true">→</span> : null}
     </Link>

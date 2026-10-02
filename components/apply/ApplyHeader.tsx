@@ -1,6 +1,7 @@
 import { Button } from "@/components/Button";
 import { PageHeader } from "@/components/PageHeader";
 import { TextLink } from "@/components/TextLink";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import type { StatusCopy } from "@/lib/apply";
 
 /** /apply header with the status block — the one PageHeader with an action (spec 05 §2, §4.1). */
@@ -11,11 +12,21 @@ export function ApplyHeader({ copy }: { copy: StatusCopy }) {
       {copy.lead ? <p className="mt-4 text-lead text-ink-2">{copy.lead}</p> : null}
       <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-5">
         {copy.action ? (
-          <Button href={copy.action.href} external={copy.action.external} className="w-full sm:w-auto">
+          <Button
+            href={copy.action.href}
+            external={copy.action.external}
+            className="w-full sm:w-auto"
+            track={{ cta: ctaFromLabel(copy.action.label), placement: "apply-header" }}
+          >
             {copy.action.label}
           </Button>
         ) : null}
-        <TextLink href={copy.secondary.href} arrow className="whitespace-nowrap">
+        <TextLink
+          href={copy.secondary.href}
+          arrow
+          className="whitespace-nowrap"
+          track={{ cta: ctaFromLabel(copy.secondary.label), placement: "apply-header" }}
+        >
           {copy.secondary.label}
         </TextLink>
       </div>

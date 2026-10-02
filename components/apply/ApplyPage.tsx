@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import type { ApplyContent, Recruiting } from "@/content/types";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import { applyBandCopy, applyStatusCopy, stageDates } from "@/lib/apply";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 
@@ -41,7 +42,12 @@ export function ApplyPage({ apply, recruiting, contactEmail, now }: ApplyPagePro
         title={copy.title}
         lead={copy.lead}
         action={
-          <Button href={copy.action.href} external={copy.action.external} variant="inverse">
+          <Button
+            href={copy.action.href}
+            external={copy.action.external}
+            variant="inverse"
+            track={{ cta: ctaFromLabel(copy.action.label), placement: "band" }}
+          >
             {copy.action.label}
           </Button>
         }
