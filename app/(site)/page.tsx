@@ -16,6 +16,7 @@ const content = {
 
 export const metadata: Metadata = {
   title: { absolute: "Traders at Carolina · Quantitative Finance at UNC" },
+  alternates: { canonical: "/" },
   description: home.hero.subhead,
 };
 

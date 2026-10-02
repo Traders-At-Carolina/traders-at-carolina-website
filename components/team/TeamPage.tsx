@@ -7,6 +7,7 @@ import { LeadershipTier } from "@/components/team/LeadershipTier";
 import { PlacementWall } from "@/components/team/PlacementWall";
 import { Placements } from "@/components/team/Placements";
 import type { CompanyMark, Placement, Recruiting, TeamContent } from "@/content/types";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import { getApplicationState } from "@/lib/applications";
 import { homeApplyCopy } from "@/lib/home";
 import { coPresidents, directors, execMembers, showPlacements, sortFirms } from "@/lib/team";
@@ -94,7 +95,7 @@ export function TeamPage({ team, placements, wall, recruiting, now }: TeamPagePr
       <CTABand
         title={bandTitle}
         action={
-          <Button href={band.href} external={band.external} variant="inverse">
+          <Button href={band.href} external={band.external} variant="inverse" track={{ cta: ctaFromLabel(band.label), placement: "band" }}>
             {band.label}
           </Button>
         }

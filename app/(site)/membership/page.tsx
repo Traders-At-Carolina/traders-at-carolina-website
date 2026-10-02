@@ -16,6 +16,7 @@ validateMembership(
 
 export const metadata: Metadata = {
   title: "Membership",
+  alternates: { canonical: "/membership" },
   description: membership.header.lead,
 };
 

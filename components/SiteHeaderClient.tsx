@@ -8,6 +8,7 @@ import { Button } from "@/components/Button";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import { Wordmark } from "@/components/Wordmark";
 import type { NavLink } from "@/content/nav";
+import { trackAttrs } from "@/lib/analytics/attributes";
 import { useFloatingHeader } from "@/lib/use-floating-header";
 
 type SiteHeaderClientProps = {
@@ -110,9 +111,9 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
   // With a mouse, the collapsed menu opens when the pointer reaches the menu button and closes when it leaves the header.
   const canHover = () => window.matchMedia("(hover: hover)").matches;
 
-  const applyButton = (props: { fullWidth?: boolean; size?: "compact" | "sm" }) => {
+  const applyButton = ({ placement, ...props }: { fullWidth?: boolean; size?: "compact" | "sm"; placement: string }) => {
     const button = (href: string, external: boolean) => (
-      <Button href={href} external={external} shape="rounded" {...props}>
+      <Button href={href} external={external} shape="rounded" track={{ cta: "apply", placement }} {...props}>
         Apply
       </Button>
     );
@@ -173,6 +174,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
                     }}
                     data-nav-link
                     href={link.href}
+                    {...trackAttrs({ cta: "nav", target: link.label, placement: "header" })}
                     aria-current={i === activeIndex ? "page" : undefined}
                     onPointerEnter={() => setPointed(i)}
                     onFocus={() => setPointed(i)}
@@ -186,12 +188,12 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
               ))}
             </ul>
           </div>
-          {applyButton({ size: "sm" })}
+          {applyButton({ size: "sm", placement: "header" })}
         </nav>
 
         {/* Mobile: Apply stays one tap away beside the menu button; the open menu has its own full-width Apply. */}
         <div className="flex items-center gap-2 md:hidden">
-          {open ? null : applyButton({ size: "compact" })}
+          {open ? null : applyButton({ size: "compact", placement: "header-mobile" })}
           <button
             ref={menuButtonRef}
             type="button"
@@ -224,6 +226,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    {...trackAttrs({ cta: "nav", target: link.label, placement: "menu" })}
                     onClick={close}
                     aria-current={isActive(link.href) ? "page" : undefined}
                     className={`-mx-3 flex min-h-12 items-center rounded-[0.625rem] px-3 font-display text-h3 active:bg-wash ${
@@ -237,7 +240,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
             </ul>
           </nav>
           <div className="mt-4" onClick={close}>
-            {applyButton({ fullWidth: true })}
+            {applyButton({ fullWidth: true, placement: "menu" })}
           </div>
         </div>
       ) : null}

@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { CTABand } from "@/components/CTABand";
 import { PageHeader } from "@/components/PageHeader";
 import type { AboutContent, Recruiting, TimelineEntry } from "@/content/types";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import { aboutSectionKeys } from "@/lib/about";
 import { getApplicationState } from "@/lib/applications";
 import { homeApplyCopy, numberSections } from "@/lib/home";
@@ -41,7 +42,7 @@ export function AboutPage({ about, timeline, recruiting, now }: AboutPageProps) 
       <CTABand
         title={bandTitle}
         action={
-          <Button href={band.href} external={band.external} variant="inverse">
+          <Button href={band.href} external={band.external} variant="inverse" track={{ cta: ctaFromLabel(band.label), placement: "band" }}>
             {band.label}
           </Button>
         }

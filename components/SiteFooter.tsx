@@ -4,6 +4,7 @@ import { Container, Grid } from "@/components/Container";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import { TextLink } from "@/components/TextLink";
 import { Wordmark } from "@/components/Wordmark";
+import { trackAttrs } from "@/lib/analytics/attributes";
 import { primaryNav } from "@/content/nav";
 import { site } from "@/content/site";
 
@@ -17,7 +18,7 @@ export function SiteFooter() {
   const { contactEmail, social, disclaimer } = site;
   const deadline = apply.state.status === "open" ? apply.state.deadline : undefined;
   const applyLink = (href: string, external: boolean) => (
-    <TextLink href={href} external={external} tone="inverse" arrow={external} className="max-md:hit-target">
+    <TextLink href={href} external={external} tone="inverse" arrow={external} className="max-md:hit-target" track={{ cta: "apply", placement: "footer" }}>
       Apply
     </TextLink>
   );
@@ -36,7 +37,11 @@ export function SiteFooter() {
             <ul className={listClasses}>
               {primaryNav.map((link) => (
                 <li key={link.href} className={itemClasses}>
-                  <Link href={link.href} className="max-md:hit-target hover:underline hover:underline-offset-4">
+                  <Link
+                    href={link.href}
+                    className="max-md:hit-target hover:underline hover:underline-offset-4"
+                    {...trackAttrs({ cta: "nav", target: link.label, placement: "footer" })}
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -56,21 +61,35 @@ export function SiteFooter() {
               <ul className={listClasses}>
                 {contactEmail ? (
                   <li className={itemClasses}>
-                    <TextLink href={`mailto:${contactEmail}`} tone="inverse" className="max-md:hit-target">
+                    <TextLink href={`mailto:${contactEmail}`} tone="inverse" className="max-md:hit-target" track={{ cta: "email", placement: "footer" }}>
                       {contactEmail}
                     </TextLink>
                   </li>
                 ) : null}
                 {social.instagram ? (
                   <li className={itemClasses}>
-                    <TextLink href={social.instagram} external arrow tone="inverse" className="max-md:hit-target">
+                    <TextLink
+                      href={social.instagram}
+                      external
+                      arrow
+                      tone="inverse"
+                      className="max-md:hit-target"
+                      track={{ cta: "social", target: "Instagram", placement: "footer" }}
+                    >
                       Instagram
                     </TextLink>
                   </li>
                 ) : null}
                 {social.linkedin ? (
                   <li className={itemClasses}>
-                    <TextLink href={social.linkedin} external arrow tone="inverse" className="max-md:hit-target">
+                    <TextLink
+                      href={social.linkedin}
+                      external
+                      arrow
+                      tone="inverse"
+                      className="max-md:hit-target"
+                      track={{ cta: "social", target: "LinkedIn", placement: "footer" }}
+                    >
                       LinkedIn
                     </TextLink>
                   </li>
@@ -82,6 +101,8 @@ export function SiteFooter() {
 
         <div className="mt-16 flex flex-col gap-2 border-t border-rule-inverse pt-6 text-caption md:flex-row md:justify-between">
           <p className="tabular">© {year} Traders at Carolina</p>
+          {/* Spec 06 §7.1: no cookies and no consent banner, so the site says what it measures. */}
+          <p>Anonymous, cookie-free analytics tell us which pages are useful.</p>
           {disclaimer ? <p className="max-w-[60ch]">{disclaimer}</p> : null}
         </div>
       </Container>

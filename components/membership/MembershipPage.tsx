@@ -7,6 +7,7 @@ import { HowItWorks } from "@/components/membership/HowItWorks";
 import { Tracks } from "@/components/membership/Tracks";
 import { PageHeader } from "@/components/PageHeader";
 import type { MembershipContent, Recruiting } from "@/content/types";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import { getApplicationState } from "@/lib/applications";
 import { homeApplyCopy, numberSections } from "@/lib/home";
 import { showExpectations } from "@/lib/membership";
@@ -55,7 +56,7 @@ export function MembershipPage({ membership, leadNames, recruiting, now }: Membe
         title="Found your track?"
         lead={closedLead}
         action={
-          <Button href={band.href} external={band.external} arrow={band.arrow} variant="inverse">
+          <Button href={band.href} external={band.external} arrow={band.arrow} variant="inverse" track={{ cta: ctaFromLabel(band.label), placement: "band" }}>
             {band.label}
           </Button>
         }
