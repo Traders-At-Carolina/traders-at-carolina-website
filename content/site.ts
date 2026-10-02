@@ -13,5 +13,6 @@ export const site: Site = {
   recruiting: {
     applicationsOpen: false,
     applyUrl: "",
+    interestFormUrl: "https://forms.gle/uVcW9vqpCDQckoLj7",
   },
 };

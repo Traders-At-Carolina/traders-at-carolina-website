@@ -32,6 +32,26 @@ describe("SiteHeaderClient", () => {
     expect(screen.queryByRole("navigation", { name: "Mobile" })).not.toBeInTheDocument();
   });
 
+  it("keeps Apply one tap away on mobile and hides the page behind the open menu", async () => {
+    const user = userEvent.setup();
+    const main = document.createElement("main");
+    document.body.appendChild(main);
+    try {
+      const { container } = renderHeader();
+      // Desktop nav Apply + compact mobile Apply.
+      expect(screen.getAllByRole("link", { name: "Apply" })).toHaveLength(2);
+
+      await user.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(main).toHaveAttribute("inert");
+      expect(container.parentElement).not.toHaveAttribute("inert");
+
+      await user.keyboard("{Escape}");
+      expect(main).not.toHaveAttribute("inert");
+    } finally {
+      main.remove();
+    }
+  });
+
   it("closes the menu on Escape and returns focus to the button", async () => {
     const user = userEvent.setup();
     renderHeader();

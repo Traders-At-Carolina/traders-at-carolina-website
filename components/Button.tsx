@@ -12,6 +12,8 @@ type ButtonProps = {
   /** Trailing → on internal links (external links always show ↗). */
   arrow?: boolean;
   fullWidth?: boolean;
+  /** Compact trims side padding for tight spots like the mobile header; height stays 44px. */
+  size?: "default" | "compact";
   className?: string;
 };
 
@@ -22,9 +24,10 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 /** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
-export function Button({ href, children, variant = "primary", external, arrow, fullWidth, className = "" }: ButtonProps) {
+export function Button({ href, children, variant = "primary", external, arrow, fullWidth, size = "default", className = "" }: ButtonProps) {
   const classes = [
-    "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-3 text-button font-semibold transition-colors duration-150",
+    "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap py-3 text-button font-semibold transition-colors duration-150",
+    size === "compact" ? "px-4" : "px-6",
     variants[variant],
     fullWidth ? "w-full" : "",
     className,

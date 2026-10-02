@@ -76,6 +76,11 @@ export type Partner = {
   relationship?: string;
   /** Optional https link to the firm's site. */
   url?: string;
+  /**
+   * Official mark from the firm's own site or media kit, in public/images/sponsors, with a transparent
+   * background. Rendered as a single-color mask, so only its shape matters. width/height set the aspect ratio.
+   */
+  logo?: { src: string; width: number; height: number };
 };
 
 export type Advisor = { name: string; title: string; department: string; note?: string };

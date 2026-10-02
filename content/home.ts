@@ -29,20 +29,20 @@ export const home: HomeContent = {
     {
       title: "Preparation",
       body: "Education sessions on probability, statistics and mental math, plus structured interview preparation for trading and research roles.",
-      link: { label: "See the curriculum", href: "/membership" },
+      link: { label: "See weekly activities", href: "/membership#activities" },
     },
     {
       title: "Engagement",
-      body: "Mock trading, market-making games and competitions alongside a community of peers working toward the same roles.",
-      link: { label: "How membership works", href: "/membership" },
+      body: "Mock trading, market-making games (quoting prices to both buy and sell) and competitions alongside a community of peers working toward the same roles.",
+      link: { label: "Explore the three tracks", href: "/membership#tracks" },
     },
     {
       title: "Opportunity",
       body: "Firm events, sponsor connections and recruiting support from members who have been through the process.",
-      link: { label: "About the club", href: "/about" },
+      link: { label: "Meet our sponsors", href: "/about#partners" },
     },
   ],
-  stats: {},
+  stats: { foundedYear: 2023 },
   photos: [
     {
       src: generalMeeting,

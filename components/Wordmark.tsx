@@ -9,7 +9,7 @@ export function Wordmark({ tone = "default" }: { tone?: "default" | "inverse" })
     <Link
       href="/"
       aria-label="Traders at Carolina, home"
-      className={`font-display text-[1.25rem] leading-none whitespace-nowrap ${tone === "inverse" ? "text-bone" : "text-black"}`}
+      className={`hit-target font-display text-[1.25rem] leading-none whitespace-nowrap ${tone === "inverse" ? "text-bone" : "text-black"}`}
     >
       Traders <em>at</em> Carolina
     </Link>

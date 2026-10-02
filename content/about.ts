@@ -50,6 +50,15 @@ export const about: AboutContent = {
       body: "Members who place help the next class prepare.",
     },
   ],
-  partners: [],
+  partners: [
+    { name: "Jane Street", relationship: "Sponsor", logo: { src: "/images/sponsors/jane-street.svg", width: 28, height: 28 } },
+    { name: "JPMorgan Chase", relationship: "Sponsor", logo: { src: "/images/sponsors/jpmorgan-chase.png", width: 109, height: 40 } },
+    {
+      name: "Quiver Quantitative",
+      relationship: "Sponsor",
+      logo: { src: "/images/sponsors/quiver-quantitative.png", width: 91, height: 91 },
+    },
+    { name: "TradingView", relationship: "Sponsor", logo: { src: "/images/sponsors/tradingview.svg", width: 211, height: 108 } },
+  ],
   advisors: [],
 };

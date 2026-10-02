@@ -20,7 +20,7 @@ export function PartnersAdvisors({ index, headings, partners, advisors }: Partne
   const advisorsOnly = partners.length === 0;
 
   return (
-    <Section tone="white" labelledBy="partners-title">
+    <Section id="partners" tone="white" labelledBy="partners-title">
       <SectionHeader
         index={index}
         eyebrow={advisorsOnly ? "Advisors" : "Partners and advisors"}

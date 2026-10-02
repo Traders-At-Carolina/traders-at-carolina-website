@@ -3,7 +3,7 @@ import { HomePage } from "@/components/home/HomePage";
 import { about } from "@/content/about";
 import { home } from "@/content/home";
 import { site } from "@/content/site";
-import { resolvePartnerFirms } from "@/lib/about";
+import { resolvePartnerFirms, sortPartners } from "@/lib/about";
 import { validateHome } from "@/lib/validate-home";
 
 validateHome(home);
@@ -20,5 +20,6 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <HomePage home={content} recruiting={site.recruiting} now={new Date()} />;
+  const sponsors = sortPartners(about.partners).map(({ name, logo }) => ({ name, logo }));
+  return <HomePage home={content} recruiting={site.recruiting} sponsors={sponsors} now={new Date()} />;
 }

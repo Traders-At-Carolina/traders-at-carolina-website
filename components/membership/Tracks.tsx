@@ -17,7 +17,7 @@ type TracksProps = {
  */
 export function Tracks({ index, title, tracks, leadNames }: TracksProps) {
   return (
-    <Section labelledBy="tracks-title">
+    <Section id="tracks" labelledBy="tracks-title">
       <SectionHeader index={index} eyebrow="Tracks" title={title} id="tracks-title" />
       <Reveal className="mt-12 md:mt-16">
         <div className="grid grid-cols-1 divide-y divide-rule lg:grid-cols-3 lg:divide-x lg:divide-y-0">

@@ -16,7 +16,7 @@ type ActivitiesProps = {
  */
 export function Activities({ index, title, activities, tracks }: ActivitiesProps) {
   return (
-    <Section labelledBy="activities-title">
+    <Section id="activities" labelledBy="activities-title">
       <SectionHeader index={index} eyebrow="What we do" title={title} id="activities-title" />
       <Reveal className="mt-12 md:mt-16">
         <table role="table" aria-labelledby="activities-title" className="block w-full border-t border-rule-strong lg:table lg:border-collapse">
