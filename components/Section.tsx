@@ -22,6 +22,7 @@ export function Section({ children, tone = "bone", id, labelledBy, className = "
   return (
     <section
       id={id}
+      data-tone={tone}
       aria-labelledby={labelledBy}
       // scroll-mt clears the sticky header (64 / 80px) when linked to by #id.
       className={`${tones[tone]} scroll-mt-16 py-16 md:scroll-mt-20 md:py-24 lg:py-32 ${className}`}

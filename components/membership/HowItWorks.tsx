@@ -24,14 +24,14 @@ export function HowItWorks({ index, title, steps, switchingPolicy }: HowItWorksP
               <h3 className="mt-3 text-h3">{step.title}</h3>
               <p className="mt-3 max-w-prose text-body text-ink-2">{step.body}</p>
               {i < steps.length - 1 ? (
-                <span aria-hidden="true" className="absolute top-0 -right-2.5 hidden bg-bone px-1 text-caption text-ink-3 lg:block">
+                <span aria-hidden="true" className="absolute top-0 -right-3 hidden bg-bone px-1 text-caption text-ink-3 lg:block">
                   →
                 </span>
               ) : null}
             </li>
           ))}
         </ol>
-        {switchingPolicy ? <p className="mt-10 text-caption text-ink-3">{switchingPolicy}</p> : null}
+        {switchingPolicy ? <p className="mt-12 text-caption text-ink-3">{switchingPolicy}</p> : null}
       </Reveal>
     </Section>
   );

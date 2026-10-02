@@ -17,3 +17,16 @@ export function expectationRows(expectations: MembershipContent["expectations"])
   ];
   return rows.filter((row): row is [string, Expectation] => Boolean(row[1])).map(([term, e]) => ({ term, ...e }));
 }
+
+/** Expectations earn their own section only with at least two answered rows; one row reads as a stub (spec 03 §3.5). */
+export function showExpectations(expectations: MembershipContent["expectations"]): boolean {
+  return expectationRows(expectations).length >= 2;
+}
+
+/** Which optional activity columns carry information worth a column. */
+export function activityColumns(activities: MembershipContent["activities"]): { frequency: boolean; tracks: boolean } {
+  return {
+    frequency: activities.some((a) => Boolean(a.frequency)),
+    tracks: activities.some((a) => a.tracks !== "all"),
+  };
+}

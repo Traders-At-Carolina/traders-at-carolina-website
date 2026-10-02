@@ -11,11 +11,13 @@ import type { MembershipContent } from "@/content/types";
  * - tracks[].leadSlug (a slug from content/team.ts, once the Team page exists)
  *
  * Track descriptions describe what members do; never call background items "required".
+ * goodFit and sampleProblem are DRAFT copy written for review; edit or remove freely.
  */
 export const membership: MembershipContent = {
   header: {
     h1: "Three tracks. One standard.",
-    lead: "Members join one of three tracks — Trading, Research or Development — and build skills that map directly to roles at quantitative trading firms.",
+    // Non-breaking spaces keep each em dash on the line with the word before it.
+    lead: "Members join one of three tracks\u00a0— Trading, Research or Development\u00a0— and build skills that map directly to roles at quantitative trading firms.",
   },
   headings: {
     how: "From application to your first project.",
@@ -35,6 +37,9 @@ export const membership: MembershipContent = {
       name: "Trading",
       description:
         "Market-making games (quoting prices to both buy and sell), decision-making under uncertainty, expected value and fast mental math.",
+      goodFit: "like making fast decisions with incomplete information and living with the outcome.",
+      sampleProblem:
+        "Make a two-sided market on the sum of two dice. Someone buys at your ask. What did you just learn, and where do you quote next?",
       recommendedBackground: ["Probability", "Mental math", "Comfort with quick estimation"],
     },
     {
@@ -42,6 +47,8 @@ export const membership: MembershipContent = {
       roleLabel: "Quantitative research",
       name: "Research",
       description: "Statistics, modeling and research projects on market data, from forming a hypothesis to testing it honestly.",
+      goodFit: "would rather find out why something works than take it on faith.",
+      sampleProblem: "A strategy returned 18% last year. What would you check before believing it, and how would you test whether it was luck?",
       recommendedBackground: ["Statistics", "Linear algebra", "Python or R"],
     },
     {
@@ -49,6 +56,8 @@ export const membership: MembershipContent = {
       roleLabel: "Software engineering",
       name: "Development",
       description: "Building backtesters, trading simulators and the infrastructure the club's other tracks use.",
+      goodFit: "like building tools other people depend on and making them fast.",
+      sampleProblem: "Replay a day of prices through a simple strategy, then find the bug that makes the backtest look better than it should.",
       recommendedBackground: ["Python or C++", "Data structures and algorithms"],
     },
   ],

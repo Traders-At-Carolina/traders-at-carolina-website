@@ -127,6 +127,10 @@ export type MembershipContent = {
     roleLabel: string;
     name: string;
     description: string;
+    /** One line on who the track suits, completing "Good fit if you…". */
+    goodFit?: string;
+    /** A representative problem a member works on, so visitors can feel the track. */
+    sampleProblem?: string;
     /** 2–4 items. Recommended, never required. */
     recommendedBackground: string[];
     /** Slug of a person in content/team.ts (spec 04). */

@@ -138,6 +138,16 @@
   --color-rule-strong: rgb(235 234 228 / 0.45);
 }
 
+/* Two bone sections in a row would stack both paddings (up to 256px of empty bone). The second one's
+   hairline already marks the boundary, so its top padding drops a step: 112 / 160 / 192px gaps. */
+[data-tone="bone"] + [data-tone="bone"] {
+  padding-top: 3rem;
+
+  @media (min-width: 48rem) {
+    padding-top: 4rem;
+  }
+}
+
 /* Resting hairline underline that fills in from the left on hover (00 §9.2). */
 @utility link-underline {
   background-image:
