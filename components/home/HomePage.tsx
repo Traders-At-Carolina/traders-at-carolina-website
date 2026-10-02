@@ -41,10 +41,10 @@ export function HomePage({ home, recruiting, sponsors = [], now }: HomePageProps
 
   const { members, foundedYear, partnerFirms } = home.stats;
   const stats: StatItem[] = [
-    { value: members !== undefined ? `${members}+` : undefined, label: "Active members" },
-    { value: foundedYear !== undefined ? String(foundedYear) : undefined, label: "Founded" },
+    { value: members !== undefined ? `${members}+` : undefined, label: "Active members", phrase: `${members}+ active members` },
+    { value: foundedYear !== undefined ? String(foundedYear) : undefined, label: "Founded", phrase: `Founded in ${foundedYear}` },
     // The named sponsor list replaces the bare count when it's available.
-    { value: partnerFirms !== undefined && sponsors.length === 0 ? String(partnerFirms) : undefined, label: "Partner firms" },
+    { value: partnerFirms !== undefined && sponsors.length === 0 ? String(partnerFirms) : undefined, label: "Partner firms", phrase: `${partnerFirms} partner firms` },
   ];
   const showNumbers = stats.some((s) => s.value) || sponsors.length > 0;
   const showInside = home.photos.length >= 2;

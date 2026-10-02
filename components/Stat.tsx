@@ -1,4 +1,5 @@
-export type StatItem = { value?: string; label: string };
+/** `phrase` is how the stat reads as a sentence ("Founded in 2023") when it stands alone as a heading. */
+export type StatItem = { value?: string; label: string; phrase?: string };
 type Tone = "default" | "inverse";
 
 /** Large tabular number over a caption label (00 §7.4): navy on light sections, bone on dark. */
@@ -13,7 +14,7 @@ export function Stat({ value, label, tone = "default" }: { value: string; label:
 
 /** Stats separated by hairlines; entries without a value are dropped, never padded. */
 export function StatRow({ stats, tone = "default" }: { stats: StatItem[]; tone?: Tone }) {
-  const shown = stats.filter((s): s is Required<StatItem> => Boolean(s.value));
+  const shown = stats.filter((s): s is StatItem & { value: string } => Boolean(s.value));
   if (shown.length === 0) return null;
 
   return (
