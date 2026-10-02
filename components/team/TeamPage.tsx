@@ -4,8 +4,9 @@ import { CTABand } from "@/components/CTABand";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { LeadershipTier } from "@/components/team/LeadershipTier";
+import { PlacementWall } from "@/components/team/PlacementWall";
 import { Placements } from "@/components/team/Placements";
-import type { Placement, Recruiting, TeamContent } from "@/content/types";
+import type { CompanyMark, Placement, Recruiting, TeamContent } from "@/content/types";
 import { getApplicationState } from "@/lib/applications";
 import { homeApplyCopy } from "@/lib/home";
 import { coPresidents, directors, execMembers, showPlacements, sortFirms } from "@/lib/team";
@@ -13,13 +14,15 @@ import { coPresidents, directors, execMembers, showPlacements, sortFirms } from 
 type TeamPageProps = {
   team: TeamContent;
   placements: Placement[];
+  /** Firms for the header strip (content/placement-wall.ts); empty omits the strip. */
+  wall: CompanyMark[];
   recruiting: Recruiting;
   /** Build time for the static page; injectable for tests. */
   now: Date;
 };
 
 /** Composes /team (spec 04 §2). Placements render only at 5+ firms. */
-export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
+export function TeamPage({ team, placements, wall, recruiting, now }: TeamPageProps) {
   const state = getApplicationState(now, recruiting);
   const band = homeApplyCopy(state, recruiting, now).band;
   const bandTitle = state.status === "open" ? "Want to see your name here next year?" : band.title;
@@ -42,7 +45,6 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
       eyebrow: "Leadership",
       title: "Co-Presidents",
       members: presidents,
-      variant: "featured",
     },
     {
       id: "directors-title",
@@ -63,7 +65,7 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
         eyebrow="Team"
         title="The people running the desk."
         lead="Traders at Carolina is run by students. Meet the executive board, co-presidents and directors."
-        seed={404}
+        art={wall.length > 0 ? <PlacementWall companies={wall} /> : null}
       />
       {noLeadership ? (
         <LeadershipTier
