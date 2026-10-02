@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getApplyTarget } from "@/components/ApplyButton";
 import { Container, Grid } from "@/components/Container";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
+import { BitWordmark } from "@/components/footer/BitWordmark";
 import { TextLink } from "@/components/TextLink";
 import { Wordmark } from "@/components/Wordmark";
 import { primaryNav } from "@/content/nav";
@@ -24,7 +25,7 @@ export function SiteFooter() {
 
   return (
     <footer className="on-dark bg-black text-bone">
-      <Container className="py-16 md:py-20">
+      <Container className="pt-16 pb-8 md:pt-20 md:pb-12">
         <Grid className="gap-y-12">
           <div className="col-span-12 md:col-span-5">
             <Wordmark tone="inverse" size="lg" />
@@ -84,6 +85,11 @@ export function SiteFooter() {
           <p className="tabular">© {year} Traders at Carolina</p>
           {disclaimer ? <p className="max-w-[60ch]">{disclaimer}</p> : null}
         </div>
+      </Container>
+
+      {/* Decorative 0s-and-1s wordmark that closes the page (spec 06). Flush with the page end, so no bottom padding. */}
+      <Container>
+        <BitWordmark />
       </Container>
     </footer>
   );

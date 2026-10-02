@@ -1,6 +1,6 @@
 # Spec 06 — Footer bit wordmark
 
-**Status:** Draft · **Date:** 2026-10-02 · **Route:** every page (inside `SiteFooter`) · **Depends on:** [Spec 00 §3, §9.2, §10](00-vision-and-style.md)
+**Status:** Implemented · **Date:** 2026-10-02 · **Route:** every page (inside `SiteFooter`) · **Depends on:** [Spec 00 §3, §9.2, §10](00-vision-and-style.md)
 
 All tokens, type roles and components are defined in spec 00. References like (00 §9.2) point there. This spec adds one component, `BitWordmark`, to the bottom of `SiteFooter`.
 
@@ -31,8 +31,8 @@ Spec 00 §3 says "Never use … terminal or monospace typography". A field of bi
 |---|---|
 | **Position** | A band at the very bottom of `SiteFooter`, below the `© {year}` row, inside the footer's `black` background |
 | **Width** | The container width (00 §6), including its 16px gutters on mobile |
-| **Height** | Set by the wordmark's aspect ratio: roughly 160–220px on desktop (one line), 220–280px on mobile (two lines) |
-| **Spacing** | 48px above the band on desktop, 32px on mobile; the band ends flush with the footer's bottom padding |
+| **Height** | Set by the wordmark's aspect ratio (height / width): 0.14 from `md` up (about 165px at the 1184px content width, one line) and 0.46 below (about 154px at 335px, two lines) |
+| **Spacing** | 32px above the band on mobile, 48px on desktop (the footer's bottom padding above it); the band ends flush with the end of the page, with no padding below it |
 | **Edges** | Soft fade, no hard boundary: a CSS `mask-image` gradient dims the left, right and top edges to transparent over about 12% of the width / 25% of the height. The bottom edge is flush with the page end and is not faded. |
 
 `SiteFooter` stays a server component; `BitWordmark` is a client component imported into it.
@@ -42,15 +42,15 @@ Spec 00 §3 says "Never use … terminal or monospace typography". A field of bi
 ## 4. Rendering
 
 - **Technique:** one `<canvas>` with a `requestAnimationFrame` loop. No animation library, no new dependency (00 §9.2).
-- **Grid:** square cells, 8px on desktop and 7px below 768px, covering the canvas. Each cell holds one glyph, `0` or `1`, drawn in `--font-sans` at the cell size. The canvas is scaled by `devicePixelRatio` (capped at 2) so glyphs stay sharp.
+- **Grid:** square cells, 6px from `md` up and 5px below, covering the canvas. Each cell holds one glyph, `0` or `1`, drawn in `--font-sans` at weight 700 and about 1.3× the cell size, so the digits fill the cell. Glyphs are pre-rendered once as two sprites and stamped per cell. The canvas is scaled by `devicePixelRatio` (capped at 2) so glyphs stay sharp.
 - **Letter mask:** on mount, and after `document.fonts.ready` and on resize, the text "Traders at Carolina" is drawn once to an offscreen canvas in `--font-title` (Chivo, weight 800, matching the Team headings), fitted to the width. Each cell is a **letter cell** if its coverage in that bitmap is at least 50%. The mask is recomputed only when the grid size changes.
 - **Layout of the text:** one line from `md` up; two lines ("Traders at" / "Carolina") below `md`, so the strokes stay at least two cells wide.
 - **Colors** (bone only, 00 §4):
 
 | State | Color |
 |---|---|
-| Resting, non-letter cell | `bone` at 18% |
-| Resting, letter cell | `bone` at 90% |
+| Resting, non-letter cell | `bone` at 12% |
+| Resting, letter cell | `bone` at 100% |
 | Hovered cell | `bone` at 100%, glyph forced to `1` |
 
 - **Bit values:** each cell has a seeded random bit. The seed is fixed per grid size, so the resolved field is the same between visits; only the scramble flicker uses runtime randomness.
@@ -63,7 +63,7 @@ The sequence **replays every time** the band enters view.
 
 1. **Scrambled (default state, and the state after leaving view).** Every cell flickers: its glyph re-rolls randomly at 8–14 Hz, per cell, and all cells sit at the same mid brightness (`bone` at 40%). No letters are visible.
 2. **Trigger.** An `IntersectionObserver` fires when 40% of the band is visible.
-3. **Wave.** A front sweeps left to right over **1.6s** (`ease-out`). Cells it has passed stop flickering and settle: letter cells to 90% and non-letter cells to 18%, easing over 250ms. Cells ahead of the front keep flickering. A slight softness in the front (a band about 6 columns wide) avoids a hard scan line.
+3. **Wave.** A front sweeps left to right over **1.6s** (`ease-out`). Cells it has passed stop flickering and settle: letter cells to 100% and non-letter cells to 12%, easing with the soft front. Cells ahead of the front keep flickering. A slight softness in the front (a band about 6 columns wide) avoids a hard scan line.
 4. **Idle.** Once formed, about 1% of cells per second re-roll their glyph, so the field shimmers faintly.
 5. **Leaving view.** When less than 10% of the band is visible, the loop stops and the state resets to scrambled, so the next entry replays.
 
@@ -88,7 +88,7 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 - **`prefers-reduced-motion: reduce` (00 §9.2):** the canvas draws the **finished static wordmark** once (resolved, no flicker, no idle shimmer), and hover and touch effects are disabled. The loop never starts.
 - **No JavaScript / before mount:** the band reserves its height and is empty (black). The footer content above is unaffected.
 - **Contrast:** decorative text is exempt from contrast requirements; the footer's links and copyright keep their existing contrast on `black`.
-- **Performance:** about 14k cells at 1200px wide on desktop. Drawing is batched per color and per alpha bucket, and cells that haven't changed are not redrawn between frames. The loop is paused off-screen. Target: sustained 60fps on a mid-range laptop, with no layout shift (the band's height is reserved by `aspect-ratio`).
+- **Performance:** about 6.5k cells at the 1184px desktop content width (about 2.6k on mobile). Each frame redraws every cell by stamping one of two pre-rendered glyph sprites with `globalAlpha`. The loop is paused while the band is off-screen or the tab is hidden. Target: smooth 60fps on a mid-range laptop, with no layout shift (the band's height is reserved by `aspect-ratio`).
 
 ---
 
@@ -124,4 +124,4 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 
 ## 10. Open items
 
-- Final cell size, wave duration and hover radius are tuned against the live page during implementation; the numbers above are starting points.
+- Cell size, band aspect, glyph weight and the resting opacities were tuned against the live page during implementation (8px cells and 18% / 90% opacities were too faint to read the wordmark). Wave duration and hover radius are unchanged from the first draft and can still be adjusted by feel.
