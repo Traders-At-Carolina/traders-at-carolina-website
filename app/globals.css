@@ -170,6 +170,22 @@
   }
 }
 
+/*
+ * Extra room above the navy CTA band (00 §10): one step up the section rhythm, added to the
+ * section before it so that section's tone (bone or white) carries down to the band.
+ */
+section:has(+ [data-cta-band]) {
+  padding-bottom: 6rem;
+
+  @variant md {
+    padding-bottom: 8rem;
+  }
+
+  @variant lg {
+    padding-bottom: 10rem;
+  }
+}
+
 /* Motion (00 §9.2). Content stays visible without JS or with reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   html.js .reveal {

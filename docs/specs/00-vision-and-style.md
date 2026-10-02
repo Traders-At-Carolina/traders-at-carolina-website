@@ -307,6 +307,7 @@ All variants are square (except the header's Apply pill, §10 `SiteHeader`), use
 ### `CTABand`
 - A full-bleed `navy` section: an H2 in `white`, an optional lead in `bone`, and an `inverse` Apply `Button`.
 - Counts as that page's one navy band (§4.3).
+- The section directly above it gets one extra step of bottom padding (96 / 128 / 160px instead of 64 / 96 / 128px), so the band has more room. The padding sits on that section, so its bone or white tone runs right up to the navy.
 
 ### `RandomWalk`
 - The seeded SVG motif described in §7.2. Props: `seed`, `paths` (3–5), `size` (`hero` | `header`).
