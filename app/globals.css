@@ -198,6 +198,49 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
   }
 }
 
+/* Team header logo strip: a slow loop that fades out at both edges. Static by default (a wrapped row);
+   motion, the mask and the repeated list switch on only without a reduced-motion preference, so nothing is clipped. */
+.logo-strip-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.logo-strip-copy {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo-strip {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  .logo-strip-track {
+    display: flex;
+    width: max-content;
+    animation: logo-strip-scroll 32s linear infinite;
+  }
+
+  .logo-strip-list {
+    flex-wrap: nowrap;
+  }
+
+  .logo-strip-copy {
+    display: flex;
+  }
+
+  .logo-strip:hover .logo-strip-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes logo-strip-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
 /* Resting hairline underline that fills in from the left on hover (00 §9.2). */
 @utility link-underline {
   background-image:

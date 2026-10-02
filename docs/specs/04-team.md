@@ -79,11 +79,13 @@ Put faces and names to the club, and show where its members go.
 - **H1:** working copy "The people running the desk."
 - **Lead:** max about 30 words. Working copy: "Traders at Carolina is run by students. Meet the executive board and the leads for each track."
 - **Art:** `PlacementWall` in place of the usual `RandomWalk`, hidden below 768px.
-  - Eyebrow "Where we've worked", then a hairline-ruled grid of the companies in `person.company`, three per row.
-  - Each company appears once, in the order people first appear in `content/team.ts` (`companyMarks()` in `lib/team.ts`).
-  - Marks render as flat ink silhouettes. Each has its company name beneath it as a caption, because some marks say nothing alone (Infragrid's is a bare square). The image itself is decorative (`alt=""`).
-  - With no `company` on anyone, the art column is left out and the header is text only. The wall never falls back to the `RandomWalk`.
-  - This is separate from § 03 Placements (§4.4), which stays text-only and threshold-gated.
+  - Eyebrow "Where we've worked", then a slow looping strip of firm marks that fades out at both edges.
+  - **Firms:** `content/placement-wall.ts`, in display order: Citadel, JPMorgan Chase, AWS, Infragrid. It is separate from people (`person.company`, used for the headshot hover badge) and from `content/placements.ts` (§4.4).
+  - Marks render as flat ink silhouettes with the firm name beneath as a caption, because some marks say nothing alone (Infragrid's is a bare square). The image itself is decorative (`alt=""`).
+  - **Motion:** the list is repeated once and translated by -50% over 32s, linear and infinite, so the loop is seamless. The repeat is `aria-hidden`. It pauses on hover. Edges fade with a CSS mask.
+  - **Reduced motion:** no animation, no mask and no repeat; the firms show as a centered, wrapped static row.
+  - With an empty list, the art column is left out and the header is text only. It never falls back to the `RandomWalk`.
+  - Separate from § 03 Placements (§4.4), which stays text-only and threshold-gated.
 
 ### 4.2 Executive board (§ 01)
 
@@ -206,4 +208,4 @@ export const placements: Array<{ firm: string }> = [];
 7. LinkedIn links have descriptive `aria-label`s, 44×44 tap targets, and open in a new tab.
 8. Lighthouse (mobile) ≥ 95 in all categories, with images served via `next/image` as AVIF/WebP.
 9. No hard-coded hex values or font stacks. Only spec-00 tokens.
-10. The header shows each distinct `company` once with its name, and no `RandomWalk`. With no companies, the art column is absent.
+10. The header strip lists each firm in `content/placement-wall.ts` once to assistive tech, with its name, and shows no `RandomWalk`. It loops seamlessly and is static under `prefers-reduced-motion`. With an empty list, the art column is absent.

@@ -23,8 +23,8 @@ const pres: Person = {
 };
 const firms = (n: number): Placement[] => Array.from({ length: n }, (_, i) => ({ firm: `Firm ${String.fromCharCode(69 - i)}` }));
 
-const renderTeam = (team: TeamContent, placements: Placement[] = []) =>
-  render(<TeamPage team={team} placements={placements} recruiting={closed} now={now} />);
+const renderTeam = (team: TeamContent, placements: Placement[] = [], wall: CompanyMark[] = []) =>
+  render(<TeamPage team={team} placements={placements} wall={wall} recruiting={closed} now={now} />);
 const eyebrows = () => screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent);
 
 const co: Person = { slug: "co-one", name: "Co One", role: "Co-President, Trading", group: "co-president", order: 1 };
@@ -33,23 +33,28 @@ const dir: Person = { slug: "dir-one", name: "Dir One", role: "Director of Educa
 const mark = (name: string): CompanyMark => ({ name, logo: { ...image, src: `/images/companies/${name}.png` } as StaticImageData });
 
 describe("TeamPage", () => {
-  it("shows each company the team has worked at in the header, once, instead of the random walk", () => {
-    const people: Person[] = [
-      { ...pres, company: mark("Citadel") },
-      { ...co, company: mark("Citadel") },
-      { ...dir, company: mark("AWS") },
-    ];
-    const { container } = renderTeam({ people });
+  it("shows the wall's firms in a looping header strip instead of the random walk", () => {
+    const wall = ["Citadel", "JPMorgan Chase", "AWS", "Infragrid"].map(mark);
+    const { container } = renderTeam({ people: [pres] }, [], wall);
     const header = container.querySelector("header") as HTMLElement;
     expect(within(header).getByText("Where we've worked")).toBeInTheDocument();
     // Each mark carries its name as a visible caption (Infragrid's mark is a bare square); the image itself is decorative.
-    const cells = within(header).getAllByRole("listitem");
-    expect(cells.map((cell) => cell.textContent)).toEqual(["Citadel", "AWS"]);
-    expect(header.querySelectorAll("img[alt='']")).toHaveLength(2);
+    expect(within(header).getAllByRole("listitem").map((cell) => cell.textContent)).toEqual([
+      "Citadel",
+      "JPMorgan Chase",
+      "AWS",
+      "Infragrid",
+    ]);
+    // The strip loops by repeating the list once; the copy is hidden from assistive tech so firms are announced once.
+    const lists = header.querySelectorAll("ul");
+    expect(lists).toHaveLength(2);
+    expect(lists[0]).not.toHaveAttribute("aria-hidden");
+    expect(lists[1]).toHaveAttribute("aria-hidden", "true");
+    expect(header.querySelectorAll("img[alt='']")).toHaveLength(8);
     expect(header.querySelector("svg")).not.toBeInTheDocument();
   });
 
-  it("leaves the header art out when nobody has a company", () => {
+  it("leaves the header art out when the wall has no firms", () => {
     const { container } = renderTeam({ people: [pres] });
     const header = container.querySelector("header") as HTMLElement;
     expect(within(header).queryByText("Where we've worked")).not.toBeInTheDocument();
