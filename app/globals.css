@@ -16,6 +16,7 @@
   --color-rule-inverse: rgb(235 234 228 / 0.2);
   --color-navy-press: color-mix(in oklab, #233265 85%, black);
   --color-grid: rgb(35 50 101 / 0.06);
+  --color-wash: rgb(35 50 101 / 0.08);
 
   --radius-*: initial;
   --shadow-*: initial;
@@ -54,6 +55,18 @@
   /* 1200px content + 48px gutters each side (00 §6) */
   --container-page: 81rem;
   --container-prose: 68ch;
+
+  /* Header-only easings (00 §9.2), sampled from damped springs. Spring: ~4% overshoot, no snap; soft: no overshoot. */
+  --ease-spring: linear(0, 0.019, 0.071, 0.143, 0.229, 0.32, 0.415, 0.505, 0.593, 0.671, 0.743, 0.804, 0.858, 0.903, 0.94, 0.97, 0.993, 1.01, 1.023, 1.032, 1.037, 1.039, 1.04, 1.038, 1.036, 1.033, 1.03, 1.026, 1.022, 1.019, 1.015, 1.012, 1.01, 1.007, 1.005, 1.003, 1);
+  --ease-soft: linear(0, 0.018, 0.062, 0.118, 0.189, 0.265, 0.342, 0.418, 0.49, 0.553, 0.615, 0.672, 0.722, 0.767, 0.806, 0.838, 0.868, 0.893, 0.914, 0.932, 0.947, 0.958, 0.968, 0.976, 0.983, 0.988, 0.992, 0.995, 0.998, 1);
+}
+
+/* Browsers without linear() get the closest cubic-bezier equivalents. */
+@supports not (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: cubic-bezier(0.22, 1.1, 0.36, 1);
+    --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }
 
 /* next/font sets these variables on <html>, so they must resolve inline. */
@@ -131,6 +144,37 @@
   mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 100%);
 }
 
+/*
+ * The same grid, drawn faintly behind the docked header so the hero's graph paper seems to run up
+ * into it (00 §7.3, §10). Anchored to the bottom edge so its lines continue the hero's grid, which
+ * starts right below. Centre-weighted: about 55% strength at the bottom centre (what the hero's own
+ * mask gives at its top edge), fading toward the sides and the top.
+ */
+@utility graph-paper-nav {
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: 0 100%;
+  mask-image: radial-gradient(ellipse 60% 140% at 50% 100%, rgb(0 0 0 / 0.55), transparent);
+}
+
+/* Visible only while the header is docked, and only on pages that have a hero grid to continue. */
+[data-nav-grid] {
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-nav-grid] {
+    transition: none;
+  }
+}
+
 /* Graphite contrast section: remaps the ink, accent and rule tokens so every utility inside it
    (text-ink-2, text-navy, border-rule, link underlines…) reads light-on-dark without per-component tones.
    Navy accents become bone, matching the inverse eyebrow on the navy band and footer. */
@@ -193,6 +237,22 @@
   }
 }
 
+/*
+ * Extra room above the navy CTA band (00 §10): one step up the section rhythm, added to the
+ * section before it so that section's tone (bone or white) carries down to the band.
+ */
+section:has(+ [data-cta-band]) {
+  padding-bottom: 6rem;
+
+  @variant md {
+    padding-bottom: 8rem;
+  }
+
+  @variant lg {
+    padding-bottom: 10rem;
+  }
+}
+
 /* Motion (00 §9.2). Content stays visible without JS or with reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   html.js .reveal {
@@ -224,6 +284,14 @@
 
   .draw-in path:nth-child(n + 4) {
     animation-delay: 240ms;
+  }
+}
+
+/* Mobile menu card entrance (00 §10 SiteHeader). Exit is instant. */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
   }
 }
 

@@ -27,7 +27,7 @@ export function SiteFooter() {
       <Container className="py-16 md:py-20">
         <Grid className="gap-y-12">
           <div className="col-span-12 md:col-span-5">
-            <Wordmark tone="inverse" />
+            <Wordmark tone="inverse" size="lg" />
             <p className="mt-5 max-w-[36ch] text-body">{site.mission}</p>
           </div>
 

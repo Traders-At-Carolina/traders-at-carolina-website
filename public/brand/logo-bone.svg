@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 30 305 322" width="305" height="322" fill="none">
+  <title>Traders at Carolina</title>
+  <g stroke="#EBEAE4" stroke-width="8.5">
+    <circle cx="62" cy="47" r="12.75"/>
+    <path d="M74.75 47H350M121.5 47V234M158.5 47V287M196 47V321.75"/>
+    <circle cx="196" cy="334.5" r="12.75"/>
+  </g>
+  <path fill="#EBEAE4" d="M350 43C263.3 54.7 212.8 123.2 212.8 200.5C212.8 288.3 284.7 354.4 350 352Z"/>
+</svg>

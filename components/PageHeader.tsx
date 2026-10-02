@@ -22,6 +22,8 @@ export function PageHeader({ eyebrow, title, lead, seed = 1, children }: PageHea
       <Container className="relative py-16 md:py-24">
         <Grid className="items-center">
           <div className="col-span-12 md:col-span-7">
+            {/* Header floats as soon as the first line of text reaches it (00 §10). */}
+            <span aria-hidden="true" data-nav-float-point className="-mb-px block h-px" />
             <Eyebrow>{eyebrow}</Eyebrow>
             <h1 className="mt-4 text-h1">{title}</h1>
             {lead ? <p className="mt-6 text-lead text-ink-2">{lead}</p> : null}

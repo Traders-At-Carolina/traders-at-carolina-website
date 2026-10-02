@@ -55,6 +55,8 @@ export function Hero({ hero, index, actions }: HeroProps) {
       <Container className="relative flex flex-col justify-center pt-12 pb-14 md:pt-16 md:pb-20 lg:min-h-[clamp(600px,calc(100svh-5rem),820px)] lg:py-16">
         <Grid className="gap-y-12 lg:items-center">
           <div className="col-span-12 lg:col-span-6 lg:col-start-1 lg:row-start-1 xl:pr-6">
+            {/* Header floats as soon as the first line of text reaches it (00 §10). */}
+            <span aria-hidden="true" data-nav-float-point className="-mb-px block h-px" />
             <Eyebrow index={index} className="text-[0.8125rem] md:text-[0.875rem]">
               {hero.eyebrow}
             </Eyebrow>

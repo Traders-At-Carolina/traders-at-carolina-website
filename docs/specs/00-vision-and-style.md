@@ -166,7 +166,7 @@ Text colors are always **solid** values (`ink-2` and `ink-3`), never `opacity` o
 - **Section padding:** 96–128px vertical on desktop, 64px on mobile.
 - **Section anatomy:** hairline `rule` at the top, then eyebrow, then H2, then optional lead, then content.
 - **Background rhythm:** bone by default, with occasional white sections for contrast. At most one navy band per page. The footer is always black.
-- **Corners and depth:** `border-radius: 0` everywhere, no box shadows. Elevation is a `white` surface plus a 1px `rule` border.
+- **Corners and depth:** `border-radius: 0` everywhere, no box shadows. Elevation is a `white` surface plus a 1px `rule` border. **Sole exception:** the `SiteHeader`'s floating bar, nav highlight, Apply button and mobile menu card (§10).
 - **Breakpoints:** Tailwind defaults (`sm` 640, `md` 768, `lg` 1024, `xl` 1280). Mobile-first.
 
 ---
@@ -190,7 +190,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 
 ### 7.3 Graph-paper grid
 - 28px cells drawn in the `grid` color with `mask-image`, fading out toward the edges.
-- Used only behind the Home hero and inside `PageHeader`.
+- Used only behind the Home hero and inside `PageHeader`, plus a faint continuation behind the docked `SiteHeader` (§10) so the grid seems to run up into the nav bar.
 
 ### 7.4 Stat rows
 - Large `Stat`-role numbers in navy with caption-sized labels underneath.
@@ -207,7 +207,13 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 ### 8.1 Logo
 - The club's existing logo is the source of truth. SVG is preferred.
 - Required variants: full-color (if it has color), one-color black (for bone and white), and one-color bone (for navy and black).
-- Location: `public/brand/`.
+- Location: `public/brand/`: `logo.svg` (full-color navy), `logo-black.svg` and `logo-bone.svg`. The three share identical geometry (a test enforces it).
+- The club supplied the logo as a 400 × 400 JPG of the **mark only** (no wordmark in the artwork). The SVGs are a faithful trace of it (within about 1px), so swap them for the club's original vector files if they exist.
+- Where it appears:
+  - **Header:** the full-color mark (32px tall, 28px on phones) beside the typeset name. Below 360px wide the name is dropped and only the mark remains.
+  - **Footer:** the bone mark (44px tall) beside the name.
+  - **Browser tab and home screen:** `app/icon.svg`, `app/favicon.ico` (16, 32 and 48px) and `app/apple-icon.png` (180px on `bone`), all made from the same mark.
+- The typeset name next to the mark is Georgia, not part of the logo.
 - Clear space: at least the cap height of the wordmark on every side.
 - Don't recolor, stretch or add effects to the logo.
 
@@ -244,6 +250,9 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
 | Link underline | Underline scales in from the left on hover, 200ms |
 | Button hover | Background color transition, 150ms |
+| Header float | Docked bar morphs into the floating bar over 450ms, `--ease-soft` (no overshoot) |
+| Header nav highlight | One shared highlight trails the pointer between links: 70ms delay, then a 700ms `--ease-spring` (~4% overshoot). Header only |
+| Mobile menu card | Fades in and drops 8px over 250ms, `--ease-soft`. Header only |
 
 - No parallax, marquees, scroll-jacking or auto-advancing carousels.
 - Under `prefers-reduced-motion: reduce`, every effect above is disabled and content renders in its final state.
@@ -256,9 +265,11 @@ Page specs reference these by name. Each one is built once and reused.
 
 ### `SiteHeader`
 - Logo on the left (links to `/`). Nav on the right: **About · Membership · Team**, then an **Apply** `Button` (`primary`).
-- Sticky, on a `bone` background. A bottom hairline `rule` appears once the page has scrolled.
-- The active page's nav link gets a 1px underline at a 4px offset.
-- **Mobile (< 768px):** logo and a menu button. The menu opens a full-screen `bone` overlay with large Georgia (H2-size) links and a full-width Apply button. Focus is trapped while it's open, and `Esc` closes it.
+- **Docked** until the first line of hero text (Home `Hero` or `PageHeader`) reaches the header, tracked by a 1px `data-nav-float-point` marker at the top of the hero's text column: full-width, sticky, on a `bone` background, 64 / 80px tall. On pages with a hero grid, the same 28px grid shows faintly behind the docked bar (`graph-paper-nav`): lines aligned with the hero's grid below, about 55% strength at the bottom centre, fading toward the sides and the top. It fades out as the bar floats and does not appear on pages without a hero.
+- **Floating** as soon as that text would pass under it (pages without a hero: as soon as the page scrolls): a centred bar inset 8 / 12px from the top, 48px tall on desktop (52px on mobile) and `min(100% − 2rem, 52rem)` wide, with 16px corners, `bone` at 85% with a backdrop blur, a 1px `rule` border and a soft shadow. The header keeps its height, so the page never shifts. It stays floating while the mobile menu is open.
+- **Nav highlight:** a single `wash` highlight (navy at 8%, 10px corners) rests behind the active page's link, springs to whichever link is hovered or focused, and springs back when the pointer or focus leaves. The hovered or active link's text turns `navy`. With no active page (Home) the highlight fades in at the hovered link. Under reduced motion it jumps.
+- The Apply button is a `primary` button with 10px corners (`shape="rounded"`, concentric with the bar's 16px corners and 6px inset), in the bar and in the mobile menu. In the desktop bar it is compact (`size="sm"`, 36px tall, a 6px inset in the 48px bar), the one exception to the 44px minimum height; it is pointer-only there, and the mobile menu's Apply stays 44px. Apply buttons elsewhere stay square.
+- **Mobile (< 768px):** logo, a compact Apply button (44px tall, `size="compact"`) and a menu button; the compact Apply gives way to the menu's own Apply while the menu is open. The menu opens a dropdown card directly under the bar: `bone`, 1px `rule` border, 16px corners and the bar's shadow, with Georgia (H3-size) links, each at least 48px tall, and a full-width Apply button. It is a disclosure, not a modal: the page behind stays interactive and still scrolls (it is not made `inert`) and there is no focus trap. `Esc`, a press outside the header, tabbing out of the header or choosing a link closes it. The current page's link sits on the `wash` highlight.
 
 ### `SiteFooter`
 - Background `black`, text `bone`, hairlines `rule-inverse`.
@@ -273,7 +284,7 @@ Page specs reference these by name. Each one is built once and reused.
   - a UNC student-organization disclaimer, if UNC requires one (§14)
 
 ### `Button`
-All variants are square, use the Button type role, and have 12px × 24px padding with a minimum height of 44px.
+All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (36px tall, 8px × 20px padding).
 
 | Variant | Rest | Hover / press |
 |---|---|---|
@@ -306,6 +317,7 @@ All variants are square, use the Button type role, and have 12px × 24px padding
 ### `CTABand`
 - A full-bleed `navy` section: an H2 in `white`, an optional lead in `bone`, and an `inverse` Apply `Button`.
 - Counts as that page's one navy band (§4.3).
+- The section directly above it gets one extra step of bottom padding (96 / 128 / 160px instead of 64 / 96 / 128px), so the band has more room. The padding sits on that section, so its bone or white tone runs right up to the navy.
 
 ### `RandomWalk`
 - The seeded SVG motif described in §7.2. Props: `seed`, `paths` (3–5), `size` (`hero` | `header`).
@@ -389,7 +401,7 @@ Each spec is implemented separately, only after it is approved.
 
 These are needed from the club. None of them block this spec.
 
-- [ ] Logo files (SVG preferred), plus one-color black and bone variants if they exist.
+- [x] Logo: received as a JPG of the mark and traced to SVG (§8.1). Still wanted: the original vector files and any official wordmark lockup.
 - [ ] Whether "T@C" is an established short form.
 - [ ] Contact email, Instagram URL, LinkedIn URL.
 - [ ] Whether UNC requires a student-organization disclaimer in the footer.
