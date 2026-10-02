@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { StaticImageData } from "next/image";
 import type { Person } from "@/content/types";
 import { execMembers, initials, shortClassYear, showPlacements, sortFirms, trackLeadNames } from "@/lib/team";
-import { validateTeam } from "@/lib/validate-team";
+import { lowResHeadshots, validateTeam } from "@/lib/validate-team";
 
 const person = (p: Partial<Person> & Pick<Person, "slug" | "name">): Person => ({
   role: "Member",
@@ -62,5 +62,26 @@ describe("validateTeam", () => {
     expect(() => validateTeam({ people: bad }, [{ firm: "SIG" }, { firm: "sig" }])).toThrow(
       /kebab-case[\s\S]*duplicate slug[\s\S]*need a track[\s\S]*alt text[\s\S]*https[\s\S]*duplicate firm/,
     );
+  });
+});
+
+describe("lowResHeadshots", () => {
+  const photo = (width: number) => ({ src: "/x.jpg", width, height: width, blurDataURL: "" }) as StaticImageData;
+  const person = (slug: string, width?: number): Person => ({
+    slug,
+    name: slug,
+    role: "Director",
+    group: "director",
+    order: 1,
+    ...(width ? { headshot: photo(width), alt: `Portrait of ${slug}` } : {}),
+  });
+
+  it("lists only headshots narrower than 600px, ignoring people without one", () => {
+    const team = { people: [person("small", 320), person("big", 960), person("none")] };
+    expect(lowResHeadshots(team)).toEqual(["small"]);
+  });
+
+  it("warns but does not fail the build for low-res headshots", () => {
+    expect(() => validateTeam({ people: [person("small", 240)] }, [])).not.toThrow();
   });
 });

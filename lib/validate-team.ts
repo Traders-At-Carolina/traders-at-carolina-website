@@ -29,4 +29,17 @@ export function validateTeam(team: TeamContent, placements: Placement[]): void {
   if (problems.length > 0) {
     throw new Error(`Invalid team content:\n- ${problems.join("\n- ")}`);
   }
+
+  const soft = lowResHeadshots(team);
+  if (soft.length > 0) {
+    console.warn(`Team headshots below ${MIN_HEADSHOT_WIDTH}px wide will look soft on high-density screens: ${soft.join(", ")}`);
+  }
+}
+
+/** Cards render up to 256px wide, so 2x screens need about 512px; 600px leaves room for cropping. */
+export const MIN_HEADSHOT_WIDTH = 600;
+
+/** Slugs whose headshot is narrower than MIN_HEADSHOT_WIDTH. A warning, not a build failure, until better photos arrive. */
+export function lowResHeadshots(team: TeamContent): string[] {
+  return team.people.filter((p) => p.headshot && p.headshot.width < MIN_HEADSHOT_WIDTH).map((p) => p.slug);
 }

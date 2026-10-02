@@ -151,6 +151,9 @@ export type MembershipContent = {
   };
 };
 
+/** A company's official mark on a transparent background, static-imported from public/images/companies. */
+export type CompanyMark = { name: string; logo: StaticImageData };
+
 /** Exec board member or track lead. Field definitions: docs/specs/04-team.md §5. */
 export type Person = {
   /** Unique kebab-case id; used as the /team#anchor and by membership leadSlug. */
@@ -158,7 +161,7 @@ export type Person = {
   name: string;
   /** e.g. "President", "Trading Lead". */
   role: string;
-  /** Leadership tiers on /team: co-presidents, then executive board, then directors, then track leads. */
+  /** Tier on /team: executive board, then co-presidents, then directors. "track-lead" only links from /membership. */
   group: "co-president" | "exec" | "director" | "track-lead";
   /** Required for track leads; set on an exec who also leads a track. */
   track?: TrackId;
@@ -171,8 +174,10 @@ export type Person = {
   headshot?: StaticImageData;
   /** Required when headshot is set, e.g. "Portrait of Jane Doe". */
   alt?: string;
-  /** Only with the person's consent, e.g. "Incoming QT intern, Firm X". */
+  /** One line, only with the person's consent: a role ("Previously at Citadel") or a result ("1st place, Citadel Challenge"). */
   placement?: string;
+  /** The placement company's square icon, shown on the headshot on hover. */
+  company?: CompanyMark;
   /** Full https URL. */
   linkedin?: string;
 };

@@ -1,27 +1,45 @@
 import Image from "next/image";
 import { LinkedInIcon } from "@/components/LinkedInIcon";
-import type { Person } from "@/content/types";
+import type { CompanyMark, Person } from "@/content/types";
 import { initials, personMeta } from "@/lib/team";
 
 type PersonCardProps = {
   person: Person;
+  /** Image `sizes` hint matching the card's rendered width at each breakpoint. */
+  sizes?: string;
 };
+
+/**
+ * The placement company's mark, bare on the headshot's bottom-left corner. Mouse users see it on hover; touch screens
+ * (no hover) always show it.
+ * Decorative: the placement line under the name already names the company.
+ */
+function CompanyBadge({ company }: { company: CompanyMark }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="absolute bottom-2 left-2 flex size-8 translate-y-1 items-end justify-start opacity-0 transition duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
+    >
+      <Image src={company.logo} alt="" sizes="32px" className="max-h-full w-auto max-w-full object-contain" />
+    </span>
+  );
+}
 
 /**
  * Full-colour headshot, role, name, class year and major, optional placement and LinkedIn (spec 04 §3.1).
  * Only the LinkedIn icon is interactive; the card is the /team#{slug} anchor target.
  */
-export function PersonCard({ person }: PersonCardProps) {
+export function PersonCard({ person, sizes = "(min-width: 640px) 192px, 50vw" }: PersonCardProps) {
   const meta = personMeta(person);
   return (
     <article id={person.slug} aria-labelledby={`${person.slug}-name`} className="scroll-mt-24 text-center">
-      <div className={`relative overflow-hidden rounded-2xl aspect-square`}>
+      <div className="group relative aspect-square overflow-hidden">
         {person.headshot ? (
           <Image
             src={person.headshot}
             alt={person.alt ?? ""}
             fill
-            sizes="(min-width: 640px) 240px, 192px"
+            sizes={sizes}
             placeholder="blur"
             className="object-cover object-[50%_25%]"
           />
@@ -30,11 +48,12 @@ export function PersonCard({ person }: PersonCardProps) {
             <span className="font-display text-h1 text-navy">{initials(person.name)}</span>
           </div>
         )}
+        {person.company ? <CompanyBadge company={person.company} /> : null}
       </div>
       <div className="mt-4">
-        {/* One treatment for every tier: role leads, name follows. */}
-        <p className="font-display text-h3 text-navy">{person.role}</p>
-        <h3 id={`${person.slug}-name`} className="mt-1 text-body text-ink-2">
+        {/* One treatment for every tier: role leads as a label, the name is the line people remember. */}
+        <p className="text-caption font-medium text-navy">{person.role}</p>
+        <h3 id={`${person.slug}-name`} className="mt-1 font-display text-h3 text-black">
           {person.name}
         </h3>
         {meta ? <p className="mt-1 text-caption text-ink-3 tabular">{meta}</p> : null}
