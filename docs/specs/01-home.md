@@ -67,7 +67,7 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
   - Single column: eyebrow, headline, subhead, then the actions stacked (Apply full width, link below).
-  - The figure is full width at 200px, followed by the caption, legend, and the seed beside a full-width button.
+  - The figure is full width at 260px, followed by its one-line caption.
   - No min-height. Content defines the height.
 
 **Behavior**
