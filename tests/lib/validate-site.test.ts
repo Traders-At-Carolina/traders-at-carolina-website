@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateSite } from "@/lib/validate-site";
+import { collectSiteProblems, validateSite } from "@/lib/validate-site";
 import type { Site } from "@/content/types";
 
 const valid: Site = {
@@ -42,5 +42,18 @@ describe("validateSite", () => {
   it("rejects a non-https interest form URL", () => {
     const site = { ...valid, recruiting: { ...valid.recruiting, interestFormUrl: "http://forms.gle/x" } };
     expect(() => validateSite(site)).toThrow(/interestFormUrl/);
+  });
+});
+
+describe("collectSiteProblems", () => {
+  it("returns no problems for a valid configuration", () => {
+    expect(collectSiteProblems(valid)).toEqual([]);
+  });
+
+  it("returns problems instead of throwing", () => {
+    const site = { ...valid, recruiting: { ...valid.recruiting, interestFormUrl: "http://forms.gle/x" } };
+    expect(collectSiteProblems(site)).toEqual([
+      'recruiting.interestFormUrl must be an https Google Forms URL (got "http://forms.gle/x")',
+    ]);
   });
 });

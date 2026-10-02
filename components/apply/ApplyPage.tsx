@@ -7,6 +7,7 @@ import { Button } from "@/components/Button";
 import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import type { ApplyContent, Recruiting } from "@/content/types";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import { applyBandCopy, applyPrimaryAction, applyStatusCopy, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 
@@ -38,7 +39,13 @@ export function ApplyPage({ apply, recruiting, contactEmail, now, vercelEnv }: A
   const primary = (s: ApplicationState) => {
     const action = applyPrimaryAction(s, recruiting, contactEmail);
     return (
-      <Button href={action.href} external={action.external} variant="secondary" className="w-full sm:w-auto">
+      <Button
+        href={action.href}
+        external={action.external}
+        variant="secondary"
+        className="w-full sm:w-auto"
+        track={{ cta: ctaFromLabel(action.label), placement: "apply-benefits" }}
+      >
         {action.label}
       </Button>
     );
@@ -59,7 +66,12 @@ export function ApplyPage({ apply, recruiting, contactEmail, now, vercelEnv }: A
         title={copy.title}
         lead={copy.lead}
         action={
-          <Button href={copy.action.href} external={copy.action.external} variant="inverse">
+          <Button
+            href={copy.action.href}
+            external={copy.action.external}
+            variant="inverse"
+            track={{ cta: ctaFromLabel(copy.action.label), placement: "band" }}
+          >
             {copy.action.label}
           </Button>
         }

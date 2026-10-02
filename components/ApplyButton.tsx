@@ -11,6 +11,8 @@ type ApplyButtonProps = {
   now?: Date;
   recruiting?: Recruiting;
   className?: string;
+  /** Where this Apply sits, for analytics (e.g. "band", "hero"). */
+  placement?: string;
 };
 
 /** Resolves where an Apply action goes right now (spec 05 §3). */
@@ -22,10 +24,10 @@ export function getApplyTarget(now: Date = new Date(), recruiting: Recruiting = 
 }
 
 /** Apply button shared by the header, CTA bands and page heroes. */
-export function ApplyButton({ variant = "primary", fullWidth, label = "Apply", now, recruiting, className }: ApplyButtonProps) {
+export function ApplyButton({ variant = "primary", fullWidth, label = "Apply", now, recruiting, className, placement }: ApplyButtonProps) {
   const { href, external } = getApplyTarget(now, recruiting);
   return (
-    <Button href={href} external={external} variant={variant} fullWidth={fullWidth} className={className}>
+    <Button href={href} external={external} variant={variant} fullWidth={fullWidth} className={className} track={{ cta: "apply", placement }}>
       {label}
     </Button>
   );

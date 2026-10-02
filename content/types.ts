@@ -1,4 +1,8 @@
-import type { StaticImageData } from "next/image";
+/**
+ * An image the site can render: a static import today, an uploaded image once spec 06 lands.
+ * Same shape as next/image's StaticImageData, so static imports satisfy it. Without `blurDataURL` the image renders without a blur placeholder.
+ */
+export type ImageAsset = { src: string; width: number; height: number; blurDataURL?: string };
 
 /** Recruiting configuration. Full field definitions: docs/specs/05-apply.md §5. */
 export type Recruiting = {
@@ -37,8 +41,8 @@ export type Site = {
 export type ContentLink = { label: string; href: string };
 
 export type HomePhoto = {
-  /** Static import from public/images/events, e.g. `import p from "@/public/images/events/x.jpg"`. */
-  src: StaticImageData;
+  /** Static import from public/images/events, e.g. `import p from "@/public/images/events/x.jpg"`, or an uploaded image (spec 06). */
+  src: ImageAsset;
   alt: string;
   /** Editorial caption, e.g. "Mock trading night, Spring 2026". */
   caption: string;
@@ -84,7 +88,7 @@ export type Partner = {
    * Official mark from the firm's own site or media kit, in public/images/sponsors, with a transparent
    * background. Rendered as a single-color mask, so only its shape matters. width/height set the aspect ratio.
    */
-  logo?: { src: string; width: number; height: number };
+  logo?: ImageAsset;
 };
 
 export type Advisor = { name: string; title: string; department: string; note?: string };
@@ -152,7 +156,7 @@ export type MembershipContent = {
 };
 
 /** A company's official mark on a transparent background, static-imported from public/images/companies. */
-export type CompanyMark = { name: string; logo: StaticImageData };
+export type CompanyMark = { name: string; logo: ImageAsset };
 
 /** Exec board member or track lead. Field definitions: docs/specs/04-team.md §5. */
 export type Person = {
@@ -171,7 +175,7 @@ export type Person = {
   classYear?: number;
   major?: string;
   /** Static import from public/images/team, e.g. `import jane from "@/public/images/team/jane-doe.jpg"`. */
-  headshot?: StaticImageData;
+  headshot?: ImageAsset;
   /** Required when headshot is set, e.g. "Portrait of Jane Doe". */
   alt?: string;
   /** One line, only with the person's consent: a role ("Previously at Citadel") or a result ("1st place, Citadel Challenge"). */

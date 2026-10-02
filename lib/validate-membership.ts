@@ -1,13 +1,14 @@
 import type { MembershipContent } from "@/content/types";
 import { TRACK_ORDER } from "@/lib/membership";
+import { assertNoProblems } from "@/lib/validation";
 
 const REQUIRED_WORDING = /\brequire(d|ment|ments)?\b/i;
 
 /**
- * Fails the build with every content/membership.ts problem listed at once.
- * `teamSlugs` are the slugs in content/team.ts; an unknown leadSlug fails so Team links never 404 (spec 03 AC4).
+ * Every content/membership.ts problem; empty when valid. Admin saves show these as form errors (spec 06 §5).
+ * `teamSlugs` are the slugs in content/team.ts; an unknown leadSlug is a problem so Team links never 404 (spec 03 AC4).
  */
-export function validateMembership(membership: MembershipContent, teamSlugs: string[]): void {
+export function collectMembershipProblems(membership: MembershipContent, teamSlugs: string[]): string[] {
   const problems: string[] = [];
 
   if (membership.steps.length !== 3) problems.push(`steps must have exactly 3 entries (got ${membership.steps.length})`);
@@ -35,7 +36,10 @@ export function validateMembership(membership: MembershipContent, teamSlugs: str
     }
   });
 
-  if (problems.length > 0) {
-    throw new Error(`Invalid content/membership.ts:\n- ${problems.join("\n- ")}`);
-  }
+  return problems;
+}
+
+/** Fails the build with every content/membership.ts problem listed at once. */
+export function validateMembership(membership: MembershipContent, teamSlugs: string[]): void {
+  assertNoProblems("content/membership.ts", collectMembershipProblems(membership, teamSlugs));
 }

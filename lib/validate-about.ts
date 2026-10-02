@@ -1,7 +1,8 @@
 import type { AboutContent, TimelineEntry } from "@/content/types";
+import { assertNoProblems } from "@/lib/validation";
 
-/** Fails the build with every content/about.ts and content/timeline.ts problem listed at once. */
-export function validateAbout(about: AboutContent, timeline: TimelineEntry[]): void {
+/** Every content/about.ts and content/timeline.ts problem; empty when valid. Admin saves show these as form errors (spec 06 §5). */
+export function collectAboutProblems(about: AboutContent, timeline: TimelineEntry[]): string[] {
   const problems: string[] = [];
 
   const principles = about.principles.length;
@@ -30,7 +31,10 @@ export function validateAbout(about: AboutContent, timeline: TimelineEntry[]): v
     if (!entry.title.trim()) problems.push(`timeline[${i}].title must not be empty`);
   });
 
-  if (problems.length > 0) {
-    throw new Error(`Invalid About content:\n- ${problems.join("\n- ")}`);
-  }
+  return problems;
+}
+
+/** Fails the build with every content/about.ts and content/timeline.ts problem listed at once. */
+export function validateAbout(about: AboutContent, timeline: TimelineEntry[]): void {
+  assertNoProblems("About content", collectAboutProblems(about, timeline));
 }

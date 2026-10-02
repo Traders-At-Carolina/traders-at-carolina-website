@@ -4,7 +4,7 @@ import type { Recruiting } from "@/content/types";
 import { applyBandCopy, applyPrimaryAction, applyStatusCopy, formatDateRange, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
 import { getApplicationState } from "@/lib/applications";
 import { inlineToPlainText, parseInline } from "@/lib/inline-markdown";
-import { validateApply } from "@/lib/validate-apply";
+import { collectApplyProblems, validateApply } from "@/lib/validate-apply";
 
 const now = new Date("2027-01-20T17:00:00Z");
 const open: Recruiting = {
@@ -147,5 +147,15 @@ describe("validateApply", () => {
 
   it("needs at least one published answer", () => {
     expect(() => validateApply({ ...apply, faq: [{ question: "Q?", answer: "A.", draft: true }] })).toThrow(/published/);
+  });
+});
+
+describe("collectApplyProblems", () => {
+  it("returns no problems for the shipped content", () => {
+    expect(collectApplyProblems(apply)).toEqual([]);
+  });
+
+  it("returns problems instead of throwing", () => {
+    expect(collectApplyProblems({ ...apply, faq: [] })).toEqual(["faq must have at least 1 published (non-draft) entry"]);
   });
 });

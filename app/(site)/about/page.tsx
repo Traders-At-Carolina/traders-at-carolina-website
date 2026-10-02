@@ -9,6 +9,7 @@ validateAbout(about, timeline);
 
 export const metadata: Metadata = {
   title: "About",
+  alternates: { canonical: "/about" },
   description: about.header.lead,
 };
 

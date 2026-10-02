@@ -65,7 +65,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
 
 ---
@@ -312,7 +312,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 ### `PageHeader`
 - Used at the top of every page except Home.
 - Eyebrow, H1 and lead, over the graph-paper grid, with a small `RandomWalk` on the right on desktop. The `RandomWalk` is hidden below 768px.
-- An optional `art` prop replaces the `RandomWalk` in that column; `art={null}` leaves the column out. `/membership` uses it for the order-book depth chart (§7.6, spec 03 §3.1). The art stays a single composition with the grid, so the one-motif rule in §3 still holds.
+- An optional `art` prop replaces the `RandomWalk` in that column; `art={null}` leaves the column out. `/membership` uses it for the order-book depth chart (§7.6, spec 03 §3.1), and `/team` for the looping placement strip (spec 04 §4.1). The art stays a single composition with the grid, so the one-motif rule in §3 still holds.
 
 ### `Stat` / `StatRow`
 - `Stat`: a number (Stat role) plus a caption label.
@@ -352,6 +352,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 - **Header nav:** About · Membership · Team · [Apply]. The logo links to Home.
 - **Footer nav:** mirrors the header.
 - **Reserved for the future (not built, not linked):** `/resources`, `/events`. The header layout must still fit two more nav items at ≥ 1024px without crowding.
+- **Admin (not linked, not indexed):** `/admin`, defined in spec 06. It is invite-only and does not use the site header or footer.
 
 ---
 
@@ -359,7 +360,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 
 - **Framework:** Next.js (App Router) with TypeScript.
 - **Styling:** Tailwind CSS v4. Every token from §4–6 is defined once in `@theme` in `app/globals.css`. Components use only those tokens, never raw hex values.
-- **Rendering:** every page is statically generated. No client-side data fetching.
+- **Rendering:** every public page is statically generated. No client-side data fetching. Once [spec 06](06-admin.md) lands, pages that show editable collections regenerate on demand after an admin saves. `/admin` itself is rendered dynamically.
 - **Hosting:** Vercel.
 - **Content:** typed data modules in `content/`, so officers can update the site without touching components.
 
@@ -370,7 +371,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
   | `content/placements.ts` | Firms where members have placed: firm name only (spec 04 §5) |
   | `content/timeline.ts` | Club history milestones: year, title, description |
 
-  Field-level shapes are finalized in the page spec that first uses each file. No CMS until the resource hub exists.
+  Field-level shapes are finalized in the page spec that first uses each file. [Spec 06](06-admin.md) replaces the earlier "no CMS until the resource hub exists" rule. Photos, officers, tracks, sponsors and placements move into a database that admins edit at `/admin`, and their `content/*.ts` files become seed data. All other copy stays in `content/`.
 - **Assets:** `public/brand/` (logo variants), `public/images/events/`, `public/images/team/`.
 - **SEO:**
   - Per-page `metadata` (title template `%s · Traders at Carolina`, plus a description).
@@ -395,6 +396,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 03 | `03-membership.md` | Club structure, tracks, weekly cadence, expectations |
 | 04 | `04-team.md` | Executive board, track leads, placements (firm names) |
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
+| 06 | `06-admin.md` | Admin dashboard: content editing (photos, officers, tracks, sponsors, placements), admin access, usage analytics |
 
 **Every page spec contains:**
 1. The page's goal, and the visitor questions it answers.

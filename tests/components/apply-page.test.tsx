@@ -33,7 +33,7 @@ describe("ApplyPage", () => {
   });
 
   it("leads the closed state with one action and no repeated 'closed' in the band", () => {
-    const { container } = render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
+    render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Be first to know when applications open.");
     expect(screen.getByText(/^Applications are closed · /)).toBeInTheDocument();
     const notify = screen.getAllByRole("link", { name: /^Get notified/ });
@@ -99,5 +99,17 @@ describe("ApplyPage", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} vercelEnv="production" />);
     const faq = screen.getByRole("region", { name: "Common questions." });
     expect(faq.querySelectorAll("details")).toHaveLength(apply.faq.filter((f) => !f.draft).length);
+  });
+
+  it("tags each Get notified action with its placement for analytics", () => {
+    render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
+    const placements = screen
+      .getAllByRole("link", { name: /^Get notified/ })
+      .map((link) => [link.getAttribute("data-ph-capture-attribute-cta"), link.getAttribute("data-ph-capture-attribute-placement")]);
+    expect(placements).toEqual([
+      ["get-notified", "apply-header"],
+      ["get-notified", "apply-benefits"],
+      ["get-notified", "band"],
+    ]);
   });
 });

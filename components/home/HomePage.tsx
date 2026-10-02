@@ -8,6 +8,7 @@ import { InsideTheClub } from "@/components/home/InsideTheClub";
 import { IntroOverlay } from "@/components/home/IntroOverlay";
 import { Pillars } from "@/components/home/Pillars";
 import type { StatItem } from "@/components/Stat";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import type { HomeContent, Partner, Recruiting } from "@/content/types";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 import { homeApplyCopy, isUpcoming, numberSections, type HomeApplyCopy } from "@/lib/home";
@@ -69,7 +70,7 @@ export function HomePage({ home, recruiting, sponsors = [], now }: HomePageProps
           title={band.title}
           lead={band.lead}
           action={
-            <Button href={band.href} external={band.external} arrow={band.arrow} variant="inverse">
+            <Button href={band.href} external={band.external} arrow={band.arrow} variant="inverse" track={{ cta: ctaFromLabel(band.label), placement: "band" }}>
               {band.label}
             </Button>
           }

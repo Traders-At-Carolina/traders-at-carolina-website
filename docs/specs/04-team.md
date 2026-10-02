@@ -4,7 +4,7 @@
 
 All tokens, type roles, motifs and components are defined in spec 00. References like (00 §7.2) point there.
 
-> **Revision (2026-10-01):** `/team` now shows Executive board (heavy black type), Co-Presidents, then Directors (square 1:1 headshots, role set large above the name), in that order. The Track leads section (§4.3) and the "Led by" dual-role line were removed; the Placements section follows the leadership tiers. Headshots are now full colour, smaller (fixed-width cards, 160–224px), headshots have rounded corners, section spacing is tighter, and cards are centered with centered text. Where this note conflicts with §2–§4 below, this note wins. See `components/team/TeamPage.tsx`.
+> **Revision (2026-10-01):** `/team` now shows Executive board (heavy black type), Co-Presidents, then Directors (square 1:1 headshots, role set large above the name), in that order. The Track leads section (§4.3) and the "Led by" dual-role line were removed; the Placements section follows the leadership tiers. Headshots are now full colour, smaller and all one size (fixed-width cards: 192px from 640px up, a two-up grid at about 160px on phones; the co-presidents are no larger than the other tiers), headshots have rounded corners, section spacing is tighter, and cards are centered with centered text. Where this note conflicts with §2–§4 below, this note wins. See `components/team/TeamPage.tsx`.
 
 ---
 
@@ -78,7 +78,16 @@ Put faces and names to the club, and show where its members go.
 - **Eyebrow:** `TEAM`, with no § number.
 - **H1:** working copy "The people running the desk."
 - **Lead:** max about 30 words. Working copy: "Traders at Carolina is run by students. Meet the executive board and the leads for each track."
-- **Art:** small `RandomWalk` (`size="header"`, 3 paths), hidden below 768px.
+- **Art:** `PlacementWall` in place of the usual `RandomWalk`, hidden below 768px.
+  - Eyebrow "Where we've worked", then a slow looping strip of firm marks that fades out at both edges.
+  - **Firms:** `content/placement-wall.ts`, in display order: Citadel, JPMorgan Chase, AWS, Infragrid. It is separate from people (`person.company`, used for the headshot hover badge) and from `content/placements.ts` (§4.4).
+  - Marks render as flat ink silhouettes with the firm name beneath as a caption, because some marks say nothing alone (Infragrid's is a bare square). The image itself is decorative (`alt=""`).
+  - **Motion:** the strip drifts left at about 24px/s, driven from JS (`components/team/PlacementWall.tsx`). The list is repeated once and the offset wraps at one list's width, so the loop is seamless in both directions. The repeat is `aria-hidden`. Edges fade with a CSS mask.
+  - **Drag:** the strip can be dragged or flicked left or right with a mouse, pen or finger. A flick keeps its momentum and eases out; the drift then resumes. The cursor is `grab` / `grabbing`. Horizontal drags move the strip and vertical drags still scroll the page (`touch-action: pan-y`). The drift pauses while the pointer rests on the strip.
+  - **Reduced motion:** no drift, drag, mask or repeat; the firms show as a centered, wrapped static row.
+  - **Keyboard and assistive tech:** the strip is not keyboard-operable. Every firm is in the accessible list once, with its name, so nothing depends on dragging.
+  - With an empty list, the art column is left out and the header is text only. It never falls back to the `RandomWalk`.
+  - Separate from § 03 Placements (§4.4), which stays text-only and threshold-gated.
 
 ### 4.2 Executive board (§ 01)
 
@@ -142,6 +151,7 @@ export const team = {
     headshot?: string;           // "/images/team/{slug}.jpg"
     alt?: string;                // required when headshot is set
     placement?: string;          // free text, e.g. "Incoming QT intern, Firm X"
+    company?: { name: string; logo: StaticImageData };  // transparent mark from public/images/companies; feeds the header wall and the headshot hover badge
     linkedin?: string;           // full URL
   }>,
 };
@@ -200,3 +210,4 @@ export const placements: Array<{ firm: string }> = [];
 7. LinkedIn links have descriptive `aria-label`s, 44×44 tap targets, and open in a new tab.
 8. Lighthouse (mobile) ≥ 95 in all categories, with images served via `next/image` as AVIF/WebP.
 9. No hard-coded hex values or font stacks. Only spec-00 tokens.
+10. The header strip lists each firm in `content/placement-wall.ts` once to assistive tech, with its name, and shows no `RandomWalk`. It loops seamlessly, can be dragged, and is static under `prefers-reduced-motion`. With an empty list, the art column is absent.

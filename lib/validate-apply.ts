@@ -1,8 +1,9 @@
 import type { ApplyContent } from "@/content/types";
 import { parseInline } from "@/lib/inline-markdown";
+import { assertNoProblems } from "@/lib/validation";
 
-/** Fails the build with every content/apply.ts problem listed at once (spec 05 §5). */
-export function validateApply(apply: ApplyContent): void {
+/** Every content/apply.ts problem (spec 05 §5); empty when valid. */
+export function collectApplyProblems(apply: ApplyContent): string[] {
   const problems: string[] = [];
 
   if (apply.benefits.length !== 3) problems.push(`benefits must have exactly 3 entries (got ${apply.benefits.length})`);
@@ -25,7 +26,10 @@ export function validateApply(apply: ApplyContent): void {
     }
   });
 
-  if (problems.length > 0) {
-    throw new Error(`Invalid content/apply.ts:\n- ${problems.join("\n- ")}`);
-  }
+  return problems;
+}
+
+/** Fails the build with every content/apply.ts problem listed at once (spec 05 §5). */
+export function validateApply(apply: ApplyContent): void {
+  assertNoProblems("content/apply.ts", collectApplyProblems(apply));
 }

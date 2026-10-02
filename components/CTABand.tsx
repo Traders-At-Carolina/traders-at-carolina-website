@@ -21,7 +21,7 @@ export function CTABand({ title, lead, action, id = "cta-band" }: CTABandProps) 
               {title}
             </h2>
             {lead ? <p className="mt-4 text-lead text-bone">{lead}</p> : null}
-            <div className="mt-8">{action ?? <ApplyButton variant="inverse" />}</div>
+            <div className="mt-8">{action ?? <ApplyButton variant="inverse" placement="band" />}</div>
           </div>
         </Grid>
       </Container>

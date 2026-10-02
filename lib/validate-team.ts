@@ -1,9 +1,10 @@
 import type { Placement, TeamContent } from "@/content/types";
+import { assertNoProblems } from "@/lib/validation";
 
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
-/** Fails the build with every content/team.ts and content/placements.ts problem listed at once (spec 04 §5). */
-export function validateTeam(team: TeamContent, placements: Placement[]): void {
+/** Every content/team.ts and content/placements.ts problem (spec 04 §5); empty when valid. Admin saves show these as form errors (spec 06 §5). */
+export function collectTeamProblems(team: TeamContent, placements: Placement[]): string[] {
   const problems: string[] = [];
   const slugs = new Set<string>();
 
@@ -26,9 +27,12 @@ export function validateTeam(team: TeamContent, placements: Placement[]): void {
     firms.add(key);
   }
 
-  if (problems.length > 0) {
-    throw new Error(`Invalid team content:\n- ${problems.join("\n- ")}`);
-  }
+  return problems;
+}
+
+/** Fails the build with every content/team.ts and content/placements.ts problem listed at once (spec 04 §5). */
+export function validateTeam(team: TeamContent, placements: Placement[]): void {
+  assertNoProblems("team content", collectTeamProblems(team, placements));
 
   const soft = lowResHeadshots(team);
   if (soft.length > 0) {

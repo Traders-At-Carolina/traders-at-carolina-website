@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { StaticImageData } from "next/image";
 import type { Person } from "@/content/types";
 import { execMembers, initials, shortClassYear, showPlacements, sortFirms, trackLeadNames } from "@/lib/team";
-import { lowResHeadshots, validateTeam } from "@/lib/validate-team";
+import { collectTeamProblems, lowResHeadshots, validateTeam } from "@/lib/validate-team";
 
 const person = (p: Partial<Person> & Pick<Person, "slug" | "name">): Person => ({
   role: "Member",
@@ -83,5 +83,18 @@ describe("lowResHeadshots", () => {
 
   it("warns but does not fail the build for low-res headshots", () => {
     expect(() => validateTeam({ people: [person("small", 240)] }, [])).not.toThrow();
+  });
+});
+
+describe("collectTeamProblems", () => {
+  it("returns no problems for an empty team", () => {
+    expect(collectTeamProblems({ people: [] }, [])).toEqual([]);
+  });
+
+  it("returns problems instead of throwing", () => {
+    expect(collectTeamProblems({ people: [person({ slug: "Bad_Slug", name: "B" })] }, [{ firm: "SIG" }, { firm: "sig" }])).toEqual([
+      'people "Bad_Slug": slug must be kebab-case',
+      'placements: duplicate firm "sig"',
+    ]);
   });
 });
