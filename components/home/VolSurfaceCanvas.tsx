@@ -1,34 +1,27 @@
 "use client";
 
 import { OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, type ComponentRef, type KeyboardEvent, type RefObject } from "react";
 import * as THREE from "three";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
-import { CAMERA, NK, NT, SCENE, WIRE_STEP, kFromX, tFromZ, toX, toY, toZ } from "@/components/home/volSurfaceScene";
-import { DOMAIN, impliedVol, surfaceGrid, type VolParams } from "@/lib/vol-surface";
-
-export type SurfaceHover = { moneyness: number; maturity: number; vol: number };
+import { CAMERA, NK, NT, SCENE, WIRE_STEP, toX, toY, toZ } from "@/components/home/volSurfaceScene";
+import { surfaceGrid, type VolParams } from "@/lib/vol-surface";
 
 type VolSurfaceCanvasProps = {
   params: VolParams;
   autoRotate: boolean;
   label: string;
-  onHover: (hover: SurfaceHover | null) => void;
   onInteractStart: () => void;
   onInteractEnd: () => void;
 };
 
 type Controls = ComponentRef<typeof OrbitControls>;
 
-const { halfX: X, halfZ: Z, height: H, volMax: VOL_MAX } = SCENE;
-
-/** Scene coordinates for a strike (as K/S) and a maturity (years). */
-const xFromMoneyness = (m: number) => -X + ((Math.log(m) - DOMAIN.k[0]) / (DOMAIN.k[1] - DOMAIN.k[0])) * 2 * X;
-const zFromMaturity = (T: number) => Z - ((T - DOMAIN.T[0]) / (DOMAIN.T[1] - DOMAIN.T[0])) * 2 * Z;
+const { halfX: X, halfZ: Z, height: H } = SCENE;
 
 /** Brand colors read from the design tokens (00 §4), so the 3D scene never hard-codes hex. */
 function useBrandColors() {
@@ -79,7 +72,7 @@ const wireSegments = Math.ceil(NT / WIRE_STEP) * (NK - 1) + Math.ceil(NK / WIRE_
 const outlineSegments = 2 * (NK - 1) + 2 * (NT - 1);
 
 /** The surface: smooth-shaded mesh, a bone wire grid and a navy outline, all rewritten in place as params change. */
-function Surface({ params, onHover }: Pick<VolSurfaceCanvasProps, "params" | "onHover">) {
+function Surface({ params }: Pick<VolSurfaceCanvasProps, "params">) {
   const invalidate = useThree((s) => s.invalidate);
   const colors = useBrandColors();
   const wires = useLines(wireSegments, colors.bone, 1, 0.75);
@@ -150,15 +143,9 @@ function Surface({ params, onHover }: Pick<VolSurfaceCanvasProps, "params" | "on
     invalidate();
   }, [params, mesh, values, wireBuf, outlineBuf, wires, outline, colors, invalidate]);
 
-  function handlePointerMove(event: ThreeEvent<PointerEvent>) {
-    const k = kFromX(event.point.x);
-    const T = tFromZ(event.point.z);
-    onHover({ moneyness: Math.exp(k), maturity: T, vol: impliedVol(k, T, params) });
-  }
-
   return (
     <>
-      <mesh geometry={mesh} onPointerMove={handlePointerMove} onPointerOut={() => onHover(null)}>
+      <mesh geometry={mesh}>
         <meshStandardMaterial vertexColors side={THREE.DoubleSide} roughness={0.7} metalness={0} polygonOffset polygonOffsetFactor={2} polygonOffsetUnits={4} />
       </mesh>
       <primitive object={wires} />
@@ -167,21 +154,11 @@ function Surface({ params, onHover }: Pick<VolSurfaceCanvasProps, "params" | "on
   );
 }
 
-const STRIKE_TICKS = [0.7, 1, 1.4];
-const MATURITY_TICKS = [0.5, 1, 1.5, 2];
-const VOL_TICKS = [0.2, 0.4, 0.6, 0.8];
-const TICK = 0.07;
-
-type Label = { text: string; at: [number, number, number]; kind: "tick" | "title" };
-
-/** Tick values and axis titles: plain spans positioned each rendered frame (no extra React roots). */
-const LABELS: Label[] = [
-  ...STRIKE_TICKS.map((m): Label => ({ text: m.toFixed(1), at: [xFromMoneyness(m), 0, Z + 0.2], kind: "tick" })),
-  ...MATURITY_TICKS.map((T): Label => ({ text: `${T}y`, at: [-X - 0.22, 0, zFromMaturity(T)], kind: "tick" })),
-  ...VOL_TICKS.map((v): Label => ({ text: `${Math.round(v * 100)}%`, at: [-X - 0.17, (v / VOL_MAX) * H, Z + 0.17], kind: "tick" })),
-  { text: "Strike K/S", at: [0, 0, Z + 0.42], kind: "title" },
-  { text: "Maturity", at: [-X - 0.5, 0, 0], kind: "title" },
-  { text: "Implied vol", at: [-X, H + 0.2, Z], kind: "title" },
+/** Axis titles: plain spans positioned each rendered frame (no extra React roots). */
+const LABELS: { text: string; at: [number, number, number] }[] = [
+  { text: "Strike", at: [0, 0, Z + 0.28] },
+  { text: "Maturity", at: [-X - 0.38, 0, 0] },
+  { text: "Implied vol", at: [-X - 0.05, H + 0.18, Z] },
 ];
 
 /** Projects each label's 3D anchor to the canvas and moves its span there. */
@@ -212,38 +189,13 @@ function Lights() {
   );
 }
 
-/** Floor grid, axes with tick marks: the "figure" frame around the surface. */
+/** Three hairline axes meeting at the front-left corner: strike along the front, maturity along the left, vol up. */
 function Axes() {
   const colors = useBrandColors();
-
-  const { floorBuf, axesBuf } = useMemo(() => {
-    const f: number[] = [];
-    const n = 8;
-    for (let i = 0; i <= n; i++) {
-      const fx = -X + (2 * X * i) / n;
-      const fz = -Z + (2 * Z * i) / n;
-      f.push(fx, 0, -Z, fx, 0, Z, -X, 0, fz, X, 0, fz);
-    }
-    // Strike along the front edge and maturity along the left edge, meeting at the front-left corner, where the
-    // vol axis rises (it faces the camera, so the surface never hides it). Plus tick marks.
-    const a = [-X, 0, Z, X, 0, Z, -X, 0, Z, -X, 0, -Z, -X, 0, Z, -X, H, Z];
-    for (const m of STRIKE_TICKS) a.push(xFromMoneyness(m), 0, Z, xFromMoneyness(m), 0, Z + TICK);
-    for (const T of MATURITY_TICKS) a.push(-X, 0, zFromMaturity(T), -X - TICK, 0, zFromMaturity(T));
-    for (const v of VOL_TICKS) a.push(-X, (v / VOL_MAX) * H, Z, -X - TICK, (v / VOL_MAX) * H, Z + TICK);
-    return { floorBuf: new Float32Array(f), axesBuf: new Float32Array(a) };
-  }, []);
-
-  const floor = useLines(floorBuf.length / 6, colors.navy, 1, 0.16);
-  const axes = useLines(axesBuf.length / 6, colors.black, 1.25, 0.55);
-  useEffect(() => writeLines(floor, floorBuf), [floor, floorBuf]);
+  const axesBuf = useMemo(() => new Float32Array([-X, 0, Z, X, 0, Z, -X, 0, Z, -X, 0, -Z, -X, 0, Z, -X, H, Z]), []);
+  const axes = useLines(axesBuf.length / 6, colors.black, 1, 0.45);
   useEffect(() => writeLines(axes, axesBuf), [axes, axesBuf]);
-
-  return (
-    <>
-      <primitive object={floor} />
-      <primitive object={axes} />
-    </>
-  );
+  return <primitive object={axes} />;
 }
 
 /** Lets vertical swipes scroll the page on touch screens; horizontal drags still rotate. */
@@ -260,7 +212,7 @@ function TouchScroll() {
 }
 
 /** The interactive WebGL volatility surface (spec 01 §3.1). Loaded lazily by VolSurfaceFigure. */
-export default function VolSurfaceCanvas({ params, autoRotate, label, onHover, onInteractStart, onInteractEnd }: VolSurfaceCanvasProps) {
+export default function VolSurfaceCanvas({ params, autoRotate, label, onInteractStart, onInteractEnd }: VolSurfaceCanvasProps) {
   const controls = useRef<Controls>(null);
   const labelSpans = useRef<(HTMLSpanElement | null)[]>([]);
 
@@ -291,7 +243,7 @@ export default function VolSurfaceCanvas({ params, autoRotate, label, onHover, o
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <Lights />
-        <Surface params={params} onHover={onHover} />
+        <Surface params={params} />
         <Axes />
         <OrbitControls
           ref={controls}
@@ -309,16 +261,14 @@ export default function VolSurfaceCanvas({ params, autoRotate, label, onHover, o
         <TouchScroll />
         <LabelTracker spans={labelSpans} />
       </Canvas>
-      {LABELS.map(({ text, kind }, i) => (
+      {LABELS.map(({ text }, i) => (
         <span
-          key={`${kind}-${text}`}
+          key={text}
           ref={(el) => {
             labelSpans.current[i] = el;
           }}
           aria-hidden="true"
-          className={`pointer-events-none invisible absolute top-0 left-0 font-sans leading-none whitespace-nowrap tabular ${
-            kind === "title" ? "text-[11px] font-medium text-ink-2" : "text-[10px] text-ink-3"
-          }`}
+          className="pointer-events-none invisible absolute top-0 left-0 font-sans text-[11px] leading-none whitespace-nowrap text-ink-3"
         >
           {text}
         </span>

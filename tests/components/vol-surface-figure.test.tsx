@@ -2,10 +2,20 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { VolSurfaceFigure } from "@/components/home/VolSurfaceFigure";
 
-// The WebGL canvas itself is mocked out; these tests cover the poster, captions and the regime cycle.
-vi.mock("@/components/home/VolSurfaceCanvas", () => ({ default: () => null }));
+// The WebGL canvas is replaced by a stand-in that exposes its accessible label.
+vi.mock("@/components/home/VolSurfaceCanvas", () => ({
+  default: ({ label }: { label: string }) => <div role="img" aria-label={label} />,
+}));
 
-const caption = "Fig. 1 — An implied volatility surface.";
+const caption = "Fig. 1 — Implied volatility across strike and maturity.";
+
+/** Renders the figure and waits for the lazily imported canvas to mount. */
+async function renderLoaded() {
+  render(<VolSurfaceFigure caption={caption} />);
+  await act(async () => {
+    await vi.dynamicImportSettled();
+  });
+}
 
 /** An IntersectionObserver that reports the figure as visible immediately. */
 function figureInView() {
@@ -28,38 +38,37 @@ describe("VolSurfaceFigure", () => {
     vi.restoreAllMocks();
   });
 
-  it("starts on the first market with the static poster and no controls", () => {
+  it("shows only the surface and a one-line caption", () => {
     const { container } = render(<VolSurfaceFigure caption={caption} />);
     expect(container.querySelector("svg[aria-hidden='true']")).not.toBeNull();
     expect(screen.getByRole("figure")).toHaveTextContent(caption);
-    expect(screen.getByText("Calm market")).toBeInTheDocument();
-    expect(screen.queryByRole("slider")).toBeNull();
+    expect(container.querySelector("figcaption")?.textContent).toBe(caption);
     expect(screen.queryByRole("button")).toBeNull();
-    expect(screen.getByText("Calm market (showing)")).toBeInTheDocument();
+    expect(screen.queryByRole("slider")).toBeNull();
+    expect(screen.queryByRole("list")).toBeNull();
   });
 
-  it("moves on to the next market by itself while visible", () => {
+  it("moves on to the next market by itself while visible", async () => {
     vi.useFakeTimers();
     figureInView();
-    render(<VolSurfaceFigure caption={caption} />);
+    await renderLoaded();
+    expect(screen.getByRole("img")).toHaveAccessibleName(/^Calm market\./);
 
     act(() => vi.advanceTimersByTime(4500 + 2600 + 100));
 
-    expect(screen.getByText("Sell-off")).toBeInTheDocument();
-    expect(screen.getByText("Sell-off (showing)")).toBeInTheDocument();
+    expect(screen.getByRole("img")).toHaveAccessibleName(/^Sell-off\./);
   });
 
-  it("stays on one market under reduced motion", () => {
+  it("stays on one market under reduced motion", async () => {
     vi.useFakeTimers();
     figureInView();
     vi.spyOn(window, "matchMedia").mockImplementation(
       (query) => ({ matches: query.includes("reduce"), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
     );
-    render(<VolSurfaceFigure caption={caption} />);
+    await renderLoaded();
 
     act(() => vi.advanceTimersByTime(20000));
 
-    expect(screen.getByText("Calm market")).toBeInTheDocument();
-    expect(screen.getByText(/prefers reduced motion/)).toBeInTheDocument();
+    expect(screen.getByRole("img")).toHaveAccessibleName(/^Calm market\./);
   });
 });

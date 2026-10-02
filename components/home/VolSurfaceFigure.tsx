@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { SurfaceHover } from "@/components/home/VolSurfaceCanvas";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
 import { MARKET_REGIMES, describeSurface, easeInOut, lerpParams, type VolParams } from "@/lib/vol-surface";
 
@@ -47,14 +46,13 @@ type VolSurfaceFigureProps = {
 };
 
 /**
- * Fig. 1 on Home: a rotatable 3D implied-volatility surface that moves on its own through a cycle of
- * market regimes, holding each and easing smoothly into the next (spec 01 §3.1).
+ * Fig. 1 on Home: a rotatable 3D implied-volatility surface that eases on its own between market
+ * regimes (spec 01 §3.1). Deliberately bare: the surface, three axes and a one-line caption.
  */
 export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigureProps) {
   const [index, setIndex] = useState(0);
   const [params, setParams] = useState<VolParams>(MARKET_REGIMES[0].params);
   const [idle, setIdle] = useState(true);
-  const [hover, setHover] = useState<SurfaceHover | null>(null);
   const [nearViewport, setNearViewport] = useState(false);
   const [inView, setInView] = useState(false);
   const reducedMotion = useReducedMotion();
@@ -122,53 +120,22 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
   const autoRotate = idle && !reducedMotion && inView && pageVisible;
 
   return (
-    <figure className={`@container ${className}`}>
+    <figure className={className}>
       <div ref={box} className="relative h-[260px] md:h-[340px] lg:h-[clamp(300px,46vh,460px)]">
         {nearViewport ? (
           <VolSurfaceCanvas
             params={params}
             autoRotate={autoRotate}
             label={`${regime.name}. ${describeSurface(regime.params)}`}
-            onHover={setHover}
             onInteractStart={onInteractStart}
             onInteractEnd={onInteractEnd}
           />
         ) : (
           <VolSurfacePoster />
         )}
-        {hover ? (
-          <div aria-hidden="true" className="pointer-events-none absolute top-0 left-0 bg-bone/90 px-3 py-2 text-caption leading-snug tabular">
-            <span className="block font-medium text-navy">σ {(hover.vol * 100).toFixed(1)}%</span>
-            <span className="block text-ink-2">K/S {hover.moneyness.toFixed(2)}</span>
-            <span className="block text-ink-2">T {hover.maturity.toFixed(2)}y</span>
-          </div>
-        ) : null}
       </div>
 
-      <figcaption className="mt-5">
-        <ol aria-label="Market regimes" className="flex gap-1.5">
-          {MARKET_REGIMES.map((r, i) => (
-            <li key={r.name} title={r.name} className={`size-2 transition-colors duration-500 ${i === index ? "bg-navy" : "bg-navy/20"}`}>
-              <span className="sr-only">
-                {r.name}
-                {i === index ? " (showing)" : ""}
-              </span>
-            </li>
-          ))}
-        </ol>
-        {/* Two lines reserved so notes of different lengths never shift the caption below. */}
-        <p className="mt-2 min-h-[3em] text-caption">
-          <span className="font-medium text-navy">{regime.name}</span>
-          <span className="text-ink-3"> — {regime.note}</span>
-        </p>
-        {reducedMotion ? <p className="mt-2 text-caption text-ink-3">Showing one market because your device prefers reduced motion.</p> : null}
-
-        <p className="mt-3 text-caption text-ink-2">{caption}</p>
-        <p className="mt-1 flex items-center gap-2 text-caption text-ink-3">
-          <span aria-hidden="true" className="h-2.5 w-10 bg-linear-to-r from-navy/40 to-navy" />
-          Low to high implied vol
-        </p>
-      </figcaption>
+      <figcaption className="mt-4 text-caption text-ink-3">{caption}</figcaption>
     </figure>
   );
 }

@@ -71,15 +71,15 @@ export function surfaceGrid(p: VolParams, nk: number, nT: number, out?: Float32A
 }
 
 /** A named market the hero cycles through (spec 01 §3.1). */
-export type MarketRegime = { name: string; note: string; params: VolParams };
+export type MarketRegime = { name: string; params: VolParams };
 
 export const MARKET_REGIMES: readonly MarketRegime[] = [
-  { name: "Calm market", note: "low vol, gentle smirk, upward term structure", params: { atmVol: 0.16, skew: -0.55, termSlope: 0.2, curvature: 1 } },
-  { name: "Sell-off", note: "vol spikes, steep downside skew, inverted term structure", params: { atmVol: 0.42, skew: -0.85, termSlope: -0.3, curvature: 1.4 } },
-  { name: "Recovery", note: "vol settles, skew eases, curve normalises", params: { atmVol: 0.26, skew: -0.6, termSlope: 0.1, curvature: 1.2 } },
-  { name: "Event risk", note: "short-dated vol bid ahead of earnings", params: { atmVol: 0.3, skew: -0.35, termSlope: -0.25, curvature: 1.5 } },
-  { name: "Speculative rally", note: "call skew as upside demand builds", params: { atmVol: 0.38, skew: 0.15, termSlope: -0.1, curvature: 1.1 } },
-  { name: "Quiet carry", note: "near-symmetric smile, steep term structure", params: { atmVol: 0.2, skew: -0.1, termSlope: 0.3, curvature: 0.8 } },
+  { name: "Calm market", params: { atmVol: 0.16, skew: -0.55, termSlope: 0.2, curvature: 1 } },
+  { name: "Sell-off", params: { atmVol: 0.42, skew: -0.85, termSlope: -0.3, curvature: 1.4 } },
+  { name: "Recovery", params: { atmVol: 0.26, skew: -0.6, termSlope: 0.1, curvature: 1.2 } },
+  { name: "Event risk", params: { atmVol: 0.3, skew: -0.35, termSlope: -0.25, curvature: 1.5 } },
+  { name: "Speculative rally", params: { atmVol: 0.38, skew: 0.15, termSlope: -0.1, curvature: 1.1 } },
+  { name: "Quiet carry", params: { atmVol: 0.2, skew: -0.1, termSlope: 0.3, curvature: 0.8 } },
 ];
 
 /** Linear blend of two parameter sets, t ∈ [0, 1]. */

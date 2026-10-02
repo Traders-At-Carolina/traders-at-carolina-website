@@ -52,13 +52,12 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Subhead:** Lead role, max about 25 words. Working copy: "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
-- **Art — "Fig. 1":** `VolSurfaceFigure`, a rotatable 3D implied-volatility surface that moves on its own between market regimes, presented like a figure in a paper:
-  - Strike (log-moneyness −0.5…0.5, labelled K/S) × maturity (0.1–2y) × implied vol, from an SSVI-style model in `lib/vol-surface.ts`.
-  - A smooth 61 × 41 mesh shaded with a three-stop navy ramp (pale = low vol, deep = high vol; colors read from the design tokens, no tone mapping), lit by a white/bone hemisphere light plus key and rim lights.
-  - Anti-aliased, fixed-pixel-width lines (three.js `LineSegments2`): a bone wire grid every 4th row/column, a 1.75px deep-navy outline, a faint navy floor grid, and black axes with tick marks.
-  - Axes and ticks: strike K/S (0.7, 1.0, 1.4) along the front edge, maturity (0.5–2y) along the left edge, implied vol (20–80%) rising from the front-left corner so the surface never hides it.
-  - Six named regimes (`MARKET_REGIMES`): Calm market, Sell-off, Recovery, Event risk, Speculative rally, Quiet carry.
-  - `<figcaption>`: a row of six square progress markers (current one navy), the regime name and a one-line note (two lines reserved so the layout never shifts), `hero.figureCaption`, and a low→high vol legend. There are no user controls besides rotation.
+- **Art — "Fig. 1":** `VolSurfaceFigure`, a deliberately bare, rotatable 3D implied-volatility surface that eases on its own between market regimes:
+  - Strike (log-moneyness −0.5…0.5) × maturity (0.1–2y) × implied vol, from an SSVI-style model in `lib/vol-surface.ts`. The vol axis starts at 10% so the surface sits on its axes.
+  - A smooth 61 × 41 mesh shaded with a three-stop navy ramp (design-token colors, no tone mapping), a bone wire grid every 5th row/column and a deep-navy outline (anti-aliased `LineSegments2`).
+  - Three plain hairline axes from the front-left corner titled "Strike", "Maturity" and "Implied vol" — no floor grid, tick marks or values.
+  - Six regimes (`MARKET_REGIMES`) cycle unlabelled; their names appear only in the accessible label.
+  - `<figcaption>`: just `hero.figureCaption` ("Fig. 1 — Implied volatility across strike and maturity.").
 
 **Layout**
 - **Desktop (≥ 1024px):**
@@ -75,9 +74,8 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Rotate:** drag (OrbitControls; zoom and pan off; polar angle limited) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
 - **Auto-rotate:** slow spin while idle; it stops on interaction and resumes 4s after it ends.
 - **Market cycle:** each regime is held for 4.5s, then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.
-- **Hover (fine pointers):** a readout of σ, K/S and T at the pointer.
 - The cycle and auto-rotate pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and does not auto-rotate.
-- The canvas wrapper is `role="img"` with an `aria-label` summarising the current regime; the readout and axis labels are `aria-hidden`.
+- The canvas wrapper is `role="img"` with an `aria-label` naming and summarising the current regime; the axis titles are `aria-hidden`.
 - The headline is the page's only `<h1>`.
 - **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island that first renders a static SVG poster of the surface (same math, no layout shift, also the no-WebGL fallback). three.js (`three`, `@react-three/fiber`, `@react-three/drei`, ~245 kB gzipped) loads lazily via `next/dynamic` only once the figure is within 200px of the viewport, so it is never on the LCP path. Budget: LCP stays text, CLS 0.
 
