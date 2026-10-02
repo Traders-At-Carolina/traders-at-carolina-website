@@ -49,7 +49,7 @@ Give visitors who want more than the Home page a clear sense of **why the club e
 - **Eyebrow:** `ABOUT`, with no § number. Numbering starts with the first content section.
 - **H1:** working copy "Built by students, for the long game."
 - **Lead:** one sentence, max about 30 words. Working copy: "Traders at Carolina is a student-run community preparing UNC students for quantitative trading, research and engineering careers."
-- **Art:** small `RandomWalk` (`size="header"`, 3 paths) on the right on desktop. Hidden below 768px.
+- **Art:** small `RandomWalk` (`size="header"`, 3 paths, `trend="up"`) on the right on desktop: paths start low on the left and drift upward, like a rising equity curve; the highlighted (navy) path climbs the steepest. Hidden below 768px.
 
 ### 3.2 Mission and vision (§ 01)
 

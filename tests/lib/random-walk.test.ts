@@ -62,3 +62,41 @@ describe("custom origin and σ", () => {
     generateWalkPoints({ ...box, seed: 2026, paths: 5 }).forEach((w) => expect(w[0]).toEqual([0, 200]));
   });
 });
+
+describe("upward drift", () => {
+  const box = { steps: 44, width: 400, height: 200, originRatio: 0.8, sigmaRatio: 0.03, driftRatio: 0.013 };
+  const ends = (seed: number) => generateWalkPoints({ ...box, seed, paths: 3 }).map((w) => w[w.length - 1][1]);
+
+  it("rises on average and almost always ends above its origin (SVG y shrinks upward)", () => {
+    const all = Array.from({ length: 200 }, (_, i) => ends(i + 1)).flat();
+    const risen = all.filter((y) => y < 160).length / all.length;
+    const meanEnd = all.reduce((a, y) => a + y, 0) / all.length;
+    expect(risen).toBeGreaterThan(0.98);
+    expect(meanEnd).toBeLessThan(100); // origin is y=160 of 200; a clear climb
+  });
+
+  it("keeps the walk stochastic rather than a straight line", () => {
+    const [w] = generateWalkPoints({ ...box, seed: 202, paths: 1 });
+    const downSteps = w.slice(1).filter(([, y], i) => y > w[i][1]).length;
+    expect(downSteps).toBeGreaterThan(0);
+  });
+
+  it("stays inside the box", () => {
+    generateWalkPoints({ ...box, steps: 400, seed: 9, paths: 5 }).flat().forEach(([, y]) => {
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y).toBeLessThanOrEqual(200);
+    });
+  });
+
+  it("climbs the lead path more steeply than the others when leadDriftRatio is set", () => {
+    const lead = { ...box, leadDriftRatio: 0.016 };
+    let leadEnds = 0;
+    let otherEnds = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const [first, ...rest] = generateWalkPoints({ ...lead, seed, paths: 3 });
+      leadEnds += first[first.length - 1][1];
+      otherEnds += rest.reduce((a, w) => a + w[w.length - 1][1], 0) / rest.length;
+    }
+    expect(leadEnds / 200).toBeLessThan(otherEnds / 200 - 15);
+  });
+});
