@@ -17,7 +17,7 @@ Turn a student who's interested into an applicant, or into someone notified abou
 | Can I apply right now? By when? | Status header |
 | What happens after I apply? | Process and dates |
 | Am I eligible? Do I need experience? How do interviews work? | FAQ |
-| Applications are closed. How do I hear about the next cycle? | Status header (closed), Apply band |
+| Applications are closed. How do I hear about the next cycle? | Status header (closed) |
 
 ---
 
@@ -29,7 +29,6 @@ Turn a student who's interested into an applicant, or into someone notified abou
 | — | `PageHeader` + status block | bone + grid | Random walk + grid (one composition) |
 | 01 | Process and dates | bone | — |
 | 02 | FAQ | white | — |
-| — | Apply band (`CTABand`) | navy | — |
 | — | `SiteFooter` | black | — |
 
 **Exception to spec 00:** `PageHeader` (00 §10) normally has no actions. On `/apply` only, it gets a **status block** with a button (§4.1). This is the one page where the primary action belongs in the header.
@@ -38,7 +37,7 @@ Turn a student who's interested into an applicant, or into someone notified abou
 
 ## 3. Application state (single source of truth)
 
-Every Apply button on the site (header, hero, band, footer) derives from one helper in `lib/applications.ts`:
+Every Apply button on the site (header, hero, footer) derives from one helper in `lib/applications.ts`:
 
 ```ts
 type ApplicationState =
@@ -55,7 +54,7 @@ getApplicationState(now: Date): ApplicationState
 
 **When it's evaluated**
 - **At build time on every page.** Spec 01 §5 behavior uses this helper rather than reading `applicationsOpen` directly.
-- **Again in the browser on `/apply` only.** A small client island re-evaluates with the visitor's clock after mount. If the result differs from the build-time render (for example, the deadline passed after the last deploy), it swaps the status block and the Apply band to the closed state. If the results match, nothing re-renders, so there's no flash.
+- **Again in the browser.** A small client island re-evaluates with the visitor's clock after mount. If the result differs from the build-time render (for example, the deadline passed after the last deploy), it swaps the status block to the closed state. The footer's CTA zone and Apply link do the same on every other page (spec 07 §3.1). If the results match, nothing re-renders, so there's no flash.
 
 **Operational note for officers (also in the README at implementation time):** at the deadline, also set the Google Form to "Not accepting responses". Other pages update on the next deploy. The form's own setting guarantees no late submissions.
 
@@ -126,12 +125,9 @@ getApplicationState(now: Date): ApplicationState
 - Additional questions may be appended through content. There's no maximum, but the section should stay scannable (recommended ≤ 8).
 - After the list: a caption line, "Still have questions? Email {contact email}", with the email as a `TextLink`.
 
-### 4.4 Apply band
+### 4.4 Apply band (removed 2026-10-02)
 
-- `CTABand`, using the same state as the status block (§3).
-- **Open:** H2 "Ready when you are.", lead "Applications close {Fri, Feb 6}." (omitted with no deadline), button `inverse` "Apply ↗".
-- **Closed:** H2 "Applications are closed for now.", button `inverse` "Get notified ↗" (`interestFormUrl`). With no interest form, it shows the "Email us →" mailto link instead.
-- This is the page's single navy band.
+The closing Apply call to action now lives in the footer on every other page (spec 07), and the footer leaves it out here. `/apply` no longer renders `CTABand`; its status header (§4.1) is the page's call to action.
 
 ---
 
@@ -210,7 +206,7 @@ export const apply = {
 ## 9. Acceptance criteria
 
 1. With `applicationsOpen: true` and a future deadline, the header shows the open state, and Apply opens `applyUrl` in a new tab with `rel="noopener noreferrer"`.
-2. With `applicationsOpen: false`, both the header and the band show the closed state, and "Get notified" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
+2. With `applicationsOpen: false`, the status header shows the closed state, and "Get notified" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
 3. With `applicationsOpen: true` but a deadline in the past *at build time*, every page renders the closed state.
 4. With the deadline passing *after* the build, `/apply` swaps to the closed state in the browser, the change is announced via `aria-live`, and there's no layout shift beyond the swapped text.
 5. All dates render from ISO values in America/New_York with the formats shown in §4. No typed display strings appear in content.

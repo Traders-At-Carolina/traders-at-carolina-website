@@ -26,7 +26,7 @@ A recruiter or firm visitor should also leave with a sense of an active, serious
 | What is this club? | Hero |
 | What would I actually do here? | What we do |
 | Is it real and established? | By the numbers, Inside the club |
-| What's next? How do I join? | Hero CTA, Upcoming card, Apply band |
+| What's next? How do I join? | Hero CTA, Upcoming card, footer CTA zone |
 
 ---
 
@@ -39,7 +39,6 @@ A recruiter or firm visitor should also leave with a sense of an active, serious
 | 02 | What we do | bone | — |
 | 03 | By the numbers | white | Stat row |
 | 04 | Inside the club | bone | — (photos) |
-| — | Apply band (`CTABand`) | navy | — |
 | — | `SiteFooter` | black | — |
 
 Only these sections appear on Home. No placement section (data isn't available yet; see §7) and no partner-firm names list.
@@ -158,13 +157,9 @@ Only these sections appear on Home. No placement section (data isn't available y
 - The Upcoming card renders only when `upcoming` exists *and* its date is today or later at build time. A stale event never shows.
 - Because pages are static, a past event disappears only after the next deploy. This is acceptable. Officers redeploy when they update content.
 
-### 3.5 Apply band
+### 3.5 Apply band (removed 2026-10-02)
 
-- `CTABand` (00 §10).
-- H2 working copy: "Ready to start?" (open) / "Applications are closed for now." (closed).
-- Optional lead: one sentence in bone.
-- Button behavior per §5.
-- This is the page's single navy band.
+The closing Apply call to action now lives in the footer on every page (spec 07). Home no longer renders `CTABand`.
 
 ### 3.6 Intro
 
@@ -189,9 +184,9 @@ A short branded intro each time the Home page loads.
 
 ## 5. Apply behavior on this page
 
-The hero button and the band button both use `getApplicationState()` (spec 05 §3), which combines `applicationsOpen` with `applyDeadline` at build time:
+The hero button and the footer's CTA zone both use `getApplicationState()` (spec 05 §3), which combines `applicationsOpen` with `applyDeadline` at build time:
 
-| State | Hero button | Band H2 | Band button |
+| State | Hero button | Footer CTA H2 | Footer CTA button |
 |---|---|---|---|
 | `open` | "Apply ↗", opens `applyUrl` in a new tab | "Ready to start?" | "Apply ↗", opens `applyUrl` |
 | `closed` | "Applications open {Mon D}", links to `/apply` (`primary` style kept) | "Applications are closed for now." | "Get notified", links to `/apply` |
@@ -267,8 +262,8 @@ export const home = {
 ## 9. Acceptance criteria
 
 1. At 375px, 768px, 1280px and 1440px widths, the eyebrow, headline, subhead and Apply button are all visible without scrolling on the first screen.
-2. The page renders sections in exactly the order in §2, with backgrounds as listed. There's exactly one navy band.
-3. Toggling `applicationsOpen` (or setting `applyDeadline` in the past) in `content/site.ts` switches both the hero and band buttons per §5, with no other code changes.
+2. The page renders sections in exactly the order in §2, with backgrounds as listed. There is no navy band on the page; the footer's CTA zone supplies it (spec 07).
+3. Toggling `applicationsOpen` (or setting `applyDeadline` in the past) in `content/site.ts` switches the hero button and the footer's CTA zone per §5, with no other code changes.
 4. Removing any stat from `content/home.ts` drops it from the row with no gap or leftover hairline.
 5. Removing `upcoming`, or setting it to a past date, renders the photo-only layout in §3.4 with no empty card.
 6. The hero figure first renders the default regime (poster, then the same surface in WebGL), never shifts layout, and under `prefers-reduced-motion` neither moves the camera nor animates.

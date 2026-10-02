@@ -183,7 +183,7 @@ Each page spec's "Visitor questions" row "How do I join? → Apply band" becomes
 | `components/team/PlacementWall.tsx` | `tone` prop (§3.3). |
 | `app/globals.css` | Replace the `section:has(+ [data-cta-band])` rule (§3.1). |
 | `components/home/HomePage.tsx`, `about/AboutPage.tsx`, `membership/MembershipPage.tsx`, `team/TeamPage.tsx`, `apply/ApplyPage.tsx` | Remove `CTABand` and the band-only copy (`bandTitle`, `closedLead`, `applyBandCopy` usage). Delete `applyBandCopy` in `lib/apply.ts` if nothing else uses it. |
-| `app/styleguide/page.tsx` | Replace the `CTABand` demo with a note, or render it inside a footer-style frame. |
+| `app/styleguide/page.tsx` | Keep the `CTABand` demo (it is the footer's CTA zone) and update its lead copy. |
 | `docs/specs/00`–`05` | Amend per §7. |
 | `README.md` | No change needed unless the officers' notes mention the band. |
 | `tests/components/*-page.test.tsx`, `site-header.test.tsx`, `placement-wall.test.tsx` | Drop band assertions; add footer and `FooterZone` tests (§10). |
