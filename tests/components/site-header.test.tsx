@@ -125,6 +125,31 @@ describe("SiteHeaderClient", () => {
     expect(screen.queryByRole("navigation", { name: "Mobile" })).not.toBeInTheDocument();
   });
 
+  it("keeps Apply one tap away on mobile, swaps it for the menu's own Apply while open, and leaves the page usable", async () => {
+    const user = userEvent.setup();
+    const main = document.createElement("main");
+    document.body.appendChild(main);
+    try {
+      renderHeader();
+      // Desktop nav Apply + compact mobile Apply beside the menu button.
+      const barApplies = screen.getAllByRole("link", { name: "Apply" });
+      expect(barApplies).toHaveLength(2);
+      expect(barApplies[1]).toHaveClass("min-h-11", "px-4");
+
+      // Open: the compact one gives way to the full-width Apply in the card. The page stays
+      // interactive (a non-modal dropdown), so it must not be made inert.
+      await user.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(screen.getAllByRole("link", { name: "Apply" })).toHaveLength(2);
+      expect(document.getElementById("mobile-menu")?.querySelector("a[class*='w-full']")).not.toBeNull();
+      expect(main).not.toHaveAttribute("inert");
+
+      await user.keyboard("{Escape}");
+      expect(screen.getAllByRole("link", { name: "Apply" })).toHaveLength(2);
+    } finally {
+      main.remove();
+    }
+  });
+
   it("closes the menu on Escape and returns focus to the button", async () => {
     const user = userEvent.setup();
     renderHeader();

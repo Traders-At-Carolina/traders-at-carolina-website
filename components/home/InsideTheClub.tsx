@@ -79,7 +79,7 @@ export function InsideTheClub({ index, title, photos, upcoming }: InsideTheClubP
           // Three photos: a 3-up row of 3:2 images.
           <Grid className="items-start gap-y-10">
             {photos.map((photo) => (
-              <Photo key={photo.caption} photo={photo} ratio="3:2" sizes="(min-width: 768px) 33vw, 100vw" className="col-span-12 md:col-span-4" />
+              <Photo key={photo.src.src} photo={photo} ratio="3:2" sizes="(min-width: 768px) 33vw, 100vw" className="col-span-12 md:col-span-4" />
             ))}
           </Grid>
         ) : (

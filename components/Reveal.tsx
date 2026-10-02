@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, type ElementType, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 type RevealProps = {
-  as?: ElementType;
+  /** HTML tags only (JSX.IntrinsicElements also holds three.js elements via @react-three/fiber). */
+  as?: keyof HTMLElementTagNameMap;
   children: ReactNode;
   className?: string;
 };
@@ -12,8 +13,10 @@ type RevealProps = {
  * Fades content up 8px the first time it enters the viewport (00 §9.2).
  * Hidden styles apply only under html.js without reduced motion, so content is never stuck hidden.
  */
-export function Reveal({ as: Tag = "div", children, className = "" }: RevealProps) {
-  const ref = useRef<HTMLElement>(null);
+export function Reveal({ as = "div", children, className = "" }: RevealProps) {
+  // Typed as "div" for JSX: a union of every HTML tag is too complex for TS. Any tag renders the same.
+  const Tag = as as "div";
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;

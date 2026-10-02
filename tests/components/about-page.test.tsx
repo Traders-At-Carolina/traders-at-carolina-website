@@ -72,6 +72,20 @@ describe("AboutPage", () => {
     expect(within(region).queryByText("Advisors")).not.toBeInTheDocument();
   });
 
+  it("shows a decorative logo beside partners that have one, keeping the name as the heading text", () => {
+    renderAbout({
+      partners: [
+        { name: "Jane Street", relationship: "Sponsor", logo: { src: "/images/sponsors/jane-street.svg", width: 28, height: 28 } },
+        { name: "Optiver" },
+      ],
+    });
+    const region = screen.getByRole("region", { name: "Who supports us." });
+    const [jane, optiver] = within(region).getAllByRole("heading", { level: 3 });
+    expect(jane).toHaveTextContent("Jane Street");
+    expect(jane.querySelector('span[aria-hidden="true"]')).toBeInTheDocument();
+    expect(optiver.querySelector('span[aria-hidden="true"]')).not.toBeInTheDocument();
+  });
+
   it("becomes an Advisors section when there are advisors but no partners", () => {
     renderAbout({ advisors: [{ name: "Dr. Lee", title: "Professor", department: "STOR" }] });
     expect(eyebrows().at(-1)).toBe("§ 03 — Advisors");

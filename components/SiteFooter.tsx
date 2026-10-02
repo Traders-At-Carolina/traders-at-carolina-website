@@ -1,16 +1,26 @@
 import Link from "next/link";
 import { getApplyTarget } from "@/components/ApplyButton";
 import { Container, Grid } from "@/components/Container";
+import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import { TextLink } from "@/components/TextLink";
 import { Wordmark } from "@/components/Wordmark";
 import { primaryNav } from "@/content/nav";
 import { site } from "@/content/site";
+
+const listClasses = "flex flex-col text-nav md:gap-3";
+const itemClasses = "flex min-h-11 items-center md:block md:min-h-0";
 
 /** Black footer with bone text (00 §10). Contact and social links render only when provided. */
 export function SiteFooter() {
   const apply = getApplyTarget();
   const year = new Date().getFullYear();
   const { contactEmail, social, disclaimer } = site;
+  const deadline = apply.state.status === "open" ? apply.state.deadline : undefined;
+  const applyLink = (href: string, external: boolean) => (
+    <TextLink href={href} external={external} tone="inverse" arrow={external} className="max-md:hit-target">
+      Apply
+    </TextLink>
+  );
 
   return (
     <footer className="on-dark bg-black text-bone">
@@ -21,48 +31,46 @@ export function SiteFooter() {
             <p className="mt-5 max-w-[36ch] text-body">{site.mission}</p>
           </div>
 
+          {/* Mirrors the header (00 §11). Rows are 44px tall on touch layouts, tighter from md up. */}
           <nav aria-label="Footer" className="col-span-6 md:col-span-3 md:col-start-7">
-            <ul className="flex flex-col gap-3 text-nav">
-              <li>
-                <Link href="/" className="hover:underline hover:underline-offset-4">
-                  Home
-                </Link>
-              </li>
+            <ul className={listClasses}>
               {primaryNav.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="hover:underline hover:underline-offset-4">
+                <li key={link.href} className={itemClasses}>
+                  <Link href={link.href} className="max-md:hit-target hover:underline hover:underline-offset-4">
                     {link.label}
                   </Link>
                 </li>
               ))}
-              <li>
-                <TextLink href={apply.href} external={apply.external} tone="inverse" arrow={apply.external}>
-                  Apply
-                </TextLink>
+              <li className={itemClasses}>
+                {deadline ? (
+                  <DeadlineSwitch deadline={deadline.toISOString()} before={applyLink(apply.href, apply.external)} after={applyLink("/apply", false)} />
+                ) : (
+                  applyLink(apply.href, apply.external)
+                )}
               </li>
             </ul>
           </nav>
 
           {contactEmail || social.instagram || social.linkedin ? (
             <div className="col-span-6 md:col-span-3">
-              <ul className="flex flex-col gap-3 text-nav">
+              <ul className={listClasses}>
                 {contactEmail ? (
-                  <li>
-                    <TextLink href={`mailto:${contactEmail}`} tone="inverse">
+                  <li className={itemClasses}>
+                    <TextLink href={`mailto:${contactEmail}`} tone="inverse" className="max-md:hit-target">
                       {contactEmail}
                     </TextLink>
                   </li>
                 ) : null}
                 {social.instagram ? (
-                  <li>
-                    <TextLink href={social.instagram} external arrow tone="inverse">
+                  <li className={itemClasses}>
+                    <TextLink href={social.instagram} external arrow tone="inverse" className="max-md:hit-target">
                       Instagram
                     </TextLink>
                   </li>
                 ) : null}
                 {social.linkedin ? (
-                  <li>
-                    <TextLink href={social.linkedin} external arrow tone="inverse">
+                  <li className={itemClasses}>
+                    <TextLink href={social.linkedin} external arrow tone="inverse" className="max-md:hit-target">
                       LinkedIn
                     </TextLink>
                   </li>

@@ -47,4 +47,18 @@ describe("generateWalks", () => {
   it("returns SVG path data starting with a move command", () => {
     generateWalks(opts).forEach((d) => expect(d).toMatch(/^M[\d.]+ [\d.]+( L[\d.]+ [\d.]+)+$/));
   });
+
+  it("keeps the original output when origin and σ are left at their defaults", () => {
+    expect(generateWalks({ seed: 7, paths: 1, steps: 4, width: 600, height: 300 })[0]).toBe(
+      "M0 180 L150 182.3 L300 168.1 L450 151.5 L600 152.6",
+    );
+  });
+});
+
+describe("custom origin and σ", () => {
+  const box = { steps: 96, width: 1200, height: 400, originRatio: 0.5, sigmaRatio: 0.042 };
+
+  it("starts walks at the configured origin", () => {
+    generateWalkPoints({ ...box, seed: 2026, paths: 5 }).forEach((w) => expect(w[0]).toEqual([0, 200]));
+  });
 });

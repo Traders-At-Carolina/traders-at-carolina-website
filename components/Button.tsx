@@ -14,8 +14,11 @@ type ButtonProps = {
   fullWidth?: boolean;
   /** `rounded` (10px corners) is reserved for the header's Apply button (00 §10 SiteHeader). */
   shape?: "square" | "rounded";
-  /** `sm` (36px) is reserved for the desktop header's Apply button (00 §10 SiteHeader). */
-  size?: "md" | "sm";
+  /**
+   * `compact` trims side padding for tight spots like the mobile header; height stays 44px.
+   * `sm` (36px tall) is reserved for the desktop header's Apply button (00 §10 SiteHeader).
+   */
+  size?: "default" | "compact" | "sm";
   className?: string;
 };
 
@@ -26,23 +29,20 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 const sizes = {
-  md: "min-h-11 px-6 py-3",
+  default: "min-h-11 px-6 py-3",
+  compact: "min-h-11 px-4 py-3",
   sm: "min-h-9 px-5 py-2",
 } as const;
 
-/** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
-export function Button({
-  href,
-  children,
+/** Button styling, shared with the few real `<button>` actions (e.g. the hero figure's re-draw). */
+export function buttonClasses({
   variant = "primary",
-  external,
-  arrow,
   fullWidth,
   shape = "square",
-  size = "md",
+  size = "default",
   className = "",
-}: ButtonProps) {
-  const classes = [
+}: Pick<ButtonProps, "variant" | "fullWidth" | "shape" | "size" | "className">) {
+  return [
     "inline-flex items-center justify-center gap-2 whitespace-nowrap text-button font-semibold transition-colors duration-150",
     sizes[size],
     variants[variant],
@@ -50,6 +50,11 @@ export function Button({
     fullWidth ? "w-full" : "",
     className,
   ].join(" ");
+}
+
+/** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
+export function Button({ href, children, variant = "primary", external, arrow, fullWidth, shape, size, className = "" }: ButtonProps) {
+  const classes = buttonClasses({ variant, fullWidth, shape, size, className });
 
   if (external) {
     return (

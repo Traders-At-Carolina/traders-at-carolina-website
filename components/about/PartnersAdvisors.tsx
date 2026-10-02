@@ -1,6 +1,7 @@
 import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
+import { SponsorMark } from "@/components/SponsorMark";
 import { TextLink } from "@/components/TextLink";
 import type { AboutContent, Advisor, Partner } from "@/content/types";
 import { sortPartners } from "@/lib/about";
@@ -13,14 +14,14 @@ type PartnersAdvisorsProps = {
 };
 
 /**
- * § 04 — typeset partner names and optional advisors, on white (spec 02 §3.5).
+ * § 04 — typeset partner names and optional advisors, on graphite (spec 02 §3.5).
  * With advisors but no partners the section becomes "Advisors"; the caller omits it when both are empty.
  */
 export function PartnersAdvisors({ index, headings, partners, advisors }: PartnersAdvisorsProps) {
   const advisorsOnly = partners.length === 0;
 
   return (
-    <Section tone="white" labelledBy="partners-title">
+    <Section id="partners" tone="graphite" labelledBy="partners-title">
       <SectionHeader
         index={index}
         eyebrow={advisorsOnly ? "Advisors" : "Partners and advisors"}
@@ -32,7 +33,7 @@ export function PartnersAdvisors({ index, headings, partners, advisors }: Partne
           <ul className="grid grid-cols-1 gap-x-6 md:grid-cols-2 lg:grid-cols-3">
             {sortPartners(partners).map((partner) => (
               <li key={partner.name} className="border-t border-rule py-5">
-                <h3 className="text-h3">
+                <h3 className="flex items-center gap-4 text-h3">
                   {partner.url ? (
                     <TextLink href={partner.url} external>
                       {partner.name}
@@ -40,6 +41,7 @@ export function PartnersAdvisors({ index, headings, partners, advisors }: Partne
                   ) : (
                     partner.name
                   )}
+                  {partner.logo ? <SponsorMark logo={partner.logo} /> : null}
                 </h3>
                 {partner.relationship ? <p className="mt-1 text-caption text-ink-3">{partner.relationship}</p> : null}
               </li>

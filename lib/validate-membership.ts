@@ -21,7 +21,7 @@ export function validateMembership(membership: MembershipContent, teamSlugs: str
     const count = track.recommendedBackground.length;
     if (count < 2 || count > 4) problems.push(`tracks.${track.id}.recommendedBackground must have 2–4 items (got ${count})`);
     // Background is recommended, never required (spec 03 §3.3, AC3).
-    const text = [track.description, ...track.recommendedBackground].join(" ");
+    const text = [track.description, track.goodFit ?? "", track.sampleProblem ?? "", ...track.recommendedBackground].join(" ");
     if (REQUIRED_WORDING.test(text)) problems.push(`tracks.${track.id} must not say "required" or "requirements"`);
     if (track.leadSlug && !teamSlugs.includes(track.leadSlug)) {
       problems.push(`tracks.${track.id}.leadSlug "${track.leadSlug}" is not a person in content/team.ts`);

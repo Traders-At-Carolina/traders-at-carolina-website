@@ -48,10 +48,14 @@ export type HomePhoto = {
 /** Home page content. Field definitions: docs/specs/01-home.md §6. */
 export type HomeContent = {
   hero: {
+    /** Line above the headline, rendered as the "§ 01 — …" eyebrow. */
+    eyebrow: string;
     headline: string;
     /** Substring of `headline` rendered in italic. */
     headlineEmphasis?: string;
     subhead: string;
+    /** Caption under the hero's random-walk figure ("Fig. 1 — …"). */
+    figureCaption: string;
   };
   /** H2 copy for each section. */
   headings: { pillars: string; numbers: string; inside: string };
@@ -76,6 +80,11 @@ export type Partner = {
   relationship?: string;
   /** Optional https link to the firm's site. */
   url?: string;
+  /**
+   * Official mark from the firm's own site or media kit, in public/images/sponsors, with a transparent
+   * background. Rendered as a single-color mask, so only its shape matters. width/height set the aspect ratio.
+   */
+  logo?: { src: string; width: number; height: number };
 };
 
 export type Advisor = { name: string; title: string; department: string; note?: string };
@@ -118,6 +127,10 @@ export type MembershipContent = {
     roleLabel: string;
     name: string;
     description: string;
+    /** One line on who the track suits, completing "Good fit if you…". */
+    goodFit?: string;
+    /** A representative problem a member works on, so visitors can feel the track. */
+    sampleProblem?: string;
     /** 2–4 items. Recommended, never required. */
     recommendedBackground: string[];
     /** Slug of a person in content/team.ts (spec 04). */
@@ -145,14 +158,15 @@ export type Person = {
   name: string;
   /** e.g. "President", "Trading Lead". */
   role: string;
-  group: "exec" | "track-lead";
+  /** Leadership tiers on /team: co-presidents, then executive board, then directors, then track leads. */
+  group: "co-president" | "exec" | "director" | "track-lead";
   /** Required for track leads; set on an exec who also leads a track. */
   track?: TrackId;
   /** Sort order within the group (President first by convention). */
   order: number;
-  /** e.g. 2027 → rendered "'27". */
-  classYear: number;
-  major: string;
+  /** e.g. 2027 → rendered "'27". Optional; the meta line shows whatever is set. */
+  classYear?: number;
+  major?: string;
   /** Static import from public/images/team, e.g. `import jane from "@/public/images/team/jane-doe.jpg"`. */
   headshot?: StaticImageData;
   /** Required when headshot is set, e.g. "Portrait of Jane Doe". */
@@ -166,6 +180,8 @@ export type Person = {
 export type TeamContent = {
   /** e.g. "2026–27"; shown in the Executive board heading. */
   academicYear?: string;
+  /** Closing note at the bottom of /team; hidden when empty. */
+  note?: string;
   people: Person[];
 };
 

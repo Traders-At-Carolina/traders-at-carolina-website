@@ -1,7 +1,7 @@
 import type { Recruiting } from "@/content/types";
 import type { ApplicationState } from "@/lib/applications";
 import { parseEasternDateTime } from "@/lib/eastern-time";
-import { formatMonthDay } from "@/lib/format";
+import { formatWeekdayMonthDay } from "@/lib/format";
 
 /** An event stays "upcoming" through the end of its day in Eastern time (spec 01 §3.4). */
 export function isUpcoming(isoDateTime: string, now: Date): boolean {
@@ -14,25 +14,42 @@ export function numberSections<K extends string>(keys: K[]): Record<K, number> {
   return Object.fromEntries(keys.map((key, i) => [key, i + 1])) as Record<K, number>;
 }
 
+export type HomeAction = { label: string; href: string; external: boolean; arrow: boolean };
+
 export type HomeApplyCopy = {
-  hero: { label: string; href: string; external: boolean; arrow: boolean };
-  band: { title: string; label: string; href: string; external: boolean };
+  /** `status` is a one-line note under the hero button, shown when applications are closed. */
+  hero: HomeAction & { status?: string };
+  band: HomeAction & { title: string; lead?: string };
 };
 
-/** Hero and Apply-band button copy for each application state (spec 01 §5). */
+/**
+ * Hero and Apply-band copy for each application state (spec 01 §5). When closed, both buttons go
+ * straight to the interest form if there is one, so "Get notified" never lands on a dead end.
+ */
 export function homeApplyCopy(state: ApplicationState, recruiting: Recruiting, now: Date): HomeApplyCopy {
   if (state.status === "open") {
+    const apply = { label: "Apply", href: recruiting.applyUrl, external: true, arrow: false };
     return {
-      hero: { label: "Apply", href: recruiting.applyUrl, external: true, arrow: false },
-      band: { title: "Ready to start?", label: "Apply", href: recruiting.applyUrl, external: true },
+      hero: apply,
+      band: {
+        ...apply,
+        title: "Ready to start?",
+        lead: state.deadline ? `Applications close ${formatWeekdayMonthDay(state.deadline)}.` : undefined,
+      },
     };
   }
 
   const nextOpen = state.nextOpen && state.nextOpen.getTime() > now.getTime() ? state.nextOpen : undefined;
+  const when = nextOpen ? `The next cycle opens ${formatWeekdayMonthDay(nextOpen)}.` : "We recruit each fall and spring.";
+  const action: HomeAction = recruiting.interestFormUrl
+    ? { label: "Get notified", href: recruiting.interestFormUrl, external: true, arrow: false }
+    : { label: "How to apply", href: "/apply", external: false, arrow: true };
   return {
-    hero: nextOpen
-      ? { label: `Applications open ${formatMonthDay(nextOpen)}`, href: "/apply", external: false, arrow: false }
-      : { label: "How to apply", href: "/apply", external: false, arrow: true },
-    band: { title: "Applications are closed for now.", label: "Get notified", href: "/apply", external: false },
+    hero: { ...action, status: `Applications are closed. ${when}` },
+    band: {
+      ...action,
+      title: "Applications are closed for now.",
+      lead: recruiting.interestFormUrl ? `${when} Leave your email and we'll tell you when they open.` : when,
+    },
   };
 }

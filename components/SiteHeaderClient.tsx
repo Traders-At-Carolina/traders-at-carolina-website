@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
+import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import { Wordmark } from "@/components/Wordmark";
 import type { NavLink } from "@/content/nav";
 import { useFloatingHeader } from "@/lib/use-floating-header";
@@ -13,6 +14,8 @@ type SiteHeaderClientProps = {
   links: NavLink[];
   applyHref: string;
   applyExternal: boolean;
+  /** ISO instant; once it passes, Apply falls back to /apply in the browser (spec 05 §3). */
+  applyDeadline?: string;
 };
 
 type LinkBox = { x: number; w: number };
@@ -34,7 +37,7 @@ const SHELL_FLOATING =
  * Sticky header that docks over the hero and floats as a rounded bar once the hero's text reaches it,
  * with a boxy highlight that springs between the nav links and a dropdown card for mobile (00 §10).
  */
-export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeaderClientProps) {
+export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadline }: SiteHeaderClientProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
@@ -104,6 +107,19 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
 
   const close = () => setOpen(false);
 
+  const applyButton = (props: { fullWidth?: boolean; size?: "compact" | "sm" }) => {
+    const button = (href: string, external: boolean) => (
+      <Button href={href} external={external} shape="rounded" {...props}>
+        Apply
+      </Button>
+    );
+    return applyDeadline ? (
+      <DeadlineSwitch deadline={applyDeadline} before={button(applyHref, applyExternal)} after={button("/apply", false)} />
+    ) : (
+      button(applyHref, applyExternal)
+    );
+  };
+
   return (
     <header
       ref={headerRef}
@@ -163,22 +179,24 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
               ))}
             </ul>
           </div>
-          <Button href={applyHref} external={applyExternal} shape="rounded" size="sm">
-            Apply
-          </Button>
+          {applyButton({ size: "sm" })}
         </nav>
 
-        <button
-          ref={menuButtonRef}
-          type="button"
-          className={`inline-flex min-h-11 min-w-11 items-center justify-center md:hidden ${floating ? "" : "-mr-2.5"}`}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((value) => !value)}
-        >
-          {open ? <X aria-hidden="true" strokeWidth={1.5} /> : <Menu aria-hidden="true" strokeWidth={1.5} />}
-        </button>
+        {/* Mobile: Apply stays one tap away beside the menu button; the open menu has its own full-width Apply. */}
+        <div className="flex items-center gap-2 md:hidden">
+          {open ? null : applyButton({ size: "compact" })}
+          <button
+            ref={menuButtonRef}
+            type="button"
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center ${floating ? "" : "-mr-2.5"}`}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? <X aria-hidden="true" strokeWidth={1.5} /> : <Menu aria-hidden="true" strokeWidth={1.5} />}
+          </button>
+        </div>
       </div>
 
       {open ? (
@@ -205,9 +223,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal }: SiteHeader
             </ul>
           </nav>
           <div className="mt-4" onClick={close}>
-            <Button href={applyHref} external={applyExternal} shape="rounded" fullWidth>
-              Apply
-            </Button>
+            {applyButton({ fullWidth: true })}
           </div>
         </div>
       ) : null}

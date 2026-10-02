@@ -6,6 +6,8 @@
   --color-bone: #ebeae4;
   --color-white: #ffffff;
   --color-navy: #233265;
+  /* Warm dark gray for the occasional dark content section (Home sponsors); not for bands. */
+  --color-graphite: #2a2a28;
   --color-black: #000000;
   --color-ink-2: #474644;
   --color-ink-3: #636260;
@@ -23,6 +25,10 @@
   --text-display: clamp(2.75rem, 6vw, 5rem);
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.01em;
+  /* Home hero H1 only — larger than Display; exception recorded in spec 01 §3.1. */
+  --text-hero: clamp(3rem, 7.2vw, 6rem);
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.02em;
   --text-h1: clamp(2.25rem, 4.5vw, 3.75rem);
   --text-h1--line-height: 1.1;
   --text-h2: clamp(1.75rem, 3vw, 2.5rem);
@@ -67,9 +73,15 @@
 @theme inline {
   --font-display: "Georgia Pro", Georgia, var(--font-gelasio), "Times New Roman", serif;
   --font-sans: var(--font-public-sans), system-ui, sans-serif;
+  --font-title: var(--font-chivo), "Arial Black", system-ui, sans-serif;
 }
 
 @layer base {
+  /* Photos always render in standard dynamic range, never HDR-boosted. */
+  img {
+    dynamic-range-limit: standard;
+  }
+
   html {
     background-color: var(--color-bone);
     color: var(--color-black);
@@ -130,6 +142,29 @@
     linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 100%);
+}
+
+/* Graphite contrast section: remaps the ink, accent and rule tokens so every utility inside it
+   (text-ink-2, text-navy, border-rule, link underlines…) reads light-on-dark without per-component tones.
+   Navy accents become bone, matching the inverse eyebrow on the navy band and footer. */
+@utility surface-graphite {
+  background-color: var(--color-graphite);
+  color: var(--color-bone);
+  --color-navy: #ebeae4;
+  --color-ink-2: #c9c8c2;
+  --color-ink-3: #a8a7a1;
+  --color-rule: rgb(235 234 228 / 0.2);
+  --color-rule-strong: rgb(235 234 228 / 0.45);
+}
+
+/* Two bone sections in a row would stack both paddings (up to 256px of empty bone). The second one's
+   hairline already marks the boundary, so its top padding drops a step: 112 / 160 / 192px gaps. */
+[data-tone="bone"] + [data-tone="bone"] {
+  padding-top: 3rem;
+
+  @media (min-width: 48rem) {
+    padding-top: 4rem;
+  }
 }
 
 /* Resting hairline underline that fills in from the left on hover (00 §9.2). */
@@ -232,5 +267,18 @@ section:has(+ [data-cta-band]) {
 @keyframes draw-in {
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+/* Grows a short inline link's tap target to 44px tall without moving layout (00 §12).
+   Use on standalone links only; inside running text the enlarged areas would overlap. */
+@utility hit-target {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block: min(0px, calc((100% - 44px) / 2));
   }
 }

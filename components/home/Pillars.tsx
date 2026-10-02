@@ -23,7 +23,7 @@ export function Pillars({ index, title, pillars }: PillarsProps) {
             <h3 className="mt-3 text-h3">{pillar.title}</h3>
             <p className="mt-3 text-body text-ink-2">{pillar.body}</p>
             <p className="mt-5">
-              <TextLink href={pillar.link.href} arrow>
+              <TextLink href={pillar.link.href} arrow className="hit-target">
                 {pillar.link.label}
               </TextLink>
             </p>

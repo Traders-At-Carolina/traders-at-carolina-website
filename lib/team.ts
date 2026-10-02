@@ -1,5 +1,4 @@
-import type { Person, Placement, TrackId } from "@/content/types";
-import { TRACK_ORDER } from "@/lib/membership";
+import type { Person, Placement } from "@/content/types";
 
 /** The placements section appears once there are enough firms to be meaningful (spec 04 §4.4). */
 export const PLACEMENT_THRESHOLD = 5;
@@ -10,21 +9,17 @@ export function execMembers(people: Person[]): Person[] {
   return people.filter((p) => p.group === "exec").sort(byOrder);
 }
 
-export type TrackGroup = {
-  track: TrackId;
-  /** Track-lead cards for this track. */
-  leads: Person[];
-  /** Exec members who also lead this track; shown as a "Led by" line, not a second card. */
-  execLeads: Person[];
-};
+export function coPresidents(people: Person[]): Person[] {
+  return people.filter((p) => p.group === "co-president").sort(byOrder);
+}
 
-/** Track leads grouped in the fixed Trading → Research → Development order (spec 04 §4.3). */
-export function trackGroups(people: Person[]): TrackGroup[] {
-  return TRACK_ORDER.map((track) => ({
-    track,
-    leads: people.filter((p) => p.group === "track-lead" && p.track === track).sort(byOrder),
-    execLeads: people.filter((p) => p.group === "exec" && p.track === track).sort(byOrder),
-  }));
+export function directors(people: Person[]): Person[] {
+  return people.filter((p) => p.group === "director").sort(byOrder);
+}
+
+/** Meta line under a name, e.g. "'27 · Mathematics"; empty when neither is set. */
+export function personMeta(person: Pick<Person, "classYear" | "major">): string {
+  return [person.classYear ? shortClassYear(person.classYear) : "", person.major ?? ""].filter(Boolean).join(" · ");
 }
 
 /** slug → name for everyone who leads a track, used by /membership "Led by" links (spec 04 §5). */
