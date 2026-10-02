@@ -13,7 +13,7 @@ type CTABandProps = {
 /** Full-bleed navy band — the page's single navy moment (00 §4.3, §10). */
 export function CTABand({ title, lead, action, id = "cta-band" }: CTABandProps) {
   return (
-    <section aria-labelledby={id} className="on-dark bg-navy text-white">
+    <section data-cta-band aria-labelledby={id} className="on-dark bg-navy text-white">
       <Container className="py-16 md:py-24">
         <Grid>
           <div className="col-span-12 lg:col-span-8">
