@@ -2,6 +2,8 @@
 
 **Status:** Approved · **Date:** 2026-09-30 · **Route:** `/` · **Depends on:** [Spec 00](00-vision-and-style.md)
 
+> **Revision (2026-10-02, hero):** the live readout moved from above the plot to below it. With the surface drawn low in its canvas, a readout at the top of the figure column floated away from what it describes; under the plot it reads as the figure's data line, and on mobile it brings the top of the surface into the first screen. The gap between the hero text and the figure is also tighter below 1024px (32px, was 48px).
+
 > **Revision (2026-10-02):** two Home sections changed. **By the numbers** no longer shows a one-item stat row: a lone stat becomes the section heading (§3.3). **Inside the club** with three photos now uses one large lead photo with the other two stacked beside it, instead of a 3-up row of equal thumbnails (§3.4). Where this note conflicts with §3 below, this note wins.
 
 All tokens, type roles, motifs and components named here are defined in spec 00. Section references like (00 §7.2) point there.
@@ -59,7 +61,7 @@ Only these sections appear on Home. No placement section (data isn't available y
   - A matte 61 × 41 mesh washed in navy (mixed into white), deeper where implied vol is higher — tinted by absolute vol, so a sell-off reads darker than a calm market. Design-token colors, no tone mapping, mostly ambient light.
   - Navy-ink lines (anti-aliased `LineSegments2`): a faint wire grid every 5th row/column, a thin outline, and a bold **at-the-money line** (K/S = 1) tracing the ATM term structure.
   - Hairline axes meeting at the front-right corner, with tick marks and values: strike K/S 0.8 / "1.0 ATM" / 1.25, maturity 6M / 1Y / 18M / 2Y, implied vol 20% / 40% / 60%; titled "Strike K/S", "Maturity" and "Implied vol". Each label fades out as its axis turns away from the camera, so far-side numbers never sit over the surface. No floor grid.
-  - **Live readout** above the plot (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the canvas label carries the same information).
+  - **Live readout** directly under the plot, on a `rule` hairline and above the caption, like the data line of a printed figure (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the canvas label carries the same information).
   - `<figcaption>`: `hero.figureCaption` ("Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.")
 
 **Layout**

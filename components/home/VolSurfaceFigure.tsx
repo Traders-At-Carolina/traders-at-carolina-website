@@ -44,14 +44,14 @@ const pct = (v: number) => (v * 100).toFixed(1);
 
 /**
  * Live numbers for the surface on screen, recomputed every frame of a morph: ATM vol at 3M, 1Y and 2Y (the term
- * structure) and 1Y skew as the vol spread between the 90% and 110% strikes. Decorative duplicate of the canvas
- * label, so hidden from assistive tech.
+ * structure) and 1Y skew as the vol spread between the 90% and 110% strikes. Sits under the plot on a hairline, like
+ * the data line of a printed figure. Decorative duplicate of the canvas label, so hidden from assistive tech.
  */
 function Readout({ name, params }: { name: string; params: VolParams }) {
   const atm = [0.25, 1, 2].map((T) => pct(impliedVol(0, T, params)));
   const skew = (impliedVol(Math.log(0.9), 1, params) - impliedVol(Math.log(1.1), 1, params)) * 100;
   return (
-    <div aria-hidden="true" className="mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 text-caption tabular">
+    <div aria-hidden="true" className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-rule pt-3 text-caption tabular">
       <p className="font-medium text-navy">{name}</p>
       <dl className="flex flex-wrap gap-x-5 gap-y-1 text-ink-3">
         <div className="flex gap-2">
@@ -153,7 +153,6 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
 
   return (
     <figure className={className}>
-      <Readout name={regime.name} params={params} />
       <div ref={box} className="relative h-[300px] md:h-[420px] lg:h-[clamp(380px,58vh,600px)]">
         {nearViewport ? (
           <VolSurfaceCanvas
@@ -168,7 +167,8 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
         )}
       </div>
 
-      <figcaption className="mt-4 text-caption text-ink-3">{caption}</figcaption>
+      <Readout name={regime.name} params={params} />
+      <figcaption className="mt-3 text-caption text-ink-3">{caption}</figcaption>
     </figure>
   );
 }
