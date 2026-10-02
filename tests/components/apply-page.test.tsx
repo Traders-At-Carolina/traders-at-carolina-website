@@ -59,6 +59,7 @@ describe("ApplyPage", () => {
     const { container } = render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
     const faq = screen.getByRole("region", { name: "Common questions." });
     expect(faq.querySelectorAll("details")).toHaveLength(apply.faq.length);
+    expect(faq).toHaveClass("surface-graphite", "on-dark");
     expect(within(faq).getByRole("link", { name: "recommended background" })).toHaveAttribute("href", "/membership#trading");
     const ld = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.textContent ?? "{}");
     expect(ld["@type"]).toBe("FAQPage");

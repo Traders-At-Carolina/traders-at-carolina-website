@@ -9,10 +9,10 @@ type ExpectationsProps = {
   expectations: MembershipContent["expectations"];
 };
 
-/** § 04 — time, attendance and prerequisites as a definition list, on white (spec 03 §3.5). */
+/** § 04 — time, attendance and prerequisites as a definition list, on graphite (spec 03 §3.5). */
 export function Expectations({ index, title, expectations }: ExpectationsProps) {
   return (
-    <Section tone="white" labelledBy="expectations-title">
+    <Section tone="graphite" labelledBy="expectations-title">
       <SectionHeader index={index} eyebrow="Expectations" title={title} id="expectations-title" />
       <Reveal className="mt-12 md:mt-16">
         <dl className="border-t border-rule">

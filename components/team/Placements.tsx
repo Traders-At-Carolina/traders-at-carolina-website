@@ -7,10 +7,10 @@ type PlacementsProps = {
   firms: string[];
 };
 
-/** § 03 — firm names only, typeset, on white. Rendered only at 5+ firms (spec 04 §4.4). */
+/** § 03 — firm names only, typeset, on graphite. Rendered only at 5+ firms (spec 04 §4.4). */
 export function Placements({ index, firms }: PlacementsProps) {
   return (
-    <Section tone="white" labelledBy="placements-title">
+    <Section tone="graphite" labelledBy="placements-title">
       <SectionHeader
         index={index}
         eyebrow="Placements"

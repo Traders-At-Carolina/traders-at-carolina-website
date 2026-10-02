@@ -121,6 +121,19 @@
   mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 100%);
 }
 
+/* Graphite contrast section: remaps the ink, accent and rule tokens so every utility inside it
+   (text-ink-2, text-navy, border-rule, link underlines…) reads light-on-dark without per-component tones.
+   Navy accents become bone, matching the inverse eyebrow on the navy band and footer. */
+@utility surface-graphite {
+  background-color: var(--color-graphite);
+  color: var(--color-bone);
+  --color-navy: #ebeae4;
+  --color-ink-2: #c9c8c2;
+  --color-ink-3: #a8a7a1;
+  --color-rule: rgb(235 234 228 / 0.2);
+  --color-rule-strong: rgb(235 234 228 / 0.45);
+}
+
 /* Resting hairline underline that fills in from the left on hover (00 §9.2). */
 @utility link-underline {
   background-image:

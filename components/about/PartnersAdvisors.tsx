@@ -13,14 +13,14 @@ type PartnersAdvisorsProps = {
 };
 
 /**
- * § 04 — typeset partner names and optional advisors, on white (spec 02 §3.5).
+ * § 04 — typeset partner names and optional advisors, on graphite (spec 02 §3.5).
  * With advisors but no partners the section becomes "Advisors"; the caller omits it when both are empty.
  */
 export function PartnersAdvisors({ index, headings, partners, advisors }: PartnersAdvisorsProps) {
   const advisorsOnly = partners.length === 0;
 
   return (
-    <Section id="partners" tone="white" labelledBy="partners-title">
+    <Section id="partners" tone="graphite" labelledBy="partners-title">
       <SectionHeader
         index={index}
         eyebrow={advisorsOnly ? "Advisors" : "Partners and advisors"}

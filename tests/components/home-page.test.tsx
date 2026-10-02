@@ -134,7 +134,7 @@ describe("HomePage", () => {
       />,
     );
     const section = screen.getByRole("region", { name: "By the numbers title" });
-    expect(section).toHaveClass("bg-graphite");
+    expect(section).toHaveClass("surface-graphite");
     const marks = section.querySelectorAll('li span[aria-hidden="true"]');
     expect(marks).toHaveLength(1);
     expect(marks[0].closest("li")).toHaveTextContent("Jane Street");

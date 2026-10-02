@@ -25,7 +25,7 @@ function Answer({ source }: { source: string }) {
   );
 }
 
-/** § 02 — native details/summary accordion on white, plus FAQPage JSON-LD (spec 05 §4.3, §7). */
+/** § 02 — native details/summary accordion on graphite, plus FAQPage JSON-LD (spec 05 §4.3, §7). */
 export function Faq({ faq, contactEmail }: { faq: ApplyContent["faq"]; contactEmail?: string }) {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -38,7 +38,7 @@ export function Faq({ faq, contactEmail }: { faq: ApplyContent["faq"]; contactEm
   };
 
   return (
-    <Section tone="white" id="faq" labelledBy="faq-title" className="scroll-mt-20">
+    <Section tone="graphite" id="faq" labelledBy="faq-title" className="scroll-mt-20">
       <SectionHeader index={2} eyebrow="FAQ" title="Common questions." id="faq-title" />
       <div className="mt-12 border-t border-rule md:mt-16">
         {faq.map((item) => (

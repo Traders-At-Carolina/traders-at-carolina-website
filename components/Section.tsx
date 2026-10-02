@@ -4,7 +4,7 @@ import { Eyebrow } from "@/components/Eyebrow";
 
 type SectionProps = {
   children: ReactNode;
-  /** Bone by default; white or graphite for the occasional contrast section (00 §6). */
+  /** Bone by default; graphite for the occasional contrast section (00 §6). White is kept for the styleguide. */
   tone?: "bone" | "white" | "graphite";
   id?: string;
   labelledBy?: string;
@@ -14,7 +14,7 @@ type SectionProps = {
 const tones = {
   bone: "bg-bone",
   white: "bg-white",
-  graphite: "on-dark bg-graphite text-bone",
+  graphite: "on-dark surface-graphite",
 } as const;
 
 /** Page section with standard vertical rhythm: 64px mobile, 96px tablet, 128px desktop. */
