@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
 import { Button } from "@/components/Button";
-import { Container } from "@/components/Container";
 import { CTABand } from "@/components/CTABand";
 import { PageHeader } from "@/components/PageHeader";
+import { Section } from "@/components/Section";
 import { LeadershipTier } from "@/components/team/LeadershipTier";
 import { Placements } from "@/components/team/Placements";
 import type { Placement, Recruiting, TeamContent } from "@/content/types";
@@ -33,24 +33,22 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
   const allTiers: Tier[] = [
     {
       id: "exec-title",
-      eyebrow: "Executive board",
+      eyebrow: "Operations",
       title: "Executive Board",
       members: board,
-      variant: "bold",
     },
     {
       id: "presidents-title",
-      eyebrow: "Co-Presidents",
+      eyebrow: "Leadership",
       title: "Co-Presidents",
       members: presidents,
       variant: "featured",
     },
     {
       id: "directors-title",
-      eyebrow: "Directors",
+      eyebrow: "Programs",
       title: "Directors",
       members: directorList,
-      variant: "directors",
     },
   ];
   const tiers = allTiers
@@ -71,7 +69,7 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
         <LeadershipTier
           index={1}
           id="exec-title"
-          eyebrow="Executive board"
+          eyebrow="Operations"
           title={team.academicYear ? `Leadership, ${team.academicYear}` : "Leadership"}
           members={[]}
           emptyText="Board profiles will be posted here soon."
@@ -81,16 +79,15 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
       )}
       {showPlacements(placements) ? <Placements index={nextIndex} firms={sortFirms(placements)} /> : null}
       {team.note ? (
-        <section aria-labelledby="team-note-title" className="bg-bone py-10 md:py-12 lg:py-14">
-          <Container>
-            <div className="mx-auto max-w-prose border-t border-rule pt-8 text-center">
-              <h2 id="team-note-title" className="font-title text-h3 font-extrabold text-black">
-                How the team serves the mission
-              </h2>
-              <p className="mt-4 text-body text-ink-2">{team.note}</p>
-            </div>
-          </Container>
-        </section>
+        // A paragraph this long reads better left-aligned; the heading stays centered with the tiers above it.
+        <Section labelledBy="team-note-title" density="compact">
+          <div className="mx-auto max-w-prose border-t border-rule pt-8">
+            <h2 id="team-note-title" className="text-center font-title text-h3 font-extrabold text-black">
+              How the team serves the mission
+            </h2>
+            <p className="mt-4 text-body text-ink-2">{team.note}</p>
+          </div>
+        </Section>
       ) : null}
       <CTABand
         title={bandTitle}
