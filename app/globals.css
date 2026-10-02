@@ -175,6 +175,44 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
   }
 }
 
+/*
+ * The header's name tucks behind the logo mark as the page scrolls (00 §10). `--logo-tuck` (0–1) is
+ * scrubbed by lib/use-logo-tuck.ts; the track clips at the mark's right edge, so the name slides out
+ * of sight under it, fading over the last stretch. The short transition smooths wheel steps.
+ * Hovering or focusing the logo slides it back out.
+ */
+.wordmark-track {
+  clip-path: inset(-0.5em -0.5em -0.5em 0);
+}
+
+.wordmark-name {
+  transform: translateX(calc(var(--logo-tuck, 0) * (-100% - 0.625rem)));
+  opacity: clamp(0, (1 - var(--logo-tuck, 0)) * 2.5, 1);
+  transition:
+    transform 250ms var(--ease-soft),
+    opacity 250ms var(--ease-soft);
+}
+
+.group:focus-visible .wordmark-name {
+  transform: none;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .group:hover .wordmark-name {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-name {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
+}
+
 /* Graphite contrast section: remaps the ink, accent and rule tokens so every utility inside it
    (text-ink-2, text-navy, border-rule, link underlines…) reads light-on-dark without per-component tones.
    Navy accents become bone, matching the inverse eyebrow on the navy band and footer. */

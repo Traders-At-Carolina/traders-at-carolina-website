@@ -9,6 +9,7 @@ import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import { Wordmark } from "@/components/Wordmark";
 import type { NavLink } from "@/content/nav";
 import { useFloatingHeader } from "@/lib/use-floating-header";
+import { useLogoTuck } from "@/lib/use-logo-tuck";
 
 type SiteHeaderClientProps = {
   links: NavLink[];
@@ -45,6 +46,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   const floating = useFloatingHeader(headerRef, pathname);
+  useLogoTuck(headerRef, pathname);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const activeIndex = links.findIndex((link) => isActive(link.href));
@@ -140,7 +142,7 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
     >
       <div aria-hidden="true" data-nav-grid className="graph-paper-nav pointer-events-none absolute inset-0" />
       <div className={`${SHELL_BASE} ${floating ? SHELL_FLOATING : SHELL_DOCKED}`}>
-        <Wordmark />
+        <Wordmark tuck />
 
         <nav aria-label="Primary" className="hidden items-center gap-3 md:flex">
           <div className="relative">
