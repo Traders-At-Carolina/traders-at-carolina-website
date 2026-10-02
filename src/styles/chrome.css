@@ -90,7 +90,7 @@
 /* ---- JOIN button --------------------------------------------------------- */
 
 .tac-header__join {
-  padding: 12px 26px;
+  padding: 8px 26px;
   background: var(--tac-navy);
   color: var(--tac-white);
   font-size: 14px;

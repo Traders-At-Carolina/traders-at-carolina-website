@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { siteSettings } from '../data/siteContent'
@@ -26,11 +26,27 @@ function SiteHeader() {
   }
 
   const closeMenu = () => setOpen(false)
+  const canHover = () => window.matchMedia('(hover: hover)').matches
+
+  // On hover-capable devices the collapsed menu opens when the pointer
+  // reaches the toggle and closes when it leaves the header.
+  const openOnHover = () => {
+    if (canHover()) setOpen(true)
+  }
+  const closeOnLeave = () => {
+    if (canHover()) setOpen(false)
+  }
+  // A real mouse click on a hover-opened menu keeps it open; keyboard
+  // activation (detail === 0) and touch still toggle.
+  const handleToggle = (event: MouseEvent) => {
+    if (canHover() && event.detail > 0) setOpen(true)
+    else setOpen((value) => !value)
+  }
   const currentProps = (to: string) =>
     to === location.pathname ? ({ 'aria-current': 'page' } as const) : {}
 
   return (
-    <header className="tac-header">
+    <header className="tac-header" onMouseLeave={closeOnLeave}>
       <div className="tac-header__inner tac-container">
         <Link className="tac-header__brand" to="/" aria-label="Traders at Carolina home">
           <span className="tac-header__wordmark">Traders at Carolina</span>
@@ -57,7 +73,8 @@ function SiteHeader() {
           aria-expanded={open}
           aria-controls={MOBILE_MENU_ID}
           aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
-          onClick={() => setOpen((value) => !value)}
+          onMouseEnter={openOnHover}
+          onClick={handleToggle}
         >
           {open ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
         </button>
