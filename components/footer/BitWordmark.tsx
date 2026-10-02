@@ -88,10 +88,10 @@ export function BitWordmark({ className = "" }: { className?: string }) {
       if (!octx) return new Uint8Array(cols * rows);
 
       // Text width scales linearly with font size: fit the widest line to 94% of the band, capped so all lines
-      // together take at most 78% of its height.
+      // together take at most 86% of its height.
       octx.font = `800 ${h}px ${title}`;
       const widest = Math.max(...lines.map((line) => octx.measureText(line).width));
-      const size = Math.min((h * w * 0.94) / widest, (h * 0.78) / lines.length);
+      const size = Math.min((h * w * 0.94) / widest, (h * 0.86) / lines.length);
       octx.font = `800 ${size}px ${title}`;
       octx.fillStyle = "#000";
       octx.textAlign = "center";
@@ -299,14 +299,14 @@ export function BitWordmark({ className = "" }: { className?: string }) {
     };
   }, [reduced]);
 
-  // Aspect ratios mirror wordmarkLayout (0.46 narrow, 0.14 from md up) so the band's height is reserved before the
+  // Aspect ratios mirror wordmarkLayout (0.8 narrow, 0.36 from md up) so the band's height is reserved before the
   // canvas draws and the page never shifts.
   return (
     <canvas
       ref={ref}
       aria-hidden="true"
       role="presentation"
-      className={`bit-wordmark block aspect-[100/46] w-full touch-pan-y select-none md:aspect-[100/14] ${className}`}
+      className={`bit-wordmark block aspect-[100/80] w-full touch-pan-y select-none md:aspect-[100/36] ${className}`}
     />
   );
 }

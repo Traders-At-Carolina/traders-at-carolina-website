@@ -16,14 +16,14 @@ import {
 } from "@/components/footer/bitWordmarkScene";
 
 describe("wordmarkLayout", () => {
-  it("sets the wordmark on one line from md up and two lines below", () => {
-    expect(wordmarkLayout(true).lines).toEqual(["Traders at Carolina"]);
-    expect(wordmarkLayout(false).lines).toEqual(["Traders at", "Carolina"]);
+  it("stacks the wordmark on two lines from md up and three below", () => {
+    expect(wordmarkLayout(true).lines).toEqual(["Traders at", "Carolina"]);
+    expect(wordmarkLayout(false).lines).toEqual(["Traders", "at", "Carolina"]);
   });
 
-  it("uses a taller band on narrow screens, where the two lines stack", () => {
+  it("uses a taller band on narrow screens, where more lines stack", () => {
     expect(wordmarkLayout(false).aspect).toBeGreaterThan(wordmarkLayout(true).aspect);
-    expect(wordmarkLayout(true).cell).toBe(6);
+    expect(wordmarkLayout(true).cell).toBe(8);
     expect(wordmarkLayout(false).cell).toBe(5);
   });
 });
@@ -143,17 +143,26 @@ describe("cellState", () => {
     expect(glyphs).toEqual(new Set(["0", "1"]));
   });
 
-  it("forces hovered cells to a full-brightness 1", () => {
-    const s = cellState({ ...formed, isLetter: false, heat: 1 });
-    expect(s.glyph).toBe("1");
-    expect(s.alpha).toBe(1);
+  it("forces hovered letter cells to a full-brightness 1", () => {
+    // A column where the resolved bit is 0, so the flip to 1 is observable.
+    const col = Array.from({ length: 50 }, (_, c) => c).find((c) => seededBit(c, 3) === 0) ?? 0;
+    const cold = cellState({ ...formed, col, isLetter: true, heat: 0 });
+    expect(cold.glyph).toBe("0");
+    const hot = cellState({ ...formed, col, isLetter: true, heat: 1 });
+    expect(hot.glyph).toBe("1");
+    expect(hot.alpha).toBe(1);
   });
 
-  it("blends hover brightness with heat, and ignores heat on cells the wave hasn't reached", () => {
-    const half = cellState({ ...formed, isLetter: false, heat: 0.4 });
-    expect(half.alpha).toBeGreaterThan(ALPHA.field);
-    expect(half.alpha).toBeLessThan(1);
-    const ahead = cellState({ ...formed, settle: 0, isLetter: false, heat: 1 });
+  it("leaves the background field alone however hot the pointer makes it", () => {
+    const col = Array.from({ length: 50 }, (_, c) => c).find((c) => seededBit(c, 3) === 0) ?? 0;
+    const cold = cellState({ ...formed, col, isLetter: false, heat: 0 });
+    const hot = cellState({ ...formed, col, isLetter: false, heat: 1 });
+    expect(hot).toEqual(cold);
+    expect(hot.alpha).toBeCloseTo(ALPHA.field, 5);
+  });
+
+  it("ignores heat on letter cells the wave hasn't reached", () => {
+    const ahead = cellState({ ...formed, settle: 0, isLetter: true, heat: 1 });
     expect(ahead.alpha).toBeCloseTo(ALPHA.scrambled, 5);
   });
 

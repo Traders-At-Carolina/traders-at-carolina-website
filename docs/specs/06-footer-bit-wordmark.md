@@ -31,9 +31,9 @@ Spec 00 §3 says "Never use … terminal or monospace typography". A field of bi
 |---|---|
 | **Position** | A band at the very bottom of `SiteFooter`, below the `© {year}` row, inside the footer's `black` background |
 | **Width** | The container width (00 §6), including its 16px gutters on mobile |
-| **Height** | Set by the wordmark's aspect ratio (height / width): 0.14 from `md` up (about 165px at the 1184px content width, one line) and 0.46 below (about 154px at 335px, two lines) |
+| **Height** | Set by the wordmark's aspect ratio (height / width): 0.36 from `md` up (about 426px at the 1184px content width, two lines) and 0.8 below (about 268px at 335px, three lines) |
 | **Spacing** | 32px above the band on mobile, 48px on desktop (the footer's bottom padding above it); the band ends flush with the end of the page, with no padding below it |
-| **Edges** | Soft fade, no hard boundary: a CSS `mask-image` gradient dims the left, right and top edges to transparent over about 12% of the width / 25% of the height. The bottom edge is flush with the page end and is not faded. |
+| **Edges** | Soft fade, no hard boundary: a CSS `mask-image` gradient dims the left, right and top edges to transparent over about 8% of the width / 14% of the height. The bottom edge is flush with the page end and is not faded. |
 
 `SiteFooter` stays a server component; `BitWordmark` is a client component imported into it.
 
@@ -42,9 +42,9 @@ Spec 00 §3 says "Never use … terminal or monospace typography". A field of bi
 ## 4. Rendering
 
 - **Technique:** one `<canvas>` with a `requestAnimationFrame` loop. No animation library, no new dependency (00 §9.2).
-- **Grid:** square cells, 6px from `md` up and 5px below, covering the canvas. Each cell holds one glyph, `0` or `1`, drawn in `--font-sans` at weight 700 and about 1.3× the cell size, so the digits fill the cell. Glyphs are pre-rendered once as two sprites and stamped per cell. The canvas is scaled by `devicePixelRatio` (capped at 2) so glyphs stay sharp.
-- **Letter mask:** on mount, and after `document.fonts.ready` and on resize, the text "Traders at Carolina" is drawn once to an offscreen canvas in `--font-title` (Chivo, weight 800, matching the Team headings), fitted to the width. Each cell is a **letter cell** if its coverage in that bitmap is at least 50%. The mask is recomputed only when the grid size changes.
-- **Layout of the text:** one line from `md` up; two lines ("Traders at" / "Carolina") below `md`, so the strokes stay at least two cells wide.
+- **Grid:** square cells, 8px from `md` up and 5px below, covering the canvas. Each cell holds one glyph, `0` or `1`, drawn in `--font-sans` at weight 700 and about 1.3× the cell size, so the digits fill the cell. Glyphs are pre-rendered once as two sprites and stamped per cell. The canvas is scaled by `devicePixelRatio` (capped at 2) so glyphs stay sharp.
+- **Letter mask:** on mount, and after `document.fonts.ready` and on resize, the text "Traders at Carolina" is drawn once to an offscreen canvas in `--font-title` (Chivo, weight 800, matching the Team headings), fitted to 94% of the band's width, or to 86% of its height when that is the tighter limit. Each cell is a **letter cell** if its coverage in that bitmap is at least 50%. The mask is recomputed only when the grid size changes.
+- **Layout of the text:** stacked so the letters are big. A one-line "Traders at Carolina" is about five times wider than it is tall, so it can't be made large without leaving the page width. From `md` up it is two lines ("Traders at" / "Carolina"); below `md` it is three ("Traders" / "at" / "Carolina").
 - **Colors** (bone only, 00 §4):
 
 | State | Color |
@@ -73,7 +73,8 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 
 ## 6. Hover (and touch)
 
-- **Radius:** 90px from the pointer (60px on touch). Cells inside the radius become `1` and brighten to 100% `bone`.
+- **Radius:** 55px from the pointer (40px on touch), a tight patch so the hover reads as a cursor spotlight rather than wiping out the lettering.
+- **Only the letters respond.** Letter cells (the lit parts of "Traders at Carolina") inside the radius become `1` and brighten to 100% `bone`. The dim background field is untouched: it keeps its own bits and brightness under the cursor.
 - **Falloff:** fully on to 70% of the radius, then a linear fade to the resting state at the radius edge, so the circle is soft, not cut out.
 - **Release:** each cell eases back to its resting state over **0.6s** after the pointer leaves its radius, giving a short trail. Cells that were forced to `1` return to their own bit.
 - **Hover only affects a formed field.** While the wave is still running, hover is ignored for cells the wave hasn't reached.
@@ -88,7 +89,7 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 - **`prefers-reduced-motion: reduce` (00 §9.2):** the canvas draws the **finished static wordmark** once (resolved, no flicker, no idle shimmer), and hover and touch effects are disabled. The loop never starts.
 - **No JavaScript / before mount:** the band reserves its height and is empty (black). The footer content above is unaffected.
 - **Contrast:** decorative text is exempt from contrast requirements; the footer's links and copyright keep their existing contrast on `black`.
-- **Performance:** about 6.5k cells at the 1184px desktop content width (about 2.6k on mobile). Each frame redraws every cell by stamping one of two pre-rendered glyph sprites with `globalAlpha`. The loop is paused while the band is off-screen or the tab is hidden. Target: smooth 60fps on a mid-range laptop, with no layout shift (the band's height is reserved by `aspect-ratio`).
+- **Performance:** about 7.8k cells at the 1184px desktop content width (about 3.6k on mobile). Each frame redraws every cell by stamping one of two pre-rendered glyph sprites with `globalAlpha`. The loop is paused while the band is off-screen or the tab is hidden. Target: smooth 60fps on a mid-range laptop, with no layout shift (the band's height is reserved by `aspect-ratio`).
 
 ---
 
@@ -111,8 +112,8 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 
 1. Every page's footer ends with the band, and its edges fade with no visible boundary.
 2. Scrolling the band into view plays the scramble-to-wordmark sequence; scrolling it out and back in plays it again.
-3. The resolved field reads "Traders at Carolina" clearly at 1440px, 1024px, 768px and 390px widths (one line at ≥768px, two lines below).
-4. Hovering shows a soft-edged circle of bright `1`s that eases away about 0.6s after the pointer leaves.
+3. The resolved field reads "Traders at Carolina" clearly at 1440px, 1024px, 768px and 390px widths (two lines at ≥768px, three lines below).
+4. Hovering turns the letter bits within a small, soft-edged radius (55px) into bright `1`s, eases them back about 0.6s after the pointer leaves, and leaves the background field unchanged.
 5. On touch, dragging over the band lights up bits and does not block vertical page scroll.
 6. With `prefers-reduced-motion: reduce`, the finished wordmark is shown statically with no hover effect.
 7. The canvas is `aria-hidden`; nothing new is announced by assistive tech or reachable by keyboard.
@@ -124,4 +125,4 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 
 ## 10. Open items
 
-- Cell size, band aspect, glyph weight and the resting opacities were tuned against the live page during implementation (8px cells and 18% / 90% opacities were too faint to read the wordmark). Wave duration and hover radius are unchanged from the first draft and can still be adjusted by feel.
+- Cell size, band aspect, glyph weight, the resting opacities and the hover radius were tuned against the live page during implementation. The first build (one line, 8px cells, 18% / 90% opacities, 90px radius) was too small and faint to read, and the wordmark was restacked and enlarged after review. Wave duration is unchanged from the first draft and can still be adjusted by feel.

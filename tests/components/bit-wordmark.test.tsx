@@ -20,7 +20,7 @@ describe("BitWordmark", () => {
   it("reserves the band's height with an aspect ratio so the page never shifts", () => {
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
     const { container } = render(<BitWordmark />);
-    expect(container.querySelector("canvas")?.className).toMatch(/aspect-\[100\/46\].*md:aspect-\[100\/14\]/);
+    expect(container.querySelector("canvas")?.className).toMatch(/aspect-\[100\/80\].*md:aspect-\[100\/36\]/);
   });
 
   it("does not block vertical scrolling on touch", () => {
