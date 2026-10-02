@@ -60,7 +60,7 @@ Only these sections appear on Home. No placement section (data isn't available y
 
 **Layout**
 - **Desktop (≥ 1024px):**
-  - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **right** in columns 7–12, and the figure sits on the left in columns 1–6.
+  - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **left** in columns 1–6, and the figure sits on the right in columns 7–12.
   - The plot is `clamp(300px, 46vh, 460px)` tall. Its caption row stacks when the figure is narrower than 42rem and splits into caption/legend left and seed/button right above that (container query).
   - The hero is `clamp(600px, 100svh − header, 820px)` tall, with the grid masked to fade at the edges. The whole hero, figure included, should fit in the first viewport at 1024 × 768.
 - **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.

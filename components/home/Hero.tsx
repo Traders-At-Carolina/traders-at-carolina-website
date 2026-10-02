@@ -26,8 +26,8 @@ function Headline({ headline, emphasis }: { headline: string; emphasis?: string 
 
 /**
  * § 01 — the club's name and how to join, beside "Fig. 1": an interactive random-walk
- * figure on graph paper (spec 01 §3.1). On desktop the text sits on the right and the
- * figure on the left; on smaller screens the text comes first. Only the figure is a client island.
+ * figure on graph paper (spec 01 §3.1). On desktop the text sits on the left and the
+ * figure on the right; on smaller screens the text comes first. Only the figure is a client island.
  */
 export function Hero({ hero, index, apply }: HeroProps) {
   return (
@@ -35,7 +35,7 @@ export function Hero({ hero, index, apply }: HeroProps) {
       <div aria-hidden="true" className="graph-paper absolute inset-0" />
       <Container className="relative flex flex-col justify-center pt-12 pb-14 md:pt-16 md:pb-20 lg:min-h-[clamp(600px,calc(100svh-5rem),820px)] lg:py-16">
         <Grid className="gap-y-12 lg:items-center">
-          <div className="col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-1 xl:pl-6">
+          <div className="col-span-12 lg:col-span-6 lg:col-start-1 lg:row-start-1 xl:pr-6">
             <Eyebrow index={index} className="text-[0.8125rem] md:text-[0.875rem]">
               {hero.eyebrow}
             </Eyebrow>
@@ -52,7 +52,7 @@ export function Hero({ hero, index, apply }: HeroProps) {
               </TextLink>
             </div>
           </div>
-          <HeroFigure caption={hero.figureCaption} className="col-span-12 lg:col-span-6 lg:col-start-1 lg:row-start-1" />
+          <HeroFigure caption={hero.figureCaption} className="col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-1" />
         </Grid>
       </Container>
     </section>
