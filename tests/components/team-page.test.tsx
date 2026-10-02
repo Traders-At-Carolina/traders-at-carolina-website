@@ -154,4 +154,10 @@ describe("TeamPage", () => {
       "Firm E",
     ]);
   });
+
+  it("renders a headshot that has no blur placeholder", () => {
+    const plain = { src: "/images/team/plain.jpg", width: 800, height: 800 };
+    const { container } = renderTeam({ people: [{ ...dir, headshot: plain }] });
+    expect(container.querySelector("#dir-one img")).toHaveAttribute("alt", "Portrait of Dir One");
+  });
 });

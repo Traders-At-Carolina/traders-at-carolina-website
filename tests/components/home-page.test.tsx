@@ -198,4 +198,10 @@ describe("HomePage", () => {
     const { container } = render(<HomePage home={base} recruiting={closed} now={now} />);
     expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
   });
+
+  it("renders photos that have no blur placeholder", () => {
+    const plain = { src: "/images/events/plain.jpg", width: 1800, height: 1200 };
+    render(<HomePage home={{ ...base, photos: [photo(1), { ...photo(2), src: plain }] }} recruiting={closed} now={now} />);
+    expect(screen.getByAltText("Members at event 2")).toBeInTheDocument();
+  });
 });

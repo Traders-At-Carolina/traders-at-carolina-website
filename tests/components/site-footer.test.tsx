@@ -141,6 +141,25 @@ describe("SiteFooter placement strip", () => {
   });
 });
 
+describe("SiteFooter analytics tags (spec 06 §7.1)", () => {
+  const tag = (el: Element) => [el.getAttribute("data-ph-capture-attribute-cta"), el.getAttribute("data-ph-capture-attribute-placement")];
+
+  it("keeps the 'band' placement for the CTA zone button and tags the footer links", () => {
+    const { container } = renderFooter(settings({ interestFormUrl: form }, { contactEmail: "hi@club.org" }));
+    expect(tag(within(zone(container)).getByRole("link", { name: /^Keep me posted/ }))).toEqual(["keep-me-posted", "band"]);
+    const join = screen.getByRole("list", { name: "Join" });
+    expect(tag(within(join).getByRole("link", { name: "Apply" }))).toEqual(["apply", "footer"]);
+    expect(tag(within(join).getByRole("link", { name: /^Keep me posted/ }))).toEqual(["keep-me-posted", "footer"]);
+    expect(tag(within(screen.getByRole("list", { name: "Reach" })).getByRole("link"))).toEqual(["email", "footer"]);
+    expect(tag(within(screen.getByRole("navigation", { name: "Footer" })).getByRole("link", { name: "About" }))).toEqual(["nav", "footer"]);
+  });
+
+  it("says what analytics measure", () => {
+    renderFooter();
+    expect(screen.getByText("Anonymous, cookie-free analytics tell us which pages are useful.")).toBeInTheDocument();
+  });
+});
+
 describe("SiteFooter legal row", () => {
   it("shows the copyright, and the disclaimer only when set", () => {
     const plain = renderFooter();

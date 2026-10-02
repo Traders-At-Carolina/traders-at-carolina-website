@@ -16,7 +16,7 @@ Today the footer is a wordmark, three links, an Apply link and a copyright line.
 
 ### What changes, in one line each
 
-- **One CTA, owned by the footer.** The per-page navy `CTABand` is removed from every page. The footer's navy zone replaces it.
+- **One CTA, owned by the footer.** The per-page navy `CTABand` is removed from Home, About, Membership and Team. The footer's navy zone replaces it. `/apply` keeps its own band (spec 05 §4.4), so the footer leaves its zone out there.
 - **Fuller sitemap.** Link groups (Club, Join, Reach) replace the single link list.
 - **Placement strip.** The Team page's looping firm-logo strip appears in the footer, in bone on black.
 - **Same black base, same rules.** Black background, bone text, `rule-inverse` hairlines (00 §10 `SiteFooter`).
@@ -65,7 +65,7 @@ One `SiteFooter` component: a navy CTA zone on top of a black base made of three
 
 | Page | CTA zone | Placement strip | Why |
 |---|---|---|---|
-| `/apply` | hidden | shown | The page's status header is already the CTA. |
+| `/apply` | hidden | shown | The page has its own closing band (spec 05 §4.4); a second one would repeat it. |
 | `/team` | shown | hidden | The header wall shows the same firms. |
 | everything else | shown | shown | — |
 
@@ -77,7 +77,7 @@ The footer is a server component rendered by the root layout, so it cannot read 
 
 ### 3.1 CTA zone (`CTABand`, now rendered only by `SiteFooter`)
 
-- The existing `CTABand` markup moves inside the footer unchanged: a full-bleed `navy` section, H2 in `white`, optional lead in `bone`, an `inverse` button. It counts as the page's one navy band (00 §4.3); the footer is now the only place a navy band appears.
+- The existing `CTABand` markup moves inside the footer unchanged: a full-bleed `navy` section, H2 in `white`, optional lead in `bone`, an `inverse` button. It counts as the page's one navy band (00 §4.3). On every page except `/apply` the footer is the only place a navy band appears; `/apply`'s own band is its one.
 - Copy and action come from `homeApplyCopy(state, recruiting, now).band` (spec 01 §5), the same helper Home used. Nothing new to write:
 
 | State | H2 | Lead | Button |
@@ -89,7 +89,8 @@ The footer is a server component rendered by the root layout, so it cannot read 
 `{when}` is "Our next cycle opens {Tue, Jan 12}." or, with no date, "We open applications each fall and spring." The closed copy is warm and student-voiced (reframed 2026-10-02), but always says plainly that applications aren't open.
 
 - **Deadline flip.** Both variants are rendered on the server and wrapped in `DeadlineSwitch` (spec 05 §3) when a deadline exists, so a static page built before the deadline still flips to closed in the browser. This extends the browser re-check from `/apply` only to every page, because the footer now carries the site's primary CTA. The footer's nav-level Apply link already used `DeadlineSwitch`.
-- **Spacing above the zone.** The rule that gives the last section before the band extra bottom padding (00 §10, `section:has(+ [data-cta-band])` in `app/globals.css`) can no longer match, because the zone is outside `<main>`. It becomes `main:has(+ footer [data-cta-band]) > section:last-child` with the same 96 / 128 / 160px values, so the last section's tone still runs right up to the navy. The selector only matches when the CTA zone is actually rendered, so on `/apply` (no zone) the page's last section keeps its normal padding instead of leaving a 160px gap before the black base.
+- **Spacing above the zone.** The rule that gives the section before a band extra bottom padding (00 §10, `section:has(+ [data-cta-band])` in `app/globals.css`) can no longer match the footer's zone, because it is outside `<main>`. The rule therefore has two selectors with the same 96 / 128 / 160px values: the original (for `/apply`'s own band, inside `<main>`) and `main:has(+ footer [data-cta-band]) > section:last-child` (for the footer's zone), so the padded section's tone still runs right up to the navy. The second selector only matches when the CTA zone is actually rendered.
+- **Tracking.** Every action in the footer carries the spec 06 §7.1 tracking attributes: the CTA zone's button uses `cta` from its label (`ctaFromLabel`) with `placement: "band"`, which keeps the placement name the pages' bands used; the Club, Apply, Join and Reach links use `placement: "footer"`.
 
 ### 3.2 Link grid
 
@@ -119,7 +120,7 @@ Exact column spans are a starting point; confirm them in the browser at 375, 768
 
 ### 3.4 Legal row
 
-Unchanged: `© {year} Traders at Carolina` on the left; the disclaimer, if `site.disclaimer` is set, on the right (stacked on mobile), above a `rule-inverse` hairline.
+`© {year} Traders at Carolina` on the left; the one-line analytics note from spec 06 §7.1 ("Anonymous, cookie-free analytics tell us which pages are useful."); the disclaimer, if `site.disclaimer` is set, on the right (stacked on mobile), above a `rule-inverse` hairline.
 
 ---
 
@@ -141,7 +142,7 @@ No new content files and no new content shapes.
 ## 5. Accessibility and motion
 
 - One `<footer>` landmark. The link groups are separate lists; the nav group keeps `aria-label="Footer"`.
-- The CTA zone keeps `CTABand`'s H2 with `aria-labelledby` pointing at its `id`. Pages no longer render a band, so the default id appears once per page and cannot collide.
+- The CTA zone keeps `CTABand`'s H2 with `aria-labelledby` pointing at its `id`. The footer zone is left out on `/apply`, the only page with its own band, so the default id appears once per page and cannot collide.
 - The placement strip is decorative drift of text-captioned marks: the repeated copy stays `aria-hidden`, and the captions carry the firm names (spec 04 §4.1).
 - Reduced motion: no drift, no drag, no hover pause; the strip is a static wrapped row.
 - Contrast: bone on navy and bone on black both pass AA (00 §4.2); the strip's 70% opacity marks are decorative because captions carry the names.
@@ -162,7 +163,7 @@ No new content files and no new content shapes.
 | Spec | Section | Change |
 |---|---|---|
 | 00 | §4.3 usage rules | "At most one full-bleed navy band per page" now means the footer's CTA zone; pages no longer place their own. |
-| 00 | §10 `CTABand` | Rendered only by `SiteFooter`. Extra bottom padding moves to the last section of `<main>` (§3.1). |
+| 00 | §10 `CTABand` | Rendered by `SiteFooter` (and by `/apply`'s own band, spec 05 §4.4). Extra bottom padding also covers the last section of `<main>` when the footer zone renders (§3.1). |
 | 00 | §10 `SiteFooter` | Contents replaced by §2–§3 of this spec. |
 | 00 | §11 | "Footer nav: mirrors the header" still holds; Join and Reach are additional groups. |
 | 00 | §14 | Open items for contact email, social URLs and disclaimer stay open; they populate Reach and the legal row. |
@@ -170,7 +171,7 @@ No new content files and no new content shapes.
 | 02 | §2, §3.6, criteria 1 | Remove the Apply band. |
 | 03 | §2, §3.6, criteria 1 | Remove the Apply band. |
 | 04 | §2, §4.5, criteria | Remove the Apply band; the Placements section stays. The footer strip is hidden on `/team` (§2). |
-| 05 | §2, §4.4, §3 | Remove the Apply band from `/apply`; its status header is the CTA. The browser re-check of §3 now also runs in the footer on every other page. |
+| 05 | §4.1, §4.4, §3 | `/apply` keeps its redesigned band; the footer's CTA zone is left out there. The closed-state sign-up button is "Keep me posted" (was "Get notified"), so its analytics `cta` is `keep-me-posted`. The browser re-check of §3 now also runs in the footer on every other page. |
 
 Each page spec's "Visitor questions" row "How do I join? → Apply band" becomes "→ Footer CTA zone".
 
@@ -184,7 +185,7 @@ Each page spec's "Visitor questions" row "How do I join? → Apply band" becomes
 | `components/FooterZone.tsx` (new, client) | Route-gated wrapper (§2). |
 | `components/team/PlacementWall.tsx` | `tone` prop (§3.3). |
 | `app/globals.css` | Replace the `section:has(+ [data-cta-band])` rule (§3.1). |
-| `components/home/HomePage.tsx`, `about/AboutPage.tsx`, `membership/MembershipPage.tsx`, `team/TeamPage.tsx`, `apply/ApplyPage.tsx` | Remove `CTABand` and the band-only copy (`bandTitle`, `closedLead`, `applyBandCopy` usage). Delete `applyBandCopy` in `lib/apply.ts` if nothing else uses it. |
+| `components/home/HomePage.tsx`, `about/AboutPage.tsx`, `membership/MembershipPage.tsx`, `team/TeamPage.tsx` | Remove `CTABand` and the band-only copy (`bandTitle`, `closedLead`). `apply/ApplyPage.tsx` and `lib/apply.ts` keep their band (spec 05 §4.4); only the closed sign-up label and process intro change. |
 | `app/styleguide/page.tsx` | Keep the `CTABand` demo (it is the footer's CTA zone) and update its lead copy. |
 | `docs/specs/00`–`05` | Amend per §7. |
 | `README.md` | No change needed unless the officers' notes mention the band. |
@@ -205,13 +206,13 @@ Work in this order so each step is shippable: `PlacementWall` tone → footer re
 
 ## 10. Acceptance criteria
 
-1. Every page except `/apply` ends with the navy CTA zone directly above the black link grid; `/apply` ends bone straight into black. No page component renders `CTABand`.
+1. Every page except `/apply` ends with the navy CTA zone directly above the black link grid; `/apply` ends with its own navy band above the black link grid. Only `ApplyPage` renders `CTABand`; no other page component does.
 2. With `applicationsOpen: false` and an interest form, the CTA zone reads "We're between cycles." (with a lead that says applications aren't open right now) and "Keep me posted" opens `interestFormUrl`; without one, it offers "See how it works →" to `/apply`. With `applicationsOpen: true`, it reads "Ready to start?" with "Apply" opening `applyUrl`, plus the deadline lead when one is set.
 3. With a deadline in the past at build time, the zone renders closed; with a future deadline it renders open and flips to closed in the browser at the deadline, on any page, with no flash.
 4. Club shows About, Membership, Team. Join shows Apply (state-aware), and Keep me posted only when an interest form exists. Reach and its heading are absent until a contact value is set, and each row appears only when its own value is set.
 5. The placement strip shows on every page except `/team` when `placementWall` is non-empty; marks are bone on black; it is static under reduced motion; adding an entry to `placement-wall.ts` updates both the Team header and the footer.
 6. The Team header strip is visually unchanged.
-7. On every page that shows the CTA zone, the last section of `<main>` has the extra bottom padding and its tone runs up to the navy zone. On `/apply` it has its normal padding.
+7. On every page, the section directly above the navy band (the footer's zone, or `/apply`'s own band) has the extra bottom padding and its tone runs up to the navy.
 8. Layout holds at 375, 768 and 1280px: no horizontal scroll, touch rows at least 44px, long email addresses wrap, nothing truncates.
 9. Keyboard: tab order runs CTA button, Club, Join, Reach, strip, with a visible bone focus ring.
 10. `pnpm test` and `pnpm build` pass, and the old band assertions are gone from the page tests.

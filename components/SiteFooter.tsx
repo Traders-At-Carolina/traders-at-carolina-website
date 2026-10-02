@@ -13,6 +13,7 @@ import { primaryNav } from "@/content/nav";
 import { placementWall } from "@/content/placement-wall";
 import { site } from "@/content/site";
 import type { CompanyMark, Site } from "@/content/types";
+import { ctaFromLabel, trackAttrs } from "@/lib/analytics/attributes";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 import { homeApplyCopy } from "@/lib/home";
 
@@ -20,6 +21,7 @@ const listClasses = "flex flex-col text-nav md:gap-3";
 const itemClasses = "flex min-h-11 items-center md:block md:min-h-0";
 const headingClasses = "mb-3 text-eyebrow font-medium uppercase text-bone/70 md:mb-5";
 const navLinkClasses = "max-md:hit-target hover:underline hover:underline-offset-4";
+const SIGN_UP_LABEL = "Keep me posted";
 
 type SiteFooterProps = {
   /** Club settings; defaults to content/site.ts. Injectable for tests. */
@@ -32,7 +34,8 @@ type SiteFooterProps = {
 
 /**
  * The site's closing section (spec 07): a navy CTA zone, then a black base with the link grid, the placement strip
- * and the legal row. Rendered once by the root layout. The CTA zone is left out on /apply and the strip on /team.
+ * and the legal row. Rendered once by the root layout. The CTA zone is left out on /apply (which has its own band)
+ * and the strip on /team. Every action carries the spec 06 §7.1 tracking attributes.
  */
 export function SiteFooter({ settings = site, wall = placementWall, now = new Date() }: SiteFooterProps) {
   const { recruiting, contactEmail, social, disclaimer, mission } = settings;
@@ -53,7 +56,13 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
         title={band.title}
         lead={band.lead}
         action={
-          <Button href={band.href} external={band.external} arrow={band.arrow} variant="inverse">
+          <Button
+            href={band.href}
+            external={band.external}
+            arrow={band.arrow}
+            variant="inverse"
+            track={{ cta: ctaFromLabel(band.label), placement: "band" }}
+          >
             {band.label}
           </Button>
         }
@@ -64,7 +73,14 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
   const applyLink = (s: ApplicationState) => {
     const target = s.status === "open" ? { href: apply.href, external: apply.external } : { href: "/apply", external: false };
     return (
-      <TextLink href={target.href} external={target.external} tone="inverse" arrow={target.external} className="max-md:hit-target">
+      <TextLink
+        href={target.href}
+        external={target.external}
+        tone="inverse"
+        arrow={target.external}
+        className="max-md:hit-target"
+        track={{ cta: "apply", placement: "footer" }}
+      >
         Apply
       </TextLink>
     );
@@ -87,7 +103,11 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
             <ul className={listClasses}>
               {primaryNav.map((link) => (
                 <li key={link.href} className={itemClasses}>
-                  <Link href={link.href} className={navLinkClasses}>
+                  <Link
+                    href={link.href}
+                    className={navLinkClasses}
+                    {...trackAttrs({ cta: "nav", target: link.label, placement: "footer" })}
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -103,8 +123,15 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
               <li className={itemClasses}>{live(applyLink)}</li>
               {recruiting.interestFormUrl ? (
                 <li className={itemClasses}>
-                  <TextLink href={recruiting.interestFormUrl} external arrow tone="inverse" className="max-md:hit-target">
-                    Keep me posted
+                  <TextLink
+                    href={recruiting.interestFormUrl}
+                    external
+                    arrow
+                    tone="inverse"
+                    className="max-md:hit-target"
+                    track={{ cta: ctaFromLabel(SIGN_UP_LABEL), placement: "footer" }}
+                  >
+                    {SIGN_UP_LABEL}
                   </TextLink>
                 </li>
               ) : null}
@@ -119,21 +146,40 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
               <ul aria-labelledby="footer-reach" className={listClasses}>
                 {contactEmail ? (
                   <li className={`${itemClasses} [overflow-wrap:anywhere]`}>
-                    <TextLink href={`mailto:${contactEmail}`} tone="inverse" className="max-md:hit-target">
+                    <TextLink
+                      href={`mailto:${contactEmail}`}
+                      tone="inverse"
+                      className="max-md:hit-target"
+                      track={{ cta: "email", placement: "footer" }}
+                    >
                       {contactEmail}
                     </TextLink>
                   </li>
                 ) : null}
                 {social.instagram ? (
                   <li className={itemClasses}>
-                    <TextLink href={social.instagram} external arrow tone="inverse" className="max-md:hit-target">
+                    <TextLink
+                      href={social.instagram}
+                      external
+                      arrow
+                      tone="inverse"
+                      className="max-md:hit-target"
+                      track={{ cta: "social", target: "Instagram", placement: "footer" }}
+                    >
                       Instagram
                     </TextLink>
                   </li>
                 ) : null}
                 {social.linkedin ? (
                   <li className={itemClasses}>
-                    <TextLink href={social.linkedin} external arrow tone="inverse" className="max-md:hit-target">
+                    <TextLink
+                      href={social.linkedin}
+                      external
+                      arrow
+                      tone="inverse"
+                      className="max-md:hit-target"
+                      track={{ cta: "social", target: "LinkedIn", placement: "footer" }}
+                    >
                       LinkedIn
                     </TextLink>
                   </li>
@@ -153,6 +199,8 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
 
         <div className="mt-16 flex flex-col gap-2 border-t border-rule-inverse pt-6 text-caption md:flex-row md:justify-between">
           <p className="tabular">© {now.getFullYear()} Traders at Carolina</p>
+          {/* Spec 06 §7.1: no cookies and no consent banner, so the site says what it measures. */}
+          <p>Anonymous, cookie-free analytics tell us which pages are useful.</p>
           {disclaimer ? <p className="max-w-[60ch]">{disclaimer}</p> : null}
         </div>
       </Container>

@@ -9,6 +9,7 @@ validateTeam(team, placements);
 
 export const metadata: Metadata = {
   title: "Team",
+  alternates: { canonical: "/team" },
   description: "Traders at Carolina is run by students. Meet the executive board, co-presidents and directors.",
 };
 
