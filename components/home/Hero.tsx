@@ -27,7 +27,7 @@ function Headline({ headline, emphasis }: { headline: string; emphasis?: string 
 /** § 01 — what the club is and how to join, with the random walk on graph paper (spec 01 §3.1). */
 export function Hero({ hero, index, apply }: HeroProps) {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden lg:flex lg:min-h-[clamp(560px,calc(80vh-5rem),760px)] lg:items-center">
+    <section data-nav-hero aria-labelledby="hero-title" className="relative overflow-hidden lg:flex lg:min-h-[clamp(560px,calc(80vh-5rem),760px)] lg:items-center">
       <div aria-hidden="true" className="graph-paper absolute inset-0" />
       <Container className="relative py-14 md:py-20">
         <Grid className="items-center gap-y-10">

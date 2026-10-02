@@ -12,6 +12,8 @@ type ButtonProps = {
   /** Trailing → on internal links (external links always show ↗). */
   arrow?: boolean;
   fullWidth?: boolean;
+  /** `pill` is reserved for the header's Apply button (00 §10 SiteHeader). */
+  shape?: "square" | "pill";
   className?: string;
 };
 
@@ -22,10 +24,20 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 /** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
-export function Button({ href, children, variant = "primary", external, arrow, fullWidth, className = "" }: ButtonProps) {
+export function Button({
+  href,
+  children,
+  variant = "primary",
+  external,
+  arrow,
+  fullWidth,
+  shape = "square",
+  className = "",
+}: ButtonProps) {
   const classes = [
     "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-3 text-button font-semibold transition-colors duration-150",
     variants[variant],
+    shape === "pill" ? "rounded-full" : "",
     fullWidth ? "w-full" : "",
     className,
   ].join(" ");

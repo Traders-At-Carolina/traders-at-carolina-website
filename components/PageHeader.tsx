@@ -17,7 +17,7 @@ type PageHeaderProps = {
 /** Top of every non-Home page: grid texture, eyebrow, H1, lead and a small random walk (00 §10). */
 export function PageHeader({ eyebrow, title, lead, seed = 1, children }: PageHeaderProps) {
   return (
-    <header className="relative overflow-hidden">
+    <header data-nav-hero className="relative overflow-hidden">
       <div aria-hidden="true" className="graph-paper absolute inset-0" />
       <Container className="relative py-16 md:py-24">
         <Grid className="items-center">
