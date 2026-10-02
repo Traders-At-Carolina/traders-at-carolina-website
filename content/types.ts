@@ -199,15 +199,22 @@ export type Placement = { firm: string };
 
 /** Apply page content. Field definitions: docs/specs/05-apply.md §5. */
 export type ApplyContent = {
+  /** Exactly 3 reasons to join, shown under the header. */
+  benefits: Array<{ title: string; body: string; link?: { label: string; href: string } }>;
   /** Exactly 3, in order: Application, Interview, Decision. */
   stages: Array<{
     title: string;
     description: string;
+    /** How much it asks of the applicant, e.g. "One conversation". The Application stage uses applicationMinutes when set. */
+    effort?: string;
     /** Shown when applications are closed or a date is missing, e.g. "Week 2". */
     genericTiming?: string;
   }>;
-  /** Answers support [links](/path) and *emphasis* only. */
-  faq: Array<{ question: string; answer: string }>;
+  /**
+   * Answers support [links](/path) and *emphasis* only. `draft` answers show in development and
+   * preview deployments for officers to review, and stay off production until the flag is removed.
+   */
+  faq: Array<{ question: string; answer: string; draft?: boolean }>;
 };
 
 /** Club history milestone (00 §12, 02 §5). The list appears once there are 3+ entries. */

@@ -21,15 +21,18 @@ export function ApplyHeader({ copy }: { copy: StatusCopy }) {
             {copy.action.label}
           </Button>
         ) : null}
-        <TextLink
-          href={copy.secondary.href}
-          arrow
-          className="whitespace-nowrap"
-          track={{ cta: ctaFromLabel(copy.secondary.label), placement: "apply-header" }}
-        >
-          {copy.secondary.label}
-        </TextLink>
+        {copy.secondary ? (
+          <TextLink
+            href={copy.secondary.href}
+            arrow
+            className="whitespace-nowrap"
+            track={{ cta: ctaFromLabel(copy.secondary.label), placement: "apply-header" }}
+          >
+            {copy.secondary.label}
+          </TextLink>
+        ) : null}
       </div>
+      {copy.note ? <p className="mt-4 text-caption text-ink-3">{copy.note}</p> : null}
     </PageHeader>
   );
 }
