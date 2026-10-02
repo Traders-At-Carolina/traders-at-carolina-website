@@ -51,6 +51,16 @@ describe("VolSurfaceFigure", () => {
     expect(screen.getByText(/pts$/)).toBeInTheDocument();
   });
 
+  it("keeps the live numbers under the plot, between the surface and its caption", () => {
+    render(<VolSurfaceFigure caption={caption} />);
+    const [plot, numbers, figcaption] = Array.from(screen.getByRole("figure").children);
+    expect(plot.querySelector("svg")).not.toBeNull();
+    expect(numbers).toHaveTextContent("Calm market");
+    expect(numbers).toHaveTextContent("13.6 / 16.0 / 19.2%");
+    expect(numbers).toHaveClass("border-t");
+    expect(figcaption.tagName).toBe("FIGCAPTION");
+  });
+
   it("moves on to the next market by itself while visible", async () => {
     vi.useFakeTimers();
     figureInView();
