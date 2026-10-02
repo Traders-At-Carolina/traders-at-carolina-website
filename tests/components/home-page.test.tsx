@@ -14,7 +14,7 @@ const photo = (n: number, ratio: HomePhoto["ratio"] = "3:2"): HomePhoto => ({
 });
 
 const base: HomeContent = {
-  hero: { headline: "Rigor, practiced together.", headlineEmphasis: "practiced", subhead: "Prepares UNC students." },
+  hero: { headline: "Rigor, practiced together.", headlineEmphasis: "practiced", subhead: "Prepares UNC students.", figureCaption: "Fig. 1 — Walks." },
   headings: { pillars: "Three ways we build quants.", numbers: "By the numbers title", inside: "Inside title" },
   pillars: [
     { title: "Preparation", body: "P.", link: { label: "See the curriculum", href: "/membership" } },
@@ -87,7 +87,8 @@ describe("HomePage", () => {
 
     render(<HomePage home={{ ...withPhotos, upcoming: { ...upcoming, date: "2027-01-02T19:00" } }} recruiting={closed} now={now} />);
     expect(screen.queryByText("Mock trading night")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("figure")).toHaveLength(2);
+    // Photo figures only; the hero's random-walk figure has no image.
+    expect(screen.getAllByRole("figure").filter((f) => f.querySelector("img"))).toHaveLength(2);
   });
 
   it("renders photos with alt text and captions", () => {

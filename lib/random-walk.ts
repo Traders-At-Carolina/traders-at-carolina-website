@@ -1,11 +1,19 @@
 export type Point = [x: number, y: number];
 
-export type WalkOptions = {
-  seed: number;
-  paths: number;
+/** Box, origin and step size shared by the walks and their overlays. */
+export type WalkGeometry = {
   steps: number;
   width: number;
   height: number;
+  /** Origin height as a fraction of `height` (default 0.6). */
+  originRatio?: number;
+  /** Per-step standard deviation as a fraction of `height` (default 0.055). */
+  sigmaRatio?: number;
+};
+
+export type WalkOptions = WalkGeometry & {
+  seed: number;
+  paths: number;
 };
 
 /** Small, fast seeded PRNG. Same seed → same sequence, so the art is stable across builds. */
@@ -29,19 +37,26 @@ function gaussian(rand: () => number): number {
 
 const round = (n: number) => Math.round(n * 10) / 10;
 
+function geometry({ height, originRatio = 0.6, sigmaRatio = 0.055 }: WalkGeometry) {
+  return {
+    top: height * 0.06,
+    bottom: height * 0.94,
+    originY: round(height * originRatio),
+    sigma: height * sigmaRatio,
+  };
+}
+
 /** Brownian paths from a shared origin, reflected to stay inside the box. */
-export function generateWalkPoints({ seed, paths, steps, width, height }: WalkOptions): Point[][] {
+export function generateWalkPoints({ seed, paths, ...box }: WalkOptions): Point[][] {
   const rand = mulberry32(seed);
-  const top = height * 0.06;
-  const bottom = height * 0.94;
-  const origin: Point = [0, round(height * 0.6)];
-  const dx = width / steps;
-  const sigma = height * 0.055;
+  const { top, bottom, originY, sigma } = geometry(box);
+  const origin: Point = [0, originY];
+  const dx = box.width / box.steps;
 
   return Array.from({ length: paths }, () => {
     const points: Point[] = [origin];
     let y = origin[1];
-    for (let i = 1; i <= steps; i++) {
+    for (let i = 1; i <= box.steps; i++) {
       y += gaussian(rand) * sigma;
       if (y < top) y = top + (top - y);
       if (y > bottom) y = bottom - (y - bottom);
@@ -52,9 +67,32 @@ export function generateWalkPoints({ seed, paths, steps, width, height }: WalkOp
   });
 }
 
+/** SVG path `d` string for one walk. */
+export function toPathData(points: Point[]): string {
+  return points.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x} ${y}`).join(" ");
+}
+
 /** SVG path `d` strings for each walk. */
 export function generateWalks(opts: WalkOptions): string[] {
-  return generateWalkPoints(opts).map((points) =>
-    points.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x} ${y}`).join(" "),
-  );
+  return generateWalkPoints(opts).map(toPathData);
+}
+
+/** Closed SVG path for the band origin ± k·σ·√t, clamped to the box. */
+export function envelopePath({ k = 1, ...box }: WalkGeometry & { k?: number }): string {
+  const { originY, sigma } = geometry(box);
+  const dx = box.width / box.steps;
+  const upper: Point[] = [];
+  const lower: Point[] = [];
+  for (let i = 0; i <= box.steps; i++) {
+    const spread = k * sigma * Math.sqrt(i);
+    upper.push([round(i * dx), round(Math.max(0, originY - spread))]);
+    lower.push([round(i * dx), round(Math.min(box.height, originY + spread))]);
+  }
+  return `${toPathData([...upper, ...lower.reverse()])} Z`;
+}
+
+/** A walk's height in units of the per-step σ, positive above the origin. */
+export function standardizedValue(y: number, box: WalkGeometry): number {
+  const { originY, sigma } = geometry(box);
+  return (originY - y) / sigma;
 }

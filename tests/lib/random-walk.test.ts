@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateWalkPoints, generateWalks, mulberry32 } from "@/lib/random-walk";
+import { envelopePath, generateWalkPoints, generateWalks, mulberry32, standardizedValue } from "@/lib/random-walk";
 
 const opts = { seed: 7, paths: 4, steps: 40, width: 600, height: 300 };
 
@@ -46,5 +46,40 @@ describe("generateWalks", () => {
 
   it("returns SVG path data starting with a move command", () => {
     generateWalks(opts).forEach((d) => expect(d).toMatch(/^M[\d.]+ [\d.]+( L[\d.]+ [\d.]+)+$/));
+  });
+
+  it("keeps the original output when origin and σ are left at their defaults", () => {
+    expect(generateWalks({ seed: 7, paths: 1, steps: 4, width: 600, height: 300 })[0]).toBe(
+      "M0 180 L150 182.3 L300 168.1 L450 151.5 L600 152.6",
+    );
+  });
+});
+
+describe("hero geometry", () => {
+  const box = { steps: 96, width: 1200, height: 400, originRatio: 0.5, sigmaRatio: 0.042 };
+
+  it("starts walks at the configured origin", () => {
+    generateWalkPoints({ ...box, seed: 2026, paths: 5 }).forEach((w) => expect(w[0]).toEqual([0, 200]));
+  });
+
+  it("builds a closed ±σ√t band, symmetric about the origin and inside the box", () => {
+    const d = envelopePath(box);
+    expect(d.startsWith("M0 200")).toBe(true);
+    expect(d.endsWith(" Z")).toBe(true);
+    const ys = Array.from(d.matchAll(/[ML][\d.]+ ([\d.]+)/g), (m) => Number(m[1]));
+    expect(ys).toHaveLength(2 * (box.steps + 1));
+    const upper = ys.slice(0, box.steps + 1);
+    const lower = ys.slice(box.steps + 1).reverse();
+    upper.forEach((y, i) => {
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(lower[i]).toBeLessThanOrEqual(box.height);
+      expect(200 - y).toBeCloseTo(lower[i] - 200, 0);
+    });
+  });
+
+  it("measures height in σ units, positive above the origin", () => {
+    expect(standardizedValue(200, box)).toBe(0);
+    expect(standardizedValue(200 - 0.042 * 400, box)).toBeCloseTo(1);
+    expect(standardizedValue(200 + 2 * 0.042 * 400, box)).toBeCloseTo(-2);
   });
 });

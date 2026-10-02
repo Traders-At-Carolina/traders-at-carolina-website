@@ -21,14 +21,19 @@ const variants: Record<ButtonVariant, string> = {
   inverse: "bg-bone text-navy hover:bg-white",
 };
 
-/** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
-export function Button({ href, children, variant = "primary", external, arrow, fullWidth, className = "" }: ButtonProps) {
-  const classes = [
+/** Button styling, shared with the few real `<button>` actions (e.g. the hero figure's re-draw). */
+export function buttonClasses({ variant = "primary", fullWidth, className = "" }: Pick<ButtonProps, "variant" | "fullWidth" | "className">) {
+  return [
     "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-3 text-button font-semibold transition-colors duration-150",
     variants[variant],
     fullWidth ? "w-full" : "",
     className,
   ].join(" ");
+}
+
+/** Square link-button (00 §10): 44px min height, 12 × 24px padding. */
+export function Button({ href, children, variant = "primary", external, arrow, fullWidth, className = "" }: ButtonProps) {
+  const classes = buttonClasses({ variant, fullWidth, className });
 
   if (external) {
     return (

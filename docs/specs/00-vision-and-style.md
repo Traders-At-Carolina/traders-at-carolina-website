@@ -136,7 +136,8 @@ Text colors are always **solid** values (`ink-2` and `ink-3`), never `opacity` o
 
 | Role | Family / weight | Size | Line height | Notes |
 |---|---|---|---|---|
-| Display | Georgia 400 | `clamp(2.75rem, 6vw, 5rem)` | 1.05 | `letter-spacing: -0.01em`; Home hero only |
+| Hero | Georgia 400 | `clamp(3rem, 7.2vw, 6rem)` | 0.98 | `letter-spacing: -0.02em`; Home hero H1 only (spec 01 §3.1) |
+| Display | Georgia 400 | `clamp(2.75rem, 6vw, 5rem)` | 1.05 | `letter-spacing: -0.01em`; reserved for large statements (the Home hero now uses Hero) |
 | H1 | Georgia 400 | `clamp(2.25rem, 4.5vw, 3.75rem)` | 1.1 | Page titles |
 | H2 | Georgia 400 | `clamp(1.75rem, 3vw, 2.5rem)` | 1.15 | Section headings |
 | H3 | Georgia 400 | `1.375rem` | 1.25 | Card and sub-section headings |
@@ -182,7 +183,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 - **Strokes:**
   - One path is solid `navy` at 1.5px.
   - The others are navy at 30% opacity and black at 25% opacity, each at 1px.
-- **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits.
+- **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits. The one exception is the Home hero figure's "Draw new paths" button (spec 01 §3.1), which picks a new seed only when clicked; the first render always uses the fixed seed.
 - **Placement:** full size in the Home hero, and smaller and quieter in each `PageHeader`.
 - **Motion:** an optional 1.2s stroke draw-in on load (`stroke-dashoffset`), disabled under `prefers-reduced-motion`.
 - **Accessibility:** decorative, so it carries `aria-hidden="true"`.
@@ -238,7 +239,9 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Effect | Spec |
 |---|---|
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
-| Hero random walk | Stroke draw-in over 1.2s on load |
+| Hero random walk | Stroke draw-in over 1.2s on load, replayed on each "Draw new paths" |
+| Hero ±σ√t band | Fades in over 400ms, starting 900ms after load |
+| Hero crosshair | Follows the pointer step by step (fine pointers only); no easing or transition |
 | Link underline | Underline scales in from the left on hover, 200ms |
 | Button hover | Background color transition, 150ms |
 

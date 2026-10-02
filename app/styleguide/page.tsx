@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { CTABand } from "@/components/CTABand";
 import { Grid } from "@/components/Container";
 import { Eyebrow } from "@/components/Eyebrow";
+import { HeroFigure } from "@/components/home/HeroFigure";
 import { PageHeader } from "@/components/PageHeader";
 import { RandomWalk } from "@/components/RandomWalk";
 import { Reveal } from "@/components/Reveal";
@@ -28,6 +29,7 @@ const colors = [
 ];
 
 const typeRoles = [
+  { role: "Hero", className: "font-display text-hero", sample: "Rigor, practiced together." },
   { role: "Display", className: "font-display text-display", sample: "Rigor, practiced together." },
   { role: "H1", className: "font-display text-h1", sample: "Built by students, for the long game." },
   { role: "H2", className: "font-display text-h2", sample: "Three ways we build quants." },
@@ -127,6 +129,7 @@ export default function StyleguidePage() {
             <RandomWalk seed={42} paths={3} size="header" className="h-full w-full" />
           </div>
         </Reveal>
+        <HeroFigure caption="Fig. 1 — Home hero figure: re-draw and hover to scrub." className="mt-16" />
       </Section>
 
       <CTABand title="Ready to start?" lead="One navy band per page, with the shared Apply button." />

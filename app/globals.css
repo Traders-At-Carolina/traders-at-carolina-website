@@ -22,6 +22,10 @@
   --text-display: clamp(2.75rem, 6vw, 5rem);
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.01em;
+  /* Home hero H1 only — larger than Display; exception recorded in spec 01 §3.1. */
+  --text-hero: clamp(3rem, 7.2vw, 6rem);
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.02em;
   --text-h1: clamp(2.25rem, 4.5vw, 3.75rem);
   --text-h1--line-height: 1.1;
   --text-h2: clamp(1.75rem, 3vw, 2.5rem);
@@ -189,6 +193,17 @@
 
   .draw-in path:nth-child(n + 4) {
     animation-delay: 240ms;
+  }
+
+  /* Hero figure's ±σ√t band settles in as the paths finish drawing. */
+  .envelope-in {
+    animation: fade-in 400ms ease-out 900ms both;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
 }
 

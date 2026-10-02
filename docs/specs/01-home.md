@@ -48,26 +48,34 @@ Only these sections appear on Home. No placement section (data isn't available y
 
 **Content**
 - **Eyebrow:** `§ 01 — QUANTITATIVE FINANCE AT UNC`
-- **Headline:** Display role, max about 8 words. It may use one italic word for emphasis (00 §5.2). Working copy: "Rigor, *practiced* together."
-- **Subhead:** Lead role, one sentence, max about 25 words. Working copy: "Traders at Carolina prepares UNC students for careers in quantitative trading, research and engineering — no prior finance experience required."
+- **Headline:** **Hero** role (00 §5.2) — an exception to the Display role, used only here, max about 8 words. It may use one italic word for emphasis. Working copy: "Rigor, *practiced* together."
+- **Subhead:** Lead role, max about 25 words. Working copy: "Traders at Carolina is UNC's quantitative finance club. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
-- **Art:** `RandomWalk` (`size="hero"`, 4–5 paths, fixed seed) over the graph-paper grid.
+- **Art — "Fig. 1":** `HeroFigure`, a captioned figure of five random walks over the graph-paper grid, presented like a figure in a paper:
+  - Five paths from one origin at the left edge, mid-height (00 §7.2 strokes), 96 steps, seed `2026` on first render.
+  - A dashed navy mean line (E[X] = 0) and a navy-tinted ±σ√t band.
+  - L-shaped hairline axes (`rule-strong`) with a `0` tick at the origin.
+  - A `<figcaption>`: `hero.figureCaption` (working copy: "Fig. 1 — Five random walks from one origin. Same rules, different outcomes."), a small legend, the current seed, and a `secondary`-style `<button>` "Draw new paths".
 
 **Layout**
 - **Desktop (≥ 1024px):**
-  - The text spans columns 1–7. The random walk spans columns 8–12, vertically centered against the text block.
-  - The hero fills about 80vh, min 560px, max 760px, with the grid masked to fade at the edges.
-- **Tablet (768–1023px):** same two-column split at 7/5 with a smaller walk.
+  - Row 1: eyebrow and headline in columns 1–7; subhead and actions in columns 8–12, bottom-aligned to the headline.
+  - Row 2: the figure across the full container width, `clamp(220px, 34vh, 400px)` tall, then its caption row (caption and legend left; seed and button right).
+  - The hero is `clamp(640px, 100svh − header, 880px)` tall, with the grid masked to fade at the edges. The plot must start inside the first viewport at 1024 × 768.
+- **Tablet (768–1023px):** single text column (subhead spans 9 columns), then the figure at 280px.
 - **Mobile (< 768px):**
   - Single column: eyebrow, headline, subhead, then the actions stacked (Apply full width, link below).
-  - The random walk becomes a short full-width strip, about 120px tall, *below* the actions. It isn't hidden.
+  - The figure is full width at 200px, followed by the caption, legend, and the seed beside a full-width button.
   - No min-height. Content defines the height.
 
 **Behavior**
-- The random walk draws in over 1.2s on load (00 §9.2). Under reduced motion it renders complete.
+- The paths draw in over 1.2s on load; the band fades in after them (00 §9.2). Under reduced motion everything renders complete.
+- **Draw new paths** picks a random seed on click only (so server and client first renders match), replays the draw-in, and updates the seed text, which is the figure's only `aria-live="polite"` region.
+- **Crosshair (fine pointers only):** a navy hairline follows the pointer to the nearest step, with a marker on each path and a readout of `t`, path 1, the mean, and the band half-width, all in σ units (Public Sans, tabular). It hides on pointer leave. Touch gets the button only.
+- The SVG, crosshair and readout are `aria-hidden`; the caption and legend are real text.
 - The headline is the page's only `<h1>`.
-- The hero is the LCP element (text), so the art is inline SVG with no image request.
+- The hero is the LCP element (text). The figure is inline SVG with no image request, and `Hero` stays a server component — only `HeroFigure` is a client island.
 
 ### 3.2 What we do (§ 02)
 
@@ -190,7 +198,7 @@ nextApplicationOpenDate?: string;    // ISO "YYYY-MM-DD"; shown when closed
 
 ```ts
 export const home = {
-  hero: { headline: string; headlineEmphasis?: string; subhead: string },
+  hero: { headline: string; headlineEmphasis?: string; subhead: string; figureCaption: string },
   pillars: [ { title, body, link: { label, href } } ×3 ],
   stats: {
     members?: number;          // rendered as "{n}+"

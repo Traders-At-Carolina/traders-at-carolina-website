@@ -15,7 +15,8 @@ export const home: HomeContent = {
     headline: "Rigor, practiced together.",
     headlineEmphasis: "practiced",
     subhead:
-      "Traders at Carolina prepares UNC students for careers in quantitative trading, research and engineering — no prior finance experience required.",
+      "Traders at Carolina is UNC's quantitative finance club. We teach the probability, markets and interview craft behind trading and research careers — no finance background required.",
+    figureCaption: "Fig. 1 — Five random walks from one origin. Same rules, different outcomes.",
   },
   headings: {
     pillars: "Three ways we build quants.",
