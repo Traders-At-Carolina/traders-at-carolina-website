@@ -4,11 +4,12 @@ import { CTABand } from "@/components/CTABand";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { LeadershipTier } from "@/components/team/LeadershipTier";
+import { PlacementWall } from "@/components/team/PlacementWall";
 import { Placements } from "@/components/team/Placements";
 import type { Placement, Recruiting, TeamContent } from "@/content/types";
 import { getApplicationState } from "@/lib/applications";
 import { homeApplyCopy } from "@/lib/home";
-import { coPresidents, directors, execMembers, showPlacements, sortFirms } from "@/lib/team";
+import { coPresidents, companyMarks, directors, execMembers, showPlacements, sortFirms } from "@/lib/team";
 
 type TeamPageProps = {
   team: TeamContent;
@@ -55,6 +56,7 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
     .filter((tier) => tier.members.length > 0)
     // The first tier on the page carries the academic-year heading.
     .map((tier, i) => (i === 0 && team.academicYear ? { ...tier, title: `Leadership, ${team.academicYear}` } : tier));
+  const companies = companyMarks(team.people);
   const nextIndex = noLeadership ? 2 : tiers.length + 1;
 
   return (
@@ -63,7 +65,7 @@ export function TeamPage({ team, placements, recruiting, now }: TeamPageProps) {
         eyebrow="Team"
         title="The people running the desk."
         lead="Traders at Carolina is run by students. Meet the executive board, co-presidents and directors."
-        seed={404}
+        art={companies.length > 0 ? <PlacementWall companies={companies} /> : null}
       />
       {noLeadership ? (
         <LeadershipTier

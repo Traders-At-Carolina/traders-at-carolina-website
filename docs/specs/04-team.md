@@ -78,7 +78,12 @@ Put faces and names to the club, and show where its members go.
 - **Eyebrow:** `TEAM`, with no § number.
 - **H1:** working copy "The people running the desk."
 - **Lead:** max about 30 words. Working copy: "Traders at Carolina is run by students. Meet the executive board and the leads for each track."
-- **Art:** small `RandomWalk` (`size="header"`, 3 paths), hidden below 768px.
+- **Art:** `PlacementWall` in place of the usual `RandomWalk`, hidden below 768px.
+  - Eyebrow "Where we've worked", then a hairline-ruled grid of the companies in `person.company`, three per row.
+  - Each company appears once, in the order people first appear in `content/team.ts` (`companyMarks()` in `lib/team.ts`).
+  - Marks render as flat ink silhouettes. Each has its company name beneath it as a caption, because some marks say nothing alone (Infragrid's is a bare square). The image itself is decorative (`alt=""`).
+  - With no `company` on anyone, the art column is left out and the header is text only. The wall never falls back to the `RandomWalk`.
+  - This is separate from § 03 Placements (§4.4), which stays text-only and threshold-gated.
 
 ### 4.2 Executive board (§ 01)
 
@@ -142,6 +147,7 @@ export const team = {
     headshot?: string;           // "/images/team/{slug}.jpg"
     alt?: string;                // required when headshot is set
     placement?: string;          // free text, e.g. "Incoming QT intern, Firm X"
+    company?: { name: string; logo: StaticImageData };  // transparent mark from public/images/companies; feeds the header wall and the headshot hover badge
     linkedin?: string;           // full URL
   }>,
 };
@@ -200,3 +206,4 @@ export const placements: Array<{ firm: string }> = [];
 7. LinkedIn links have descriptive `aria-label`s, 44×44 tap targets, and open in a new tab.
 8. Lighthouse (mobile) ≥ 95 in all categories, with images served via `next/image` as AVIF/WebP.
 9. No hard-coded hex values or font stacks. Only spec-00 tokens.
+10. The header shows each distinct `company` once with its name, and no `RandomWalk`. With no companies, the art column is absent.

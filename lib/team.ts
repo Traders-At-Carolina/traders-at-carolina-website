@@ -1,4 +1,4 @@
-import type { Person, Placement } from "@/content/types";
+import type { CompanyMark, Person, Placement } from "@/content/types";
 
 /** The placements section appears once there are enough firms to be meaningful (spec 04 §4.4). */
 export const PLACEMENT_THRESHOLD = 5;
@@ -20,6 +20,15 @@ export function directors(people: Person[]): Person[] {
 /** Meta line under a name, e.g. "'27 · Mathematics"; empty when neither is set. */
 export function personMeta(person: Pick<Person, "classYear" | "major">): string {
   return [person.classYear ? shortClassYear(person.classYear) : "", person.major ?? ""].filter(Boolean).join(" · ");
+}
+
+/** Each company people have worked at, once, in the order they first appear (the Team header wall). */
+export function companyMarks(people: Person[]): CompanyMark[] {
+  const marks = new Map<string, CompanyMark>();
+  for (const { company } of people) {
+    if (company && !marks.has(company.name)) marks.set(company.name, company);
+  }
+  return [...marks.values()];
 }
 
 /** slug → name for everyone who leads a track, used by /membership "Led by" links (spec 04 §5). */

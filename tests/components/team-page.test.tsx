@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import type { StaticImageData } from "next/image";
 import { TeamPage } from "@/components/team/TeamPage";
-import type { Person, Placement, Recruiting, TeamContent } from "@/content/types";
+import type { CompanyMark, Person, Placement, Recruiting, TeamContent } from "@/content/types";
 
 const now = new Date("2027-01-05T17:00:00Z");
 const closed: Recruiting = { applicationsOpen: false, applyUrl: "" };
@@ -30,7 +30,32 @@ const eyebrows = () => screen.getAllByText(/^§ \d{2} — /).map((el) => el.text
 const co: Person = { slug: "co-one", name: "Co One", role: "Co-President, Trading", group: "co-president", order: 1 };
 const dir: Person = { slug: "dir-one", name: "Dir One", role: "Director of Education", group: "director", order: 1, headshot: image, alt: "Portrait of Dir One" };
 
+const mark = (name: string): CompanyMark => ({ name, logo: { ...image, src: `/images/companies/${name}.png` } as StaticImageData });
+
 describe("TeamPage", () => {
+  it("shows each company the team has worked at in the header, once, instead of the random walk", () => {
+    const people: Person[] = [
+      { ...pres, company: mark("Citadel") },
+      { ...co, company: mark("Citadel") },
+      { ...dir, company: mark("AWS") },
+    ];
+    const { container } = renderTeam({ people });
+    const header = container.querySelector("header") as HTMLElement;
+    expect(within(header).getByText("Where we've worked")).toBeInTheDocument();
+    // Each mark carries its name as a visible caption (Infragrid's mark is a bare square); the image itself is decorative.
+    const cells = within(header).getAllByRole("listitem");
+    expect(cells.map((cell) => cell.textContent)).toEqual(["Citadel", "AWS"]);
+    expect(header.querySelectorAll("img[alt='']")).toHaveLength(2);
+    expect(header.querySelector("svg")).not.toBeInTheDocument();
+  });
+
+  it("leaves the header art out when nobody has a company", () => {
+    const { container } = renderTeam({ people: [pres] });
+    const header = container.querySelector("header") as HTMLElement;
+    expect(within(header).queryByText("Where we've worked")).not.toBeInTheDocument();
+    expect(header.querySelector("svg")).not.toBeInTheDocument();
+  });
+
   it("shows an honest empty state with no people, and hides placements", () => {
     const { container } = renderTeam({ people: [] });
     expect(screen.getByText("Board profiles will be posted here soon.")).toBeInTheDocument();

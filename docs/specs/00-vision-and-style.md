@@ -65,7 +65,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/team` placement wall) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
 
 ---
@@ -303,6 +303,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 ### `PageHeader`
 - Used at the top of every page except Home.
 - Eyebrow, H1 and lead, over the graph-paper grid, with a small `RandomWalk` on the right on desktop. The `RandomWalk` is hidden below 768px.
+- An optional `art` prop replaces the `RandomWalk` in that column; `art={null}` leaves the column out. `/team` uses it for the placement logo wall (spec 04 §4.1). The art stays a single composition with the grid, so the one-motif rule in §3 still holds.
 
 ### `Stat` / `StatRow`
 - `Stat`: a number (Stat role) plus a caption label.

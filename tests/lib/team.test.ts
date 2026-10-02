@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { StaticImageData } from "next/image";
-import type { Person } from "@/content/types";
-import { execMembers, initials, shortClassYear, showPlacements, sortFirms, trackLeadNames } from "@/lib/team";
+import type { CompanyMark, Person } from "@/content/types";
+import { companyMarks, execMembers, initials, shortClassYear, showPlacements, sortFirms, trackLeadNames } from "@/lib/team";
 import { lowResHeadshots, validateTeam } from "@/lib/validate-team";
 
 const person = (p: Partial<Person> & Pick<Person, "slug" | "name">): Person => ({
@@ -83,5 +83,25 @@ describe("lowResHeadshots", () => {
 
   it("warns but does not fail the build for low-res headshots", () => {
     expect(() => validateTeam({ people: [person("small", 240)] }, [])).not.toThrow();
+  });
+});
+
+describe("companyMarks", () => {
+  const mark = (name: string): CompanyMark => ({ name, logo: { src: `/${name}.png`, width: 96, height: 96 } as StaticImageData });
+  const citadel = mark("Citadel");
+  const aws = mark("AWS");
+
+  it("returns each company once, in the order people first appear", () => {
+    const list = [
+      person({ slug: "a", name: "A", company: citadel }),
+      person({ slug: "b", name: "B" }),
+      person({ slug: "c", name: "C", company: aws }),
+      person({ slug: "d", name: "D", company: citadel }),
+    ];
+    expect(companyMarks(list).map((c) => c.name)).toEqual(["Citadel", "AWS"]);
+  });
+
+  it("returns an empty list when nobody has a company", () => {
+    expect(companyMarks(people)).toEqual([]);
   });
 });
