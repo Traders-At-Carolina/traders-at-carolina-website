@@ -2,7 +2,7 @@ import { Button } from "@/components/Button";
 import { Container, Grid } from "@/components/Container";
 import { Eyebrow } from "@/components/Eyebrow";
 import { TextLink } from "@/components/TextLink";
-import { HeroFigure } from "@/components/home/HeroFigure";
+import { VolSurfaceFigure } from "@/components/home/VolSurfaceFigure";
 import type { HomeContent } from "@/content/types";
 import type { HomeApplyCopy } from "@/lib/home";
 
@@ -25,8 +25,8 @@ function Headline({ headline, emphasis }: { headline: string; emphasis?: string 
 }
 
 /**
- * § 01 — the club's name and how to join, beside "Fig. 1": an interactive random-walk
- * figure on graph paper (spec 01 §3.1). On desktop the text sits on the left and the
+ * § 01 — the club's name and how to join, beside "Fig. 1": a rotatable, simulatable 3D
+ * implied-volatility surface (spec 01 §3.1). On desktop the text sits on the left and the
  * figure on the right; on smaller screens the text comes first. Only the figure is a client island.
  */
 export function Hero({ hero, index, apply }: HeroProps) {
@@ -52,7 +52,7 @@ export function Hero({ hero, index, apply }: HeroProps) {
               </TextLink>
             </div>
           </div>
-          <HeroFigure caption={hero.figureCaption} className="col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-1" />
+          <VolSurfaceFigure caption={hero.figureCaption} className="col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-1" />
         </Grid>
       </Container>
     </section>

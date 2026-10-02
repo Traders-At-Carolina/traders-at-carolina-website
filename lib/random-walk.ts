@@ -76,23 +76,3 @@ export function toPathData(points: Point[]): string {
 export function generateWalks(opts: WalkOptions): string[] {
   return generateWalkPoints(opts).map(toPathData);
 }
-
-/** Closed SVG path for the band origin ± k·σ·√t, clamped to the box. */
-export function envelopePath({ k = 1, ...box }: WalkGeometry & { k?: number }): string {
-  const { originY, sigma } = geometry(box);
-  const dx = box.width / box.steps;
-  const upper: Point[] = [];
-  const lower: Point[] = [];
-  for (let i = 0; i <= box.steps; i++) {
-    const spread = k * sigma * Math.sqrt(i);
-    upper.push([round(i * dx), round(Math.max(0, originY - spread))]);
-    lower.push([round(i * dx), round(Math.min(box.height, originY + spread))]);
-  }
-  return `${toPathData([...upper, ...lower.reverse()])} Z`;
-}
-
-/** A walk's height in units of the per-step σ, positive above the origin. */
-export function standardizedValue(y: number, box: WalkGeometry): number {
-  const { originY, sigma } = geometry(box);
-  return (originY - y) / sigma;
-}

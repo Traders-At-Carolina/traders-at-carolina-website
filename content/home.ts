@@ -17,7 +17,7 @@ export const home: HomeContent = {
     headlineEmphasis: "at",
     subhead:
       "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required.",
-    figureCaption: "Fig. 1 — Five random walks from one origin. Same rules, different outcomes.",
+    figureCaption: "Fig. 1 — An implied volatility surface across strike and maturity. Drag to rotate; press play to let the market move.",
   },
   headings: {
     pillars: "Three ways we build quants.",

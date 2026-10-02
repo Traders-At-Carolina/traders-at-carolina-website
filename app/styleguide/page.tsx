@@ -5,7 +5,7 @@ import { Card } from "@/components/Card";
 import { CTABand } from "@/components/CTABand";
 import { Grid } from "@/components/Container";
 import { Eyebrow } from "@/components/Eyebrow";
-import { HeroFigure } from "@/components/home/HeroFigure";
+import { VolSurfaceFigure } from "@/components/home/VolSurfaceFigure";
 import { PageHeader } from "@/components/PageHeader";
 import { RandomWalk } from "@/components/RandomWalk";
 import { Reveal } from "@/components/Reveal";
@@ -129,7 +129,7 @@ export default function StyleguidePage() {
             <RandomWalk seed={42} paths={3} size="header" className="h-full w-full" />
           </div>
         </Reveal>
-        <HeroFigure caption="Fig. 1 — Home hero figure: re-draw and hover to scrub." className="mt-16" />
+        <VolSurfaceFigure caption="Fig. 1 — Home hero volatility surface: drag to rotate, play to simulate." className="mt-16" />
       </Section>
 
       <CTABand title="Ready to start?" lead="One navy band per page, with the shared Apply button." />

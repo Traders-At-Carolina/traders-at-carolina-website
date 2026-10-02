@@ -65,7 +65,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In the Home hero and `PageHeader`, the grid and the random walk form a single composition and count as one motif. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
 
 ---
@@ -183,8 +183,8 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 - **Strokes:**
   - One path is solid `navy` at 1.5px.
   - The others are navy at 30% opacity and black at 25% opacity, each at 1px.
-- **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits. The one exception is the Home hero figure's "Draw new paths" button (spec 01 §3.1), which picks a new seed only when clicked; the first render always uses the fixed seed.
-- **Placement:** full size in the Home hero, and smaller and quieter in each `PageHeader`.
+- **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits.
+- **Placement:** in each `PageHeader`. (The Home hero uses a 3D volatility surface instead; spec 01 §3.1.)
 - **Motion:** an optional 1.2s stroke draw-in on load (`stroke-dashoffset`), disabled under `prefers-reduced-motion`.
 - **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 
@@ -239,9 +239,9 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Effect | Spec |
 |---|---|
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
-| Hero random walk | Stroke draw-in over 1.2s on load, replayed on each "Draw new paths" |
-| Hero ±σ√t band | Fades in over 400ms, starting 900ms after load |
-| Hero crosshair | Follows the pointer step by step (fine pointers only); no easing or transition |
+| Header random walk | Stroke draw-in over 1.2s on load |
+| Hero 3D surface — auto-rotate | Slow idle spin (0.6 OrbitControls units); stops on interaction, resumes after 4s |
+| Hero 3D surface — Play market | Surface updates every 80ms from mean-reverting parameter ticks; only while visible |
 | Link underline | Underline scales in from the left on hover, 200ms |
 | Button hover | Background color transition, 150ms |
 

@@ -194,17 +194,6 @@
   .draw-in path:nth-child(n + 4) {
     animation-delay: 240ms;
   }
-
-  /* Hero figure's ±σ√t band settles in as the paths finish drawing. */
-  .envelope-in {
-    animation: fade-in 400ms ease-out 900ms both;
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
 }
 
 @keyframes draw-in {

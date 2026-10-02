@@ -31,7 +31,7 @@ A recruiter or firm visitor should also leave with a sense of an active, serious
 | # | Section | Background | Motif used (00 §3) |
 |---|---|---|---|
 | — | `SiteHeader` | bone | — |
-| 01 | Hero | bone + grid | Random walk + grid (one composition) |
+| 01 | Hero | bone + grid | 3D volatility surface + grid (one composition) |
 | 02 | What we do | bone | — |
 | 03 | By the numbers | white | Stat row |
 | 04 | Inside the club | bone | — (photos) |
@@ -52,16 +52,15 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Subhead:** Lead role, max about 25 words. Working copy: "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
-- **Art — "Fig. 1":** `HeroFigure`, a captioned figure of five random walks over the graph-paper grid, presented like a figure in a paper:
-  - Five paths from one origin at the left edge, mid-height (00 §7.2 strokes), 96 steps, seed `2026` on first render.
-  - A dashed navy mean line (E[X] = 0) and a navy-tinted ±σ√t band.
-  - L-shaped hairline axes (`rule-strong`) with a `0` tick at the origin.
-  - A `<figcaption>`: `hero.figureCaption` (working copy: "Fig. 1 — Five random walks from one origin. Same rules, different outcomes."), a small legend, the current seed, and a `secondary`-style `<button>` "Draw new paths".
+- **Art — "Fig. 1":** `VolSurfaceFigure`, a rotatable, simulatable 3D implied-volatility surface, presented like a figure in a paper:
+  - Strike (log-moneyness −0.5…0.5, labelled K/S) × maturity (0.1–2y) × implied vol, from an SSVI-style model in `lib/vol-surface.ts`.
+  - A navy-tinted mesh (lighter = low vol, deeper = high vol; colors read from the design tokens) with a bone wire grid, a faint navy floor grid and black hairline axes labelled "Strike K/S →", "Maturity →", "Implied vol" (80% top).
+  - Controls in the `<figcaption>`: sliders for **ATM vol** (10–60%), **Skew ρ** (−0.9…0.3) and **Term slope** (−0.4…0.4); **Play market** / **Pause market** (`aria-pressed`); **New regime**; the regime text (`aria-live="polite"`); `hero.figureCaption`; a low→high vol legend.
 
 **Layout**
 - **Desktop (≥ 1024px):**
   - Two columns, vertically centered. The text block (eyebrow, headline, subhead, actions) sits on the **left** in columns 1–6, and the figure sits on the right in columns 7–12.
-  - The plot is `clamp(300px, 46vh, 460px)` tall. Its caption row stacks when the figure is narrower than 42rem and splits into caption/legend left and seed/button right above that (container query).
+  - The 3D plot is `clamp(260px, 38vh, 400px)` tall (260px mobile, 340px tablet). Sliders sit in three columns when the figure is at least 32rem wide (container query), otherwise stacked.
   - The hero is `clamp(600px, 100svh − header, 820px)` tall, with the grid masked to fade at the edges. The whole hero, figure included, should fit in the first viewport at 1024 × 768.
 - **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
@@ -70,12 +69,14 @@ Only these sections appear on Home. No placement section (data isn't available y
   - No min-height. Content defines the height.
 
 **Behavior**
-- The paths draw in over 1.2s on load; the band fades in after them (00 §9.2). Under reduced motion everything renders complete.
-- **Draw new paths** picks a random seed on click only (so server and client first renders match), replays the draw-in, and updates the seed text, which is the figure's only `aria-live="polite"` region.
-- **Crosshair (fine pointers only):** a navy hairline follows the pointer to the nearest step, with a marker on each path and a readout of `t`, path 1, the mean, and the band half-width, all in σ units (Public Sans, tabular). It hides on pointer leave. Touch gets the button only.
-- The SVG, crosshair and readout are `aria-hidden`; the caption and legend are real text.
+- **Rotate:** drag (OrbitControls; zoom and pan off; polar angle limited) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
+- **Auto-rotate:** slow spin while idle; it stops on interaction and resumes 4s after it ends.
+- **Simulate:** sliders reshape the surface instantly. **Play market** ticks every 80ms: ATM vol, skew and term slope follow Ornstein–Uhlenbeck processes that mean-revert to the slider/regime values, so the surface breathes without drifting. **New regime** draws seeded random parameters.
+- **Hover (fine pointers):** a readout of σ, K/S and T at the pointer.
+- Play and auto-rotate pause when the figure is offscreen or the tab is hidden. Under reduced motion there is no auto-rotate and Play is disabled with a note; sliders and New regime still work.
+- The canvas wrapper is `role="img"` with an `aria-label` summarising the current regime; the readout and axis labels are `aria-hidden`.
 - The headline is the page's only `<h1>`.
-- The hero is the LCP element (text). The figure is inline SVG with no image request, and `Hero` stays a server component — only `HeroFigure` is a client island.
+- **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island that first renders a static SVG poster of the surface (same math, no layout shift, also the no-WebGL fallback). three.js (`three`, `@react-three/fiber`, `@react-three/drei`, ~245 kB gzipped) loads lazily via `next/dynamic` only once the figure is within 200px of the viewport, so it is never on the LCP path. Budget: LCP stays text, CLS 0.
 
 ### 3.2 What we do (§ 02)
 
@@ -251,7 +252,7 @@ export const home = {
 3. Toggling `applicationsOpen` (or setting `applyDeadline` in the past) in `content/site.ts` switches both the hero and band buttons per §5, with no other code changes.
 4. Removing any stat from `content/home.ts` drops it from the row with no gap or leftover hairline.
 5. Removing `upcoming`, or setting it to a past date, renders the photo-only layout in §3.4 with no empty card.
-6. The random walk is identical across reloads and builds (fixed seed), has `aria-hidden="true"`, and renders fully drawn under `prefers-reduced-motion`.
+6. The hero figure first renders the default regime (poster, then the same surface in WebGL), never shifts layout, and under `prefers-reduced-motion` neither auto-rotates nor animates.
 7. All images have non-empty alt text. TypeScript fails the build if `alt` is missing.
 8. Lighthouse (mobile) ≥ 95 in Performance, Accessibility, Best Practices and SEO. LCP < 2.0s and CLS < 0.05.
 9. Keyboard-only: every link and button is reachable in visual order with a visible focus ring (00 §4.3).
