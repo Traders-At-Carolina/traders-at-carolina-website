@@ -200,8 +200,6 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
 
         <div className="mt-16 flex flex-col gap-2 border-t border-rule-inverse pt-6 text-caption md:flex-row md:justify-between">
           <p className="tabular">© {now.getFullYear()} Traders at Carolina</p>
-          {/* Spec 06 §7.1: no cookies and no consent banner, so the site says what it measures. */}
-          <p>Anonymous, cookie-free analytics tell us which pages are useful.</p>
           {disclaimer ? <p className="max-w-[60ch]">{disclaimer}</p> : null}
         </div>
       </Container>

@@ -113,14 +113,14 @@ Exact column spans are a starting point; confirm them in the browser at 375, 768
 ### 3.3 Placement strip
 
 - Reuses `PlacementWall` (`components/team/PlacementWall.tsx`) and `content/placement-wall.ts`, so adding a firm in one place updates the Team header and the footer.
-- New prop `tone?: "default" | "inverse"` (default keeps the Team header exactly as it is). With `inverse` the marks are flattened to **bone** instead of ink (`brightness-0 invert` in place of `brightness-0`, same 70% opacity), the eyebrow uses `Eyebrow tone="inverse"`, the strip's hairlines use `border-rule-inverse`, and the caption under each mark is `text-bone`. (`.on-dark` only recolors the focus ring; it does not remap tokens the way `surface-graphite` does, so these are set explicitly.)
+- New prop `tone?: "default" | "inverse"` (default keeps the Team header exactly as it is). With `inverse` the marks keep their **official colours**, unaltered (no filters, full opacity) on a clear background, the eyebrow uses `Eyebrow tone="inverse"`, the strip's hairlines use `border-rule-inverse`, and the caption under each mark is `text-bone`. (`.on-dark` only recolors the focus ring; it does not remap tokens the way `surface-graphite` does, so these are set explicitly.)
 - Behavior is unchanged: slow drift, drag and flick, edge fade, hover pause, and a static wrapped row under reduced motion (spec 04 §4.1, `.logo-strip` in `globals.css`).
 - Eyebrow "Where we've worked" (the same copy the Team header uses).
 - Rendered only when `placementWall.length > 0`, and not on `/team`.
 
 ### 3.4 Legal row
 
-`© {year} Traders at Carolina` on the left; the one-line analytics note from spec 06 §7.1 ("Anonymous, cookie-free analytics tell us which pages are useful."); the disclaimer, if `site.disclaimer` is set, on the right (stacked on mobile), above a `rule-inverse` hairline.
+`© {year} Traders at Carolina` on the left; the disclaimer, if `site.disclaimer` is set, on the right (stacked on mobile), above a `rule-inverse` hairline.
 
 ---
 

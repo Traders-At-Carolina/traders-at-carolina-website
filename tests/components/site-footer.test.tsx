@@ -153,11 +153,6 @@ describe("SiteFooter analytics tags (spec 06 §7.1)", () => {
     expect(tag(within(screen.getByRole("list", { name: "Reach" })).getByRole("link"))).toEqual(["email", "footer"]);
     expect(tag(within(screen.getByRole("navigation", { name: "Footer" })).getByRole("link", { name: "About" }))).toEqual(["nav", "footer"]);
   });
-
-  it("says what analytics measure", () => {
-    renderFooter();
-    expect(screen.getByText("Anonymous, cookie-free analytics tell us which pages are useful.")).toBeInTheDocument();
-  });
 });
 
 describe("SiteFooter legal row", () => {

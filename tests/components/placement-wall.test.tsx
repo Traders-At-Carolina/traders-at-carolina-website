@@ -86,11 +86,13 @@ describe("PlacementWall tone", () => {
     expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-ink-2");
   });
 
-  it("flattens the marks to bone and uses inverse hairlines and text on the inverse tone", () => {
+  it("shows the marks unaltered on a clear background and uses inverse hairlines and text on the inverse tone", () => {
     const { container } = render(<PlacementWall companies={companies} tone="inverse" />);
     const mark = container.querySelector("img") as HTMLElement;
-    expect(mark.className).toContain("brightness-0");
-    expect(mark.className).toContain("invert");
+    expect(mark.className).not.toContain("brightness");
+    expect(mark.className).not.toContain("invert");
+    expect(mark.className).not.toContain("opacity-70");
+    expect(mark.parentElement?.className).not.toContain("bg-");
     expect(container.querySelector(".logo-strip")).toHaveClass("border-rule-inverse");
     expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-bone");
     expect(screen.getByText("Where we've worked")).toHaveClass("text-bone");
