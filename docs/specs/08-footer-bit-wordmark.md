@@ -18,7 +18,7 @@ The reference is the dot-matrix "Orbit" wordmark at the foot of myorbitnetwork.c
 
 Spec 00 §3 says "Never use … terminal or monospace typography". A field of bits is the one deliberate exception.
 
-- **Scope:** `BitWordmark` only, inside `SiteFooter` only.
+- **Scope:** `BitWordmark` only, inside `SiteFooter` only. **Extended by [spec 10](10-not-found.md):** the 404 page's `Bit404` is the only other bit field. It shares this component's primitives.
 - **Limits:** the glyphs `0` and `1` are drawn in the site's own sans (`--font-sans`, Public Sans), not a monospace face. No monospace or terminal typography appears anywhere else on the site.
 - **Motif count:** the field counts as a motif (00 §3). It appears only at the very bottom of the page, where no other motif sits alongside it.
 - The same edit adds the exception to spec 00 §3 and §10 `SiteFooter`.
