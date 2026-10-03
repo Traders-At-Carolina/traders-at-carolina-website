@@ -3,15 +3,17 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import {
   HOVER_RADIUS,
+  LOAD_TOTAL_MS,
   TOUCH_HOVER_RADIUS,
-  WAVE_MS,
   buildGrid,
   buildLetterMask,
+  cellSettle,
   cellState,
-  columnSettle,
   decayHeat,
   hoverStrength,
-  waveFront,
+  lineBaselines,
+  loadProgress,
+  settleThreshold,
   wordmarkLayout,
 } from "@/components/footer/bitWordmarkScene";
 
@@ -28,7 +30,7 @@ function useReducedMotion() {
   );
 }
 
-/** Band visibility: the loop runs above VISIBLE, and the scroll-in wave starts at START (spec 06 §5). */
+/** Band visibility: the loop runs above VISIBLE, and the scroll-in load starts at START (spec 06 §5). */
 const VISIBLE = 0.1;
 const START = 0.4;
 /** The letter mask is drawn this many times larger than the grid, then averaged down per cell. */
@@ -39,7 +41,7 @@ type Pointer = { x: number; y: number; radius: number };
 /**
  * Decorative footer band (spec 06): a field of 0s and 1s that starts scrambled, resolves into "Traders at Carolina"
  * each time it scrolls into view, and lights up around the pointer. One canvas, no animation library. All the
- * decisions (grid, mask, wave, hover, per-cell look) live in bitWordmarkScene.ts; this component owns the DOM.
+ * decisions (grid, mask, load, hover, per-cell look) live in bitWordmarkScene.ts; this component owns the DOM.
  */
 export function BitWordmark({ className = "" }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -60,7 +62,7 @@ export function BitWordmark({ className = "" }: { className?: string }) {
     /** Latest pointer position in viewport coordinates; converted to canvas space each frame (the page may scroll). */
     let viewportPointer: Pointer | null = null;
 
-    // Built by build(): the grid, the letter mask, per-cell heat and the two glyph sprites.
+    // Built by build(): the grid, the letter mask, per-cell settle thresholds and heat, and the two glyph sprites.
     let cols = 1;
     let rows = 1;
     let cellW = 8;
@@ -68,8 +70,10 @@ export function BitWordmark({ className = "" }: { className?: string }) {
     let dpr = 1;
     let mask = new Uint8Array(1);
     let heat = new Float32Array(1);
-    let settleCols = new Float32Array(1);
+    let thresholds = new Float32Array(1);
     let sprites: Record<"0" | "1", HTMLCanvasElement> | null = null;
+    /** Pure white glyphs with a soft glow, drawn over cells the pointer is lighting (three cells wide, to hold the glow). */
+    let hotSprites: Record<"0" | "1", HTMLCanvasElement> | null = null;
 
     const style = getComputedStyle(canvas);
     const sans = style.getPropertyValue("--font-public-sans").trim() || "system-ui, sans-serif";
@@ -78,7 +82,7 @@ export function BitWordmark({ className = "" }: { className?: string }) {
     const wideQuery = window.matchMedia("(min-width: 48rem)");
 
     /** Draws the wordmark once, big, then averages each cell's block of pixels into a 0–255 coverage value. */
-    function measureLetters(lines: string[]) {
+    function measureLetters({ lines, cut, gap }: ReturnType<typeof wordmarkLayout>) {
       const w = cols * MASK_SCALE;
       const h = rows * MASK_SCALE;
       const off = document.createElement("canvas");
@@ -87,16 +91,18 @@ export function BitWordmark({ className = "" }: { className?: string }) {
       const octx = off.getContext("2d", { willReadFrequently: true });
       if (!octx) return new Uint8Array(cols * rows);
 
-      // Text width scales linearly with font size: fit the widest line to 94% of the band, capped so all lines
-      // together take at most 86% of its height.
+      // Text width scales linearly with font size: fit the widest line to 94% of the band's width. The block then
+      // sits low (lineBaselines) so the last line runs off the bottom edge, like a wordmark cropped by the page end.
       octx.font = `800 ${h}px ${title}`;
       const widest = Math.max(...lines.map((line) => octx.measureText(line).width));
-      const size = Math.min((h * w * 0.94) / widest, (h * 0.86) / lines.length);
+      const size = (h * w * 0.94) / widest;
       octx.font = `800 ${size}px ${title}`;
+      const capHeight = octx.measureText("H").actualBoundingBoxAscent || size * 0.69;
+      const baselines = lineBaselines(lines.length, h, capHeight, cut, gap);
       octx.fillStyle = "#000";
       octx.textAlign = "center";
-      octx.textBaseline = "middle";
-      lines.forEach((line, i) => octx.fillText(line, w / 2, (h * (i + 0.5)) / lines.length));
+      octx.textBaseline = "alphabetic";
+      lines.forEach((line, i) => octx.fillText(line, w / 2, baselines[i]));
 
       const px = octx.getImageData(0, 0, w, h).data;
       const coverage = new Float32Array(cols * rows);
@@ -123,6 +129,27 @@ export function BitWordmark({ className = "" }: { className?: string }) {
       return sprite;
     }
 
+    function makeHotSprite(glyph: string) {
+      const sprite = document.createElement("canvas");
+      sprite.width = Math.ceil(cellW * dpr * 3);
+      sprite.height = Math.ceil(cellH * dpr * 3);
+      const sctx = sprite.getContext("2d");
+      if (sctx) {
+        sctx.fillStyle = "#ffffff";
+        sctx.shadowColor = "rgba(255, 255, 255, 0.95)";
+        sctx.shadowBlur = cellH * dpr * 1.2;
+        sctx.font = `700 ${cellH * dpr * 1.3}px ${sans}`;
+        sctx.textAlign = "center";
+        sctx.textBaseline = "middle";
+        const x = sprite.width / 2;
+        const y = sprite.height / 2 + cellH * dpr * 0.04;
+        // Twice: the first lays down the halo, the second thickens the core so the glyph itself is brighter.
+        sctx.fillText(glyph, x, y);
+        sctx.fillText(glyph, x, y);
+      }
+      return sprite;
+    }
+
     function build() {
       const rect = canvas!.getBoundingClientRect();
       if (!rect.width || !rect.height) return false;
@@ -133,10 +160,12 @@ export function BitWordmark({ className = "" }: { className?: string }) {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas!.width = Math.round(rect.width * dpr);
       canvas!.height = Math.round(rect.height * dpr);
-      mask = measureLetters(layout.lines);
+      mask = measureLetters(layout);
       heat = new Float32Array(cols * rows);
-      settleCols = new Float32Array(cols);
+      thresholds = new Float32Array(cols * rows);
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) thresholds[r * cols + c] = settleThreshold(c, r);
       sprites = { "0": makeSprite("0"), "1": makeSprite("1") };
+      hotSprites = { "0": makeHotSprite("0"), "1": makeHotSprite("1") };
       return true;
     }
 
@@ -166,9 +195,8 @@ export function BitWordmark({ className = "" }: { className?: string }) {
       lastFrame = now;
 
       const elapsed = phase === "forming" ? now - startedAt : 0;
-      const front = reduced ? 1 : phase === "forming" ? waveFront(elapsed) : 0;
-      const formed = reduced || (phase === "forming" && elapsed >= WAVE_MS);
-      for (let c = 0; c < cols; c++) settleCols[c] = columnSettle((c + 0.5) / cols, front);
+      const progress = reduced ? 1 : phase === "forming" ? loadProgress(elapsed) : 0;
+      const formed = reduced || (phase === "forming" && elapsed >= LOAD_TOTAL_MS);
 
       if (!reduced) {
         for (let i = 0; i < heat.length; i++) if (heat[i] > 0) heat[i] = decayHeat(heat[i], dt);
@@ -181,17 +209,21 @@ export function BitWordmark({ className = "" }: { className?: string }) {
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const i = r * cols + c;
-          const { glyph, alpha } = cellState({
+          const { glyph, alpha, lit } = cellState({
             col: c,
             row: r,
             isLetter: mask[i] === 1,
             time: now,
-            settle: settleCols[c],
+            settle: cellSettle(thresholds[i], progress),
             heat: heat[i],
             shimmer: formed && !reduced,
           });
           ctx!.globalAlpha = alpha;
           ctx!.drawImage(sprites[glyph], c * cellW, r * cellH, cellW, cellH);
+          if (lit > 0.02 && hotSprites) {
+            ctx!.globalAlpha = lit;
+            ctx!.drawImage(hotSprites[glyph], (c - 1) * cellW, (r - 1) * cellH, cellW * 3, cellH * 3);
+          }
         }
       }
       ctx!.globalAlpha = 1;
@@ -299,14 +331,14 @@ export function BitWordmark({ className = "" }: { className?: string }) {
     };
   }, [reduced]);
 
-  // Aspect ratios mirror wordmarkLayout (0.8 narrow, 0.36 from md up) so the band's height is reserved before the
+  // Aspect ratios mirror wordmarkLayout (0.57 narrow, 0.28 from md up) so the band's height is reserved before the
   // canvas draws and the page never shifts.
   return (
     <canvas
       ref={ref}
       aria-hidden="true"
       role="presentation"
-      className={`bit-wordmark block aspect-[100/80] w-full touch-pan-y select-none md:aspect-[100/36] ${className}`}
+      className={`bit-wordmark block aspect-[100/57] w-full touch-pan-y select-none md:aspect-[100/28] ${className}`}
     />
   );
 }
