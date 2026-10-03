@@ -14,7 +14,8 @@ describe("MembershipPage", () => {
     expect(screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent)).toEqual([
       "§ 01 — How it works",
       "§ 02 — Tracks",
-      "§ 03 — What we do",
+      "§ 03 — Try a problem",
+      "§ 04 — What we do",
     ]);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
@@ -75,8 +76,9 @@ describe("MembershipPage", () => {
     expect(screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent)).toEqual([
       "§ 01 — How it works",
       "§ 02 — Tracks",
-      "§ 03 — Expectations",
-      "§ 04 — What we do",
+      "§ 03 — Try a problem",
+      "§ 04 — Expectations",
+      "§ 05 — What we do",
     ]);
     const dl = screen.getByRole("region", { name: "What we ask of members." }).querySelector("dl") as HTMLElement;
     expect(Array.from(dl.querySelectorAll("dt")).map((dt) => dt.textContent)).toEqual(["Time commitment", "Prerequisites"]);
