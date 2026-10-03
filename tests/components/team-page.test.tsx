@@ -43,12 +43,13 @@ describe("TeamPage", () => {
       "AWS",
       "Infragrid",
     ]);
-    // The strip loops by repeating the list once; the copy is hidden from assistive tech so firms are announced once.
-    const lists = header.querySelectorAll("ul");
-    expect(lists).toHaveLength(2);
+    // The strip loops by repeating the list (enough times to fill wide screens); the copies are hidden from assistive
+    // tech so firms are announced once.
+    const lists = Array.from(header.querySelectorAll("ul"));
+    expect(lists.length).toBeGreaterThanOrEqual(2);
     expect(lists[0]).not.toHaveAttribute("aria-hidden");
-    expect(lists[1]).toHaveAttribute("aria-hidden", "true");
-    expect(header.querySelectorAll("img[alt='']")).toHaveLength(8);
+    for (const copy of lists.slice(1)) expect(copy).toHaveAttribute("aria-hidden", "true");
+    expect(header.querySelectorAll("img[alt='']")).toHaveLength(4 * lists.length);
     expect(header.querySelector("svg")).not.toBeInTheDocument();
   });
 
