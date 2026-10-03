@@ -77,21 +77,33 @@ describe("PlacementWall tone", () => {
   });
   afterEach(() => vi.restoreAllMocks());
 
-  it("shows marks in their own colours, with the default hairlines, on the default tone", () => {
+  it("uses inverse hairlines and text on the inverse tone, still without recolouring the marks", () => {
+    const { container } = render(<PlacementWall companies={companies} tone="inverse" />);
+    const mark = container.querySelector("img") as HTMLElement;
+    expect(mark.className).not.toMatch(/brightness|invert|grayscale|opacity-/);
+    expect(container.querySelector(".logo-strip")).toHaveClass("border-rule-inverse");
+    expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-bone");
+    expect(screen.getByText("Where we've worked")).toHaveClass("text-bone");
+  });
+
+  it("repeats the list enough times that the loop has no gap on wide screens", () => {
+    const { container } = render(<PlacementWall companies={companies} />);
+    const lists = container.querySelectorAll(".logo-strip-list");
+    const listWidth = companies.length * 192;
+    // Visible width the loop can fill = every list after the first (the track wraps after one list's width).
+    expect((lists.length - 1) * listWidth).toBeGreaterThanOrEqual(2560);
+  });
+
+  it("loads the marks eagerly so none pops in late", () => {
+    const { container } = render(<PlacementWall companies={companies} />);
+    for (const img of container.querySelectorAll("img")) expect(img).toHaveAttribute("loading", "eager");
+  });
+
+  it("shows marks in their own colours, with the default hairlines and text", () => {
     const { container } = render(<PlacementWall companies={companies} />);
     const mark = container.querySelector("img") as HTMLElement;
     expect(mark.className).not.toMatch(/brightness-0|invert|grayscale|opacity-/);
     expect(container.querySelector(".logo-strip")).toHaveClass("border-rule");
     expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-ink-2");
-  });
-
-  it("flattens the marks to bone and uses inverse hairlines and text on the inverse tone", () => {
-    const { container } = render(<PlacementWall companies={companies} tone="inverse" />);
-    const mark = container.querySelector("img") as HTMLElement;
-    expect(mark.className).toContain("brightness-0");
-    expect(mark.className).toContain("invert");
-    expect(container.querySelector(".logo-strip")).toHaveClass("border-rule-inverse");
-    expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-bone");
-    expect(screen.getByText("Where we've worked")).toHaveClass("text-bone");
   });
 });

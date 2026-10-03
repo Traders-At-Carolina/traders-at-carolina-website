@@ -5,9 +5,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { primaryNav } from "@/content/nav";
 import type { CompanyMark, Recruiting, Site } from "@/content/types";
 
-const pathname = vi.hoisted(() => ({ current: "/about" }));
-vi.mock("next/navigation", () => ({ usePathname: () => pathname.current }));
-
 const now = new Date("2027-01-05T17:00:00Z");
 const logo = { src: "/x.png", width: 96, height: 96 } as StaticImageData;
 const marks: CompanyMark[] = ["Citadel", "AWS"].map((name) => ({ name, logo }));
@@ -25,7 +22,6 @@ const renderFooter = (site: Site = settings(), wall: CompanyMark[] = []) => rend
 const zone = (container: HTMLElement) => container.querySelector("[data-cta-band]") as HTMLElement;
 
 afterEach(() => {
-  pathname.current = "/about";
   vi.useRealTimers();
 });
 
@@ -68,15 +64,9 @@ describe("SiteFooter CTA zone", () => {
     expect(within(screen.getByRole("list", { name: "Join" })).getByRole("link", { name: /^Apply/ })).toHaveAttribute("href", "/apply");
   });
 
-  it("is the page's only navy band, and is left out on /apply", () => {
-    const first = renderFooter();
-    expect(first.container.querySelectorAll("section.bg-navy")).toHaveLength(1);
-    first.unmount();
-
-    pathname.current = "/apply";
-    const second = renderFooter();
-    expect(second.container.querySelectorAll("section.bg-navy")).toHaveLength(0);
-    expect(second.container.querySelector("footer")).toBeInTheDocument();
+  it("is the footer's one navy band, rendered the same on every page", () => {
+    const { container } = renderFooter();
+    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
     expect(screen.getByRole("list", { name: "Join" })).toBeInTheDocument();
   });
 });
@@ -134,10 +124,12 @@ describe("SiteFooter placement strip", () => {
     expect(screen.queryByText("Where we've worked")).not.toBeInTheDocument();
   });
 
-  it("is hidden on /team, where the header already shows the firms", () => {
-    pathname.current = "/team";
-    renderFooter(settings(), marks);
-    expect(screen.queryByText("Where we've worked")).not.toBeInTheDocument();
+  it("sits on the black footer with inverse text and the marks left in their own colours", () => {
+    const { container } = renderFooter(settings(), marks);
+    expect(screen.getByText("Where we've worked")).toHaveClass("text-bone");
+    expect(container.querySelector(".logo-strip")).toHaveClass("border-rule-inverse");
+    expect(container.querySelector(".logo-strip img")?.className).not.toMatch(/brightness-0|invert/);
+    expect(container.querySelector("div.bg-bone")).toBeNull();
   });
 });
 

@@ -5,8 +5,9 @@ import { Button } from "@/components/Button";
 import { Container, Grid } from "@/components/Container";
 import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
+import { InstagramIcon } from "@/components/InstagramIcon";
+import { LinkedInIcon } from "@/components/LinkedInIcon";
 import { BitWordmark } from "@/components/footer/BitWordmark";
-import { FooterZone } from "@/components/FooterZone";
 import { PlacementWall } from "@/components/team/PlacementWall";
 import { TextLink } from "@/components/TextLink";
 import { Wordmark } from "@/components/Wordmark";
@@ -23,6 +24,7 @@ const itemClasses = "flex min-h-11 items-center md:block md:min-h-0";
 const headingClasses = "mb-3 text-eyebrow font-medium uppercase text-bone/70 md:mb-5";
 const navLinkClasses = "max-md:hit-target hover:underline hover:underline-offset-4";
 const SIGN_UP_LABEL = "Keep me posted";
+const socialIconClasses = "mr-2 inline-block size-4 align-[-0.15em]";
 
 type SiteFooterProps = {
   /** Club settings; defaults to content/site.ts. Injectable for tests. */
@@ -35,8 +37,8 @@ type SiteFooterProps = {
 
 /**
  * The site's closing section (spec 07): a navy CTA zone, then a black base with the link grid, the placement strip
- * and the legal row. Rendered once by the root layout. The CTA zone is left out on /apply (which has its own band)
- * and the strip on /team. Every action carries the spec 06 §7.1 tracking attributes.
+ * and the legal row. Rendered once by the root layout and identical on every page. Every action
+ * carries the spec 06 §7.1 tracking attributes.
  */
 export function SiteFooter({ settings = site, wall = placementWall, now = new Date() }: SiteFooterProps) {
   const { recruiting, contactEmail, social, disclaimer, mission } = settings;
@@ -54,6 +56,8 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
     const { band } = homeApplyCopy(s, recruiting, now);
     return (
       <CTABand
+        // Its own id: /apply also renders a CTABand, so the default would repeat on that page.
+        id="footer-cta"
         title={band.title}
         lead={band.lead}
         action={
@@ -89,7 +93,7 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
 
   return (
     <footer className="on-dark bg-black text-bone">
-      <FooterZone hideOn={["/apply"]}>{live(ctaZone)}</FooterZone>
+      {live(ctaZone)}
 
       <Container className="pt-16 pb-8 md:pt-20 md:pb-12">
         <Grid className="gap-y-12">
@@ -167,6 +171,7 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
                       className="max-md:hit-target"
                       track={{ cta: "social", target: "Instagram", placement: "footer" }}
                     >
+                      <InstagramIcon className={socialIconClasses} />
                       Instagram
                     </TextLink>
                   </li>
@@ -181,6 +186,7 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
                       className="max-md:hit-target"
                       track={{ cta: "social", target: "LinkedIn", placement: "footer" }}
                     >
+                      <LinkedInIcon className={`${socialIconClasses} text-[#0A66C2]`} />
                       LinkedIn
                     </TextLink>
                   </li>
@@ -191,11 +197,9 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
         </Grid>
 
         {wall.length > 0 ? (
-          <FooterZone hideOn={["/team"]}>
-            <div className="mt-16 md:mt-20">
-              <PlacementWall companies={wall} tone="inverse" />
-            </div>
-          </FooterZone>
+          <div className="mt-16 md:mt-20">
+            <PlacementWall companies={wall} tone="inverse" />
+          </div>
         ) : null}
 
         <div className="mt-16 flex flex-col gap-2 border-t border-rule-inverse pt-6 text-caption md:flex-row md:justify-between">
