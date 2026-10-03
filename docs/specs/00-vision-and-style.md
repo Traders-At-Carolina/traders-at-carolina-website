@@ -350,6 +350,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 - **Footer nav:** mirrors the header (the Club group). The Join and Reach groups are defined in spec 07.
 - **Reserved for the future (not built, not linked):** `/resources`, `/events`. The header layout must still fit two more nav items at ≥ 1024px without crowding.
 - **Admin (not linked, not indexed):** `/admin`, defined in spec 06. It is invite-only and does not use the site header or footer.
+- **Portal (signed in, not in the nav, not indexed):** `/portal`, defined in spec 09. The corner button on every public page links to it. It is the first home for interview prep and events (the resource hub in §1); a public `/resources` or `/events` can reuse its content later.
 
 ---
 
@@ -357,7 +358,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 
 - **Framework:** Next.js (App Router) with TypeScript.
 - **Styling:** Tailwind CSS v4. Every token from §4–6 is defined once in `@theme` in `app/globals.css`. Components use only those tokens, never raw hex values.
-- **Rendering:** every public page is statically generated. No client-side data fetching. Once [spec 06](06-admin.md) lands, pages that show editable collections regenerate on demand after an admin saves. `/admin` itself is rendered dynamically.
+- **Rendering:** every public page is statically generated. No client-side data fetching. Once [spec 06](06-admin.md) lands, pages that show editable collections regenerate on demand after an admin saves. `/admin` and `/portal` (spec 09) are rendered dynamically.
 - **Hosting:** Vercel.
 - **Content:** typed data modules in `content/`, so officers can update the site without touching components.
 
@@ -395,6 +396,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
 | 06 | `06-admin.md` | Admin dashboard: content editing (photos, officers, tracks, sponsors, placements), admin access, usage analytics |
 | 08 | `08-footer-bit-wordmark.md` | Footer 0s-and-1s wordmark: scroll-in scramble and load, glitching letters, cursor-lit hover, cropped at the page end |
+| 09 | `09-portal.md` | Signed-in portal: recruiting, interview prep, events, tracks and the club for everyone; learning, internship tracker and competitions for members |
 
 **Every page spec contains:**
 1. The page's goal, and the visitor questions it answers.

@@ -6,7 +6,7 @@ import { SiteChrome } from "@/components/SiteChrome";
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 describe("SiteChrome", () => {
-  it("puts the skip link first, then header, main and footer around the page, with the admin sign-in last", () => {
+  it("puts the skip link first, then header, main and footer around the page, with the portal button last", () => {
     const { container } = render(
       <SiteChrome>
         <h1>Page</h1>

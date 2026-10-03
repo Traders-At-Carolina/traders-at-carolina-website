@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Glyph, activityIcon } from "@/components/membership/icons";
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
@@ -9,6 +10,10 @@ type ActivitiesProps = {
   title: string;
   activities: MembershipContent["activities"];
   tracks: MembershipContent["tracks"];
+  /** The portal reuses the table as "The club", with the mission as its lead and links under it (spec 09 §4.6). */
+  eyebrow?: string;
+  lead?: string;
+  footer?: ReactNode;
 };
 
 /**
@@ -17,16 +22,16 @@ type ActivitiesProps = {
  * Frequency and Tracks columns appear only when they say something: no empty column while cadences are
  * unconfirmed, and one sentence instead of "All tracks" on every row.
  */
-export function Activities({ index, title, activities, tracks }: ActivitiesProps) {
+export function Activities({ index, title, activities, tracks, eyebrow = "What we do", lead, footer }: ActivitiesProps) {
   const columns = activityColumns(activities);
   return (
     <Section id="activities" labelledBy="activities-title">
       <SectionHeader
         index={index}
-        eyebrow="What we do"
+        eyebrow={eyebrow}
         title={title}
         id="activities-title"
-        lead={columns.tracks ? undefined : "Every activity is open to members of all three tracks."}
+        lead={lead ?? (columns.tracks ? undefined : "Every activity is open to members of all three tracks.")}
       />
       <Reveal className="mt-12 md:mt-16">
         <table role="table" aria-labelledby="activities-title" className="block w-full border-t border-rule-strong lg:table lg:border-collapse">
@@ -82,6 +87,7 @@ export function Activities({ index, title, activities, tracks }: ActivitiesProps
           </tbody>
         </table>
       </Reveal>
+      {footer}
     </Section>
   );
 }

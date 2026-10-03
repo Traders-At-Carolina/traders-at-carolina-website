@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ctaFromLabel, trackAttrs } from "@/lib/analytics/attributes";
-import { INTERNAL_FLAG, isAdminPath, posthogConfig, readTrackContext, shouldTrack, uiHostFor } from "@/lib/analytics/client-config";
+import { INTERNAL_FLAG, isAdminPath, isPrivatePath, posthogConfig, readTrackContext, shouldTrack, uiHostFor } from "@/lib/analytics/client-config";
 import { posthogRewrites } from "@/lib/analytics/proxy";
 
 describe("trackAttrs", () => {
@@ -46,6 +46,14 @@ describe("shouldTrack", () => {
   it("only treats the /admin segment as admin", () => {
     expect(isAdminPath("/administrators")).toBe(false);
   });
+
+  it("never tracks the portal or account pages, so member links stay on the site (spec 06 §7.1)", () => {
+    expect(shouldTrack({ ...visitor, pathname: "/portal" })).toBe(false);
+    expect(shouldTrack({ ...visitor, pathname: "/portal/competitions" })).toBe(false);
+    expect(shouldTrack({ ...visitor, pathname: "/account/sign-in" })).toBe(false);
+    expect(isPrivatePath("/portals")).toBe(false);
+    expect(isPrivatePath("/accounting")).toBe(false);
+  });
 });
 
 describe("readTrackContext", () => {
@@ -84,6 +92,7 @@ describe("posthogConfig", () => {
     const send = config.before_send as (e: unknown) => unknown;
     expect(send(event("/team"))).toEqual(event("/team"));
     expect(send(event("/admin/photos"))).toBeNull();
+    expect(send(event("/portal"))).toBeNull();
     const internalSend = posthogConfig("https://us.i.posthog.com", () => true).before_send as (e: unknown) => unknown;
     expect(internalSend(event("/team"))).toBeNull();
   });

@@ -1,31 +1,10 @@
-import Link from "next/link";
 import { Grid } from "@/components/Container";
 import { Eyebrow } from "@/components/Eyebrow";
+import { InlineMarkdown } from "@/components/InlineMarkdown";
 import { Section } from "@/components/Section";
 import { TextLink } from "@/components/TextLink";
 import type { ApplyContent } from "@/content/types";
-import { inlineToPlainText, parseInline } from "@/lib/inline-markdown";
-
-function Answer({ source }: { source: string }) {
-  return (
-    <>
-      {parseInline(source).map((token, i) => {
-        if (token.type === "text") return token.value;
-        if (token.type === "em") return <em key={i}>{token.value}</em>;
-        const external = token.href.startsWith("https://");
-        return external ? (
-          <a key={i} href={token.href} target="_blank" rel="noopener noreferrer" className="link-underline text-navy">
-            {token.text}
-          </a>
-        ) : (
-          <Link key={i} href={token.href} className="link-underline text-navy">
-            {token.text}
-          </Link>
-        );
-      })}
-    </>
-  );
-}
+import { inlineToPlainText } from "@/lib/inline-markdown";
 
 /** § 03 — native details/summary accordion on graphite, plus FAQPage JSON-LD (spec 05 §4.3, §7). */
 export function Faq({ faq, contactEmail }: { faq: ApplyContent["faq"]; contactEmail?: string }) {
@@ -67,7 +46,7 @@ export function Faq({ faq, contactEmail }: { faq: ApplyContent["faq"]; contactEm
                 </span>
               </summary>
               <p className="max-w-prose pb-6 text-body text-ink-2">
-                <Answer source={item.answer} />
+                <InlineMarkdown source={item.answer} />
               </p>
             </details>
           ))}

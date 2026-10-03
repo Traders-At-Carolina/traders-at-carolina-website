@@ -6,15 +6,18 @@ import { InsideTheClub } from "@/components/home/InsideTheClub";
 import { IntroOverlay } from "@/components/home/IntroOverlay";
 import { Pillars } from "@/components/home/Pillars";
 import type { StatItem } from "@/components/Stat";
-import type { HomeContent, Partner, Recruiting } from "@/content/types";
+import type { ClubEvent, HomeContent, Partner, Recruiting } from "@/content/types";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
-import { homeApplyCopy, isUpcoming, numberSections, type HomeApplyCopy } from "@/lib/home";
+import { nextFeaturedEvent } from "@/lib/events";
+import { homeApplyCopy, numberSections, type HomeApplyCopy } from "@/lib/home";
 
 type HomePageProps = {
   home: HomeContent;
   recruiting: Recruiting;
   /** Sponsors, already sorted, from the About partner list. */
   sponsors?: Pick<Partner, "name" | "logo">[];
+  /** content/events.ts; the next featured public event becomes the Upcoming card (spec 01 §3.4, 09 §5.2). */
+  events?: ClubEvent[];
   /** Build time for the static page; injectable for tests. */
   now: Date;
 };
@@ -26,7 +29,7 @@ type SectionKey = "hero" | "pillars" | "numbers" | "inside";
  * When open with a deadline, the hero actions render both variants and DeadlineSwitch flips them
  * in the browser once it passes, matching /apply.
  */
-export function HomePage({ home, recruiting, sponsors = [], now }: HomePageProps) {
+export function HomePage({ home, recruiting, sponsors = [], events = [], now }: HomePageProps) {
   const state = getApplicationState(now, recruiting);
   const copy = (s: ApplicationState) => homeApplyCopy(s, recruiting, now);
   const deadline = state.status === "open" ? state.deadline : undefined;
@@ -46,7 +49,7 @@ export function HomePage({ home, recruiting, sponsors = [], now }: HomePageProps
   ];
   const showNumbers = stats.some((s) => s.value) || sponsors.length > 0;
   const showInside = home.photos.length >= 2;
-  const upcoming = home.upcoming && isUpcoming(home.upcoming.date, now) ? home.upcoming : undefined;
+  const upcoming = nextFeaturedEvent(events, now);
 
   const keys: SectionKey[] = ["hero", "pillars"];
   if (showNumbers) keys.push("numbers");

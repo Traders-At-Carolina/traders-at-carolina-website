@@ -8,7 +8,7 @@ import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import type { ApplyContent, Recruiting } from "@/content/types";
 import { ctaFromLabel } from "@/lib/analytics/attributes";
-import { applyBandCopy, applyPrimaryAction, applyStatusCopy, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
+import { applyBandCopy, applyPrimaryAction, applyStatusCopy, processLead, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 
 type ApplyPageProps = {
@@ -20,11 +20,6 @@ type ApplyPageProps = {
   /** Deployment environment for draft FAQ answers; defaults to VERCEL_ENV. */
   vercelEnv?: string;
 };
-
-const processLead = (state: ApplicationState, cycleLabel?: string) =>
-  state.status === "open" && cycleLabel
-    ? `We recruit each fall and spring. Here's how the ${cycleLabel} cycle works.`
-    : "We open applications each fall and spring. Here's how a typical cycle works.";
 
 /**
  * Composes /apply (spec 05): status header, what you get, process, FAQ and the navy band.

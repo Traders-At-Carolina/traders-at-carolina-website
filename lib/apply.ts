@@ -98,6 +98,13 @@ export function applyPrimaryAction(state: ApplicationState, recruiting: Recruiti
     : closedFallback(contactEmail);
 }
 
+/** Lead over the process rail on /apply and the portal: names the cycle while it's open (spec 05 §4.3). */
+export function processLead(state: ApplicationState, cycleLabel?: string): string {
+  return state.status === "open" && cycleLabel
+    ? `We recruit each fall and spring. Here's how the ${cycleLabel} cycle works.`
+    : "We open applications each fall and spring. Here's how a typical cycle works.";
+}
+
 /** "Feb 10–14", "Feb 28–Mar 3", or "Feb 10" for a single day. */
 export function formatDateRange(startIso: string, endIso: string): string {
   const start = parseEasternDateTime(startIso);

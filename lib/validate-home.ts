@@ -1,5 +1,4 @@
 import type { HomeContent } from "@/content/types";
-import { parseEasternDateTime } from "@/lib/eastern-time";
 import { assertNoProblems } from "@/lib/validation";
 
 /** Every content/home.ts problem (spec 01 §6); empty when valid. Admin saves show these as form errors (spec 06 §5). */
@@ -24,14 +23,7 @@ export function collectHomeProblems(home: HomeContent): string[] {
     if (!photo.caption.trim()) problems.push(`photos[${i}].caption must not be empty`);
   });
 
-  if (home.upcoming) {
-    try {
-      parseEasternDateTime(home.upcoming.date);
-    } catch (error) {
-      problems.push(`upcoming.date: ${(error as Error).message}`);
-    }
-  }
-
+  // Event dates are checked with the events themselves (lib/validate-events.ts, spec 09 §5.2).
   return problems;
 }
 
