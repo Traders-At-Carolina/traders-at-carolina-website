@@ -41,15 +41,15 @@ export async function currentActor(): Promise<Actor> {
  * The one write path for admin saves (spec 06 §3): checks the admin session, runs the change, and turns failures into
  * form state. `run` parses with zod (parseForm), applies the collection's rules, writes, audits and publishes.
  */
-export async function adminAction(run: (who: Actor) => Promise<ActionState>): Promise<ActionState> {
+export async function adminAction<S extends ActionState = ActionState>(run: (who: Actor) => Promise<S>): Promise<S & ActionState> {
   try {
     const who = await currentActor();
     return { ...(await run(who)), at: Date.now() };
   } catch (error) {
-    if (error instanceof AdminAccessError) return { error: "Only admins can do that.", at: Date.now() };
-    if (error instanceof FormError) return { error: error.message, fieldErrors: error.fieldErrors, at: Date.now() };
+    if (error instanceof AdminAccessError) return { error: "Only admins can do that.", at: Date.now() } as S;
+    if (error instanceof FormError) return { error: error.message, fieldErrors: error.fieldErrors, at: Date.now() } as S;
     console.error("admin action failed", error);
-    return { error: "Something went wrong, and nothing was saved. Try again.", at: Date.now() };
+    return { error: "Something went wrong, and nothing was saved. Try again.", at: Date.now() } as S;
   }
 }
 

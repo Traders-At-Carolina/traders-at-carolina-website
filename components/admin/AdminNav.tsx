@@ -8,7 +8,13 @@ import { usePathname } from "next/navigation";
  * Recruiting, Sponsors, Placements, Tracks, Events, Resources, Announcements, Portal settings and Analytics.
  */
 const GROUPS = [
-  { label: "Club", links: [{ href: "/admin/admins", label: "Admins" }] },
+  {
+    label: "Club",
+    links: [
+      { href: "/admin/members", label: "Members" },
+      { href: "/admin/admins", label: "Admins" },
+    ],
+  },
   { label: "Website", links: [{ href: "/admin/photos", label: "Photos" }] },
   {
     label: "Insights",

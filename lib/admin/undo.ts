@@ -2,7 +2,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { photos } from "@/lib/db/schema";
 import { type ActionState, type Actor, FormError, publish } from "@/lib/admin/action";
-import { getEntry, latestEntryId, recordAudit } from "@/lib/admin/audit";
+import { type AuditRow, getEntry, latestEntryId, recordAudit } from "@/lib/admin/audit";
+import { MEMBER_UNDO_HANDLERS } from "@/lib/admin/members-undo";
 import { photoSnapshot, type PhotoSnapshot, type SlotPage } from "@/lib/admin/photos";
 import { getPhoto, setSlots, type Slots } from "@/lib/admin/photos-db";
 import { planUndo } from "@/lib/admin/undo-plan";
@@ -12,13 +13,13 @@ import { TAGS } from "@/lib/data/public";
  * How each audited entity is undone (spec 06 §3). Each returns the item's state before and after the undo, which is
  * itself audited (action "undo"), so an undo can be undone too. New editors register here.
  */
-type Handler = {
+export type Handler = {
   label: string;
   tags: string[];
   viewHref: (entityId: string) => string;
-  remove?: (entityId: string) => Promise<{ before: unknown }>;
-  recreate?: (state: Record<string, unknown>) => Promise<{ after: unknown }>;
-  restore: (entityId: string, state: Record<string, unknown>) => Promise<{ before: unknown; after: unknown }>;
+  remove?: (entityId: string, entry: AuditRow) => Promise<{ before: unknown }>;
+  recreate?: (state: Record<string, unknown>, entry: AuditRow) => Promise<{ after: unknown }>;
+  restore: (entityId: string, state: Record<string, unknown>, entry: AuditRow) => Promise<{ before: unknown; after: unknown }>;
 };
 
 const photoHandler: Handler = {
@@ -61,7 +62,7 @@ const slotsHandler: Handler = {
   },
 };
 
-export const UNDO_HANDLERS: Record<string, Handler> = { photo: photoHandler, "photo-slots": slotsHandler };
+export const UNDO_HANDLERS: Record<string, Handler> = { photo: photoHandler, "photo-slots": slotsHandler, ...MEMBER_UNDO_HANDLERS };
 
 export function canUndoEntity(entity: string): boolean {
   return entity in UNDO_HANDLERS;
@@ -80,12 +81,12 @@ export async function undoEntry(entryId: number, who: Actor): Promise<ActionStat
   if (plan.kind === "refuse") throw new FormError(plan.reason);
   if (plan.kind === "remove") {
     if (!handler.remove) throw new FormError("This change can't be undone.");
-    ({ before } = await handler.remove(entry.entityId));
+    ({ before } = await handler.remove(entry.entityId, entry));
   } else if (plan.kind === "recreate") {
     if (!handler.recreate) throw new FormError("This change can't be undone.");
-    ({ after } = await handler.recreate(plan.state));
+    ({ after } = await handler.recreate(plan.state, entry));
   } else {
-    ({ before, after } = await handler.restore(entry.entityId, plan.state));
+    ({ before, after } = await handler.restore(entry.entityId, plan.state, entry));
   }
 
   const undoId = await recordAudit({
