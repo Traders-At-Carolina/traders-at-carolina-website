@@ -1,4 +1,7 @@
 import type { MembershipContent } from "@/content/types";
+import clubOverview from "@/public/images/events/club-overview.jpg";
+import closingQa from "@/public/images/events/closing-qa.jpg";
+import generalMeeting from "@/public/images/events/general-meeting.jpg";
 
 /**
  * Membership page content (docs/specs/03-membership.md). Officers edit this file.
@@ -89,4 +92,24 @@ export const membership: MembershipContent = {
       detail: "Each track lists recommended background. Curiosity and consistent effort matter more.",
     },
   },
+  photos: [
+    {
+      src: clubOverview,
+      alt: "A full lecture hall of members as officers present the club overview at a Traders at Carolina meeting",
+      caption: "Club overview",
+      ratio: "3:2",
+    },
+    {
+      src: generalMeeting,
+      alt: "Members seated at lecture hall desks during a Traders at Carolina general meeting",
+      caption: "General meeting",
+      ratio: "3:2",
+    },
+    {
+      src: closingQa,
+      alt: "Officers at the front of the room taking questions from members during a closing Q&A",
+      caption: "Closing Q&A",
+      ratio: "3:2",
+    },
+  ],
 };

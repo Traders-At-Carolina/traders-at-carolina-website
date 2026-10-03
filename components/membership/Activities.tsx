@@ -1,3 +1,4 @@
+import { Glyph, activityIcon } from "@/components/membership/icons";
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
 import type { MembershipContent } from "@/content/types";
@@ -57,7 +58,10 @@ export function Activities({ index, title, activities, tracks }: ActivitiesProps
                 className="flex flex-wrap items-baseline gap-x-2 border-b border-rule py-6 lg:table-row lg:border-t lg:py-0"
               >
                 <th role="rowheader" scope="row" className="order-1 w-full text-left font-normal lg:w-auto lg:py-6 lg:pr-6 lg:align-top">
-                  <span className="font-display text-h3">{activity.name}</span>
+                  <span className="inline-flex items-center gap-3">
+                    <Glyph icon={activityIcon(activity.name)} />
+                    <span className="font-display text-h3">{activity.name}</span>
+                  </span>
                 </th>
                 <td role="cell" className="order-3 mt-2 w-full max-w-prose text-body text-ink-2 lg:mt-0 lg:w-auto lg:py-6 lg:pr-6 lg:align-top">
                   {activity.description}

@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
+import { Glyph, stepIcon } from "@/components/membership/icons";
 import type { MembershipContent } from "@/content/types";
 
 type HowItWorksProps = {
@@ -18,9 +19,12 @@ export function HowItWorks({ index, title, steps, switchingPolicy }: HowItWorksP
         <ol className="grid grid-cols-1 divide-y divide-rule lg:grid-cols-3 lg:divide-x lg:divide-y-0">
           {steps.map((step, i) => (
             <li key={step.title} className="relative py-8 first:pt-0 last:pb-0 lg:px-8 lg:py-0 lg:first:pl-0 lg:last:pr-0">
-              <p aria-hidden="true" className="text-caption font-medium text-navy tabular">
-                {String(i + 1).padStart(2, "0")}
-              </p>
+              <div className="flex items-center gap-3">
+                <Glyph icon={stepIcon(i)} />
+                <p aria-hidden="true" className="text-caption font-medium text-navy tabular">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+              </div>
               <h3 className="mt-3 text-h3">{step.title}</h3>
               <p className="mt-3 max-w-prose text-body text-ink-2">{step.body}</p>
               {i < steps.length - 1 ? (

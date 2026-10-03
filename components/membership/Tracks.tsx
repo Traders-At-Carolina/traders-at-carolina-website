@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/Reveal";
+import { Glyph, trackIcon } from "@/components/membership/icons";
 import { Section, SectionHeader } from "@/components/Section";
 import { TextLink } from "@/components/TextLink";
 import type { MembershipContent } from "@/content/types";
@@ -39,6 +40,7 @@ export function Tracks({ index, title, tracks, leadNames }: TracksProps) {
                 className="flex scroll-mt-24 flex-col py-12 first:pt-0 last:pb-0 lg:row-span-5 lg:grid lg:grid-rows-subgrid lg:gap-y-0 lg:px-8 lg:py-0 lg:first:pl-0 lg:last:pr-0"
               >
                 <div>
+                  <Glyph icon={trackIcon(track.id)} className="mb-4" />
                   <p className="eyebrow">{track.roleLabel}</p>
                   <h3 id={`${track.id}-title`} className="mt-3 text-h3">
                     {track.name}

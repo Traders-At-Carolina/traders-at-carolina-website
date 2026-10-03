@@ -2,6 +2,7 @@ import { Activities } from "@/components/membership/Activities";
 import { DepthChart } from "@/components/membership/DepthChart";
 import { Expectations } from "@/components/membership/Expectations";
 import { HowItWorks } from "@/components/membership/HowItWorks";
+import { PhotoBand } from "@/components/membership/PhotoBand";
 import { Tracks } from "@/components/membership/Tracks";
 import { PageHeader } from "@/components/PageHeader";
 import type { MembershipContent } from "@/content/types";
@@ -27,6 +28,7 @@ export function MembershipPage({ membership, leadNames }: MembershipPageProps) {
   const withExpectations = showExpectations(membership.expectations);
   const keys: SectionKey[] = withExpectations ? ["how", "tracks", "expectations", "activities"] : ["how", "tracks", "activities"];
   const n = numberSections(keys);
+  const [wide, ...pair] = membership.photos ?? [];
 
   return (
     <>
@@ -37,11 +39,13 @@ export function MembershipPage({ membership, leadNames }: MembershipPageProps) {
         art={<DepthChart seed={303} className="h-48 w-full lg:h-56" />}
       />
       <HowItWorks index={n.how} title={headings.how} steps={membership.steps} switchingPolicy={membership.switchingPolicy} />
+      {wide ? <PhotoBand photos={[wide]} /> : null}
       <Tracks index={n.tracks} title={headings.tracks} tracks={membership.tracks} leadNames={leadNames} />
       {withExpectations ? (
         <Expectations index={n.expectations} title={headings.expectations} expectations={membership.expectations} />
       ) : null}
       <Activities index={n.activities} title={headings.activities} activities={membership.activities} tracks={membership.tracks} />
+      {pair.length === 2 ? <PhotoBand photos={pair} /> : null}
     </>
   );
 }

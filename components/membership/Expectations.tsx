@@ -1,3 +1,4 @@
+import { Glyph, expectationIcon } from "@/components/membership/icons";
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
 import type { MembershipContent } from "@/content/types";
@@ -18,7 +19,11 @@ export function Expectations({ index, title, expectations }: ExpectationsProps) 
         <dl className="border-t border-rule">
           {expectationRows(expectations).map((row) => (
             <div key={row.term} className="grid grid-cols-12 gap-x-6 gap-y-2 border-b border-rule py-6">
-              <dt className="col-span-12 font-display text-h3 md:col-span-4">{row.term}</dt>
+              <dt className="col-span-12 font-display text-h3 md:col-span-4"><span className="inline-flex items-center gap-3">
+                  <Glyph icon={expectationIcon(row.term)} />
+                  {row.term}
+                </span>
+              </dt>
               <dd className="col-span-12 font-medium text-navy tabular md:col-span-3">{row.value}</dd>
               <dd className="col-span-12 max-w-prose text-body text-ink-2 md:col-span-5">{row.detail}</dd>
             </div>
