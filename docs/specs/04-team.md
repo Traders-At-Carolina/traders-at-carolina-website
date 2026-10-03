@@ -144,7 +144,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 - Sits directly after the last leadership tier and takes the next § number (§ 04 with all three tiers). § Placements (§4.4) follows it, and the team note stays last.
 
 **Content**
-- `SectionHeader`: eyebrow `§ 04 — WHERE WE'VE WORKED`, H2 (working copy: "Where our leadership has worked.", see open items below), no lead.
+- Heading: the same centered heading as the leadership tiers (`TierHeader` in `components/team/LeadershipTier.tsx`): eyebrow `§ 04 — Where we've worked` in sentence case, H2 in heavy Chivo (working copy: "Where our leadership has worked", without a period, like the tier titles; see open items below), no lead.
 - **Firms:** `content/placement-wall.ts`, the same list as the header strip and the footer strip (spec 07 §3.3). Adding an entry there updates all three.
 
 **Layout and look**
@@ -162,7 +162,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 - **Touch:** a drag that starts on a firm moves the firm (`touch-action: none` on the cells). A drag that starts on empty field scrolls the page (`touch-action: pan-y` on the field).
 - **Hover:** the hovered firm holds still and its mark goes to full ink. The others keep drifting.
 - **When it runs:** only while the field is on screen (IntersectionObserver). The frame step is clamped to 0.1s, so returning to a background tab doesn't make firms jump. A ResizeObserver keeps every firm inside the field when it resizes.
-- **Pause (WCAG 2.2.2):** a caption-size text button at the field's bottom-right reads "Pause motion" or "Play motion" and carries `aria-pressed`. While paused, the firms stop where they are and can't be dragged.
+- **Pause (WCAG 2.2.2):** a caption-size text button just below the field's bottom hairline, right-aligned, with a 44px tap target. Its label names the action, "Pause motion" or "Play motion"; it has no `aria-pressed`, because the label already carries the state. While paused, the firms stop where they are and can't be dragged.
 - Built with `requestAnimationFrame` and pointer events, following `PlacementWall`'s pattern. No animation or physics library (00 §9.2).
 
 **Reduced motion**
@@ -176,7 +176,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 - `components/team/FirmField.tsx` (client component), `lib/float-field.ts` (seeded layout and a pure `step()` function), styles in `app/globals.css` next to `.logo-strip`.
 
 **Open items**
-- [ ] **H2 copy.** "Where our leadership has worked." may overclaim: nobody in `content/team.ts` is linked to JPMorgan Chase, and Esther Yu's Citadel entry is a competition result. Alternative: "Firms in our orbit."
+- [ ] **H2 copy.** "Where our leadership has worked" may overclaim: nobody in `content/team.ts` is linked to JPMorgan Chase, and Esther Yu's Citadel entry is a competition result. Alternative: "Firms in our orbit."
 - [ ] **Follow-up, separate change:** the header strip (§4.1) also moves for more than 5 seconds with no pause control (WCAG 2.2.2).
 
 ---
@@ -265,5 +265,5 @@ export const placements: Array<{ firm: string }> = [];
 11. With a non-empty `placement-wall.ts`, the firm field (§4.6) renders directly after the last leadership tier as the next § number, before § Placements and the team note. With an empty list it is absent and the numbering stays contiguous.
 12. The field lists each firm once to assistive tech, with its name. First paint shows the seeded scatter with no hydration warning.
 13. Firms drift, bounce off each other and the edges without overlapping, can be dragged and flicked, and settle back to cruise speed. On touch, a drag that starts on empty field scrolls the page.
-14. The pause button stops and restarts all motion and reports its state with `aria-pressed`. The loop does not run while the field is off screen.
+14. The pause button stops and restarts all motion, and its label names the action it will take. The loop does not run while the field is off screen.
 15. Under `prefers-reduced-motion`, the field is a static wrapped row with no transforms and no pause button.
