@@ -1,7 +1,8 @@
 import type { ComponentProps } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
-import { LeadershipTier } from "@/components/team/LeadershipTier";
+import { FirmField } from "@/components/team/FirmField";
+import { LeadershipTier, TierHeader } from "@/components/team/LeadershipTier";
 import { PlacementWall } from "@/components/team/PlacementWall";
 import { Placements } from "@/components/team/Placements";
 import type { CompanyMark, Placement, TeamContent } from "@/content/types";
@@ -10,7 +11,7 @@ import { coPresidents, directors, execMembers, showPlacements, sortFirms } from 
 type TeamPageProps = {
   team: TeamContent;
   placements: Placement[];
-  /** Firms for the header strip (content/placement-wall.ts); empty omits the strip. */
+  /** Firms for the header strip and the § 04 firm field (content/placement-wall.ts); empty omits both. */
   wall: CompanyMark[];
 };
 
@@ -46,7 +47,10 @@ export function TeamPage({ team, placements, wall }: TeamPageProps) {
     .filter((tier) => tier.members.length > 0)
     // The first tier on the page carries the academic-year heading.
     .map((tier, i) => (i === 0 && team.academicYear ? { ...tier, title: `Leadership, ${team.academicYear}` } : tier));
-  const nextIndex = noLeadership ? 2 : tiers.length + 1;
+  // The firm field and Placements take the next numbers after the tiers, so § numbers stay contiguous.
+  const fieldIndex = noLeadership ? 2 : tiers.length + 1;
+  const showField = wall.length > 0;
+  const placementsIndex = showField ? fieldIndex + 1 : fieldIndex;
 
   return (
     <>
@@ -68,7 +72,13 @@ export function TeamPage({ team, placements, wall }: TeamPageProps) {
       ) : (
         tiers.map((tier, i) => <LeadershipTier key={tier.id} index={i + 1} {...tier} />)
       )}
-      {showPlacements(placements) ? <Placements index={nextIndex} firms={sortFirms(placements)} /> : null}
+      {showField ? (
+        <Section labelledBy="firm-field-title" density="compact">
+          <TierHeader index={fieldIndex} eyebrow="Where we've worked" title="Where our leadership has worked" id="firm-field-title" />
+          <FirmField companies={wall} />
+        </Section>
+      ) : null}
+      {showPlacements(placements) ? <Placements index={placementsIndex} firms={sortFirms(placements)} /> : null}
       {team.note ? (
         // A paragraph this long reads better left-aligned; the heading stays centered with the tiers above it.
         <Section labelledBy="team-note-title" density="compact">

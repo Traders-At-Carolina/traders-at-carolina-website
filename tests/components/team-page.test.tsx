@@ -160,4 +160,21 @@ describe("TeamPage", () => {
     const { container } = renderTeam({ people: [{ ...dir, headshot: plain }] });
     expect(container.querySelector("#dir-one img")).toHaveAttribute("alt", "Portrait of Dir One");
   });
+
+  it("adds the firm field after the tiers as the next section, with each firm once", () => {
+    renderTeam({ people: [dir, co, pres] }, [], ["Citadel", "AWS"].map(mark));
+    expect(eyebrows()).toEqual(["§ 01 — Operations", "§ 02 — Leadership", "§ 03 — Programs", "§ 04 — Where we've worked"]);
+    const region = screen.getByRole("region", { name: "Where our leadership has worked" });
+    expect(within(region).getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Citadel", "AWS"]);
+  });
+
+  it("numbers placements after the firm field", () => {
+    renderTeam({ people: [] }, firms(5), [mark("Citadel")]);
+    expect(eyebrows()).toEqual(["§ 01 — Operations", "§ 02 — Where we've worked", "§ 03 — Placements"]);
+  });
+
+  it("leaves the firm field out when the wall has no firms", () => {
+    renderTeam({ people: [pres] });
+    expect(screen.queryByRole("region", { name: "Where our leadership has worked" })).not.toBeInTheDocument();
+  });
 });
