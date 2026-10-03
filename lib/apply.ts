@@ -1,6 +1,7 @@
-import type { ApplyContent, Recruiting } from "@/content/types";
+import type { ApplyContent, ClubEvent, Recruiting, Site } from "@/content/types";
 import type { ApplicationState } from "@/lib/applications";
 import { parseEasternDateTime } from "@/lib/eastern-time";
+import { formatEventWhen, nextPublicEvent } from "@/lib/events";
 import { formatMonthDay, formatTime, formatWeekdayMonthDay } from "@/lib/format";
 
 export type ApplyAction = { label: string; href: string; external: boolean };
@@ -17,7 +18,6 @@ export type StatusCopy = {
   secondary?: { label: string; href: string };
 };
 
-export type BandCopy = { title: string; lead?: string; action: ApplyAction };
 
 const futureNextOpen = (state: ApplicationState, now: Date) =>
   state.status === "closed" && state.nextOpen && state.nextOpen.getTime() > now.getTime() ? state.nextOpen : undefined;
@@ -68,28 +68,6 @@ function closedFallback(contactEmail: string | undefined): ApplyAction {
     : { label: "Read the FAQ", href: "#faq", external: false };
 }
 
-/** Navy band copy for /apply. Closed looks ahead to the next cycle rather than repeating "closed" (spec 05 §4.4). */
-export function applyBandCopy(state: ApplicationState, recruiting: Recruiting, contactEmail: string | undefined, now: Date): BandCopy {
-  if (state.status === "open") {
-    return {
-      title: "Ready when you are.",
-      lead: state.deadline ? `Applications close ${formatWeekdayMonthDay(state.deadline)}.` : undefined,
-      action: { label: "Apply", href: recruiting.applyUrl, external: true },
-    };
-  }
-  const nextOpen = futureNextOpen(state, now);
-  if (recruiting.interestFormUrl) {
-    return {
-      title: "Don't miss the next cycle.",
-      lead: nextOpen
-        ? `Applications open ${formatWeekdayMonthDay(nextOpen)}. We'll email you when they do.`
-        : "We'll email you when applications open.",
-      action: { label: "Keep me posted", href: recruiting.interestFormUrl, external: true },
-    };
-  }
-  return { title: "Applications are closed for now.", action: closedFallback(contactEmail) };
-}
-
 /** The action that sits under "What you get": the same destination as the header, in a quieter style. */
 export function applyPrimaryAction(state: ApplicationState, recruiting: Recruiting, contactEmail: string | undefined): ApplyAction {
   if (state.status === "open") return { label: "Apply", href: recruiting.applyUrl, external: true };
@@ -138,4 +116,43 @@ export function stageEfforts(stages: ApplyContent["stages"], recruiting: Recruit
   return stages.map((stage, i) =>
     i === 0 && recruiting.applicationMinutes ? `About ${recruiting.applicationMinutes} minutes` : stage.effort,
   );
+}
+
+export type WaitItem = { title: string; body: string; links: Array<{ label: string; href: string; external?: boolean }> };
+
+/**
+ * What to do while applications are closed (spec 05 §4.2): four ways to get closer to the club before the next cycle.
+ * The first points at the next public event when there is one, and the last is left out with no social links.
+ */
+export function whileYouWait(events: ClubEvent[], social: Site["social"], now: Date): WaitItem[] {
+  const event = nextPublicEvent(events, now);
+  const items: WaitItem[] = [
+    event
+      ? {
+          title: "Come to an event",
+          body: `${event.title} · ${formatEventWhen(event)}. Open to everyone, no application needed.`,
+          links: event.url ? [{ label: "Details", href: event.url, external: true }] : [],
+        }
+      : {
+          title: "See what we do",
+          body: "Browse the weekly sessions, mock trading and competitions, so you know what a week with the club looks like.",
+          links: [{ label: "See weekly activities", href: "/membership#activities" }],
+        },
+    {
+      title: "Start getting ready",
+      body: "Each track lists the background that helps. Probability and mental math are a good place to start before applications open.",
+      links: [{ label: "Explore the three tracks", href: "/membership#tracks" }],
+    },
+    {
+      title: "Meet the people",
+      body: "Get to know the board and the members you'd be learning alongside.",
+      links: [{ label: "Meet the team", href: "/team" }],
+    },
+  ];
+  const links = [
+    social.instagram ? { label: "Instagram", href: social.instagram, external: true } : undefined,
+    social.linkedin ? { label: "LinkedIn", href: social.linkedin, external: true } : undefined,
+  ].filter((link): link is NonNullable<typeof link> => Boolean(link));
+  if (links.length) items.push({ title: "Follow along", body: "Event details and recruiting dates go up on our social channels first.", links });
+  return items;
 }

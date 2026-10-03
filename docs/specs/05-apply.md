@@ -18,7 +18,7 @@ Turn a student who's interested into an applicant, or into someone notified abou
 | Why is it worth applying? | What you get |
 | What happens after I apply? | Process and dates |
 | Am I eligible? Do I need experience? How do interviews work? | FAQ |
-| Applications are closed. How do I hear about the next cycle? | Status header (closed), Apply band |
+| Applications are closed. How do I hear about the next cycle? | Status header (closed), footer CTA zone |
 
 ---
 
@@ -31,7 +31,7 @@ Turn a student who's interested into an applicant, or into someone notified abou
 | 01 | What you get | bone | — |
 | 02 | Process and dates | bone | — |
 | 03 | FAQ | graphite | — |
-| — | Apply band (`CTABand`) | navy | — |
+| — | Footer CTA zone (`CTABand`, spec 07) | navy | — |
 | — | `SiteFooter` | black | — |
 
 **Conversion rule (2026-10-02 revision):** every section ends at, or sits next to, the one action for the current state: "Apply" while open, "Keep me posted" while closed. The closed state leads with that action, not with the fact that applications are closed, and no two sections repeat the same "closed" message.
@@ -59,7 +59,7 @@ getApplicationState(now: Date): ApplicationState
 
 **When it's evaluated**
 - **At build time on every page.** Spec 01 §5 behavior uses this helper rather than reading `applicationsOpen` directly.
-- **Again in the browser on `/apply` only.** A small client island re-evaluates with the visitor's clock after mount. If the result differs from the build-time render (for example, the deadline passed after the last deploy), it swaps the status block and the Apply band to the closed state. If the results match, nothing re-renders, so there's no flash.
+- **Again in the browser on `/apply` only.** A small client island re-evaluates with the visitor's clock after mount. If the result differs from the build-time render (for example, the deadline passed after the last deploy), it swaps the status block (and the footer CTA zone) to the closed state. If the results match, nothing re-renders, so there's no flash.
 
 **Operational note for officers (also in the README at implementation time):** at the deadline, also set the Google Form to "Not accepting responses". Other pages update on the next deploy. The form's own setting guarantees no late submissions.
 
@@ -118,7 +118,7 @@ getApplicationState(now: Date): ApplicationState
 ### 4.4 FAQ (§ 03)
 
 - Graphite (00 §6). `id="faq"` on the section.
-- **Desktop:** two columns under one full-width hairline. Eyebrow `§ 03 — FAQ`, H2 "Common questions." and the "Still have questions? Email {contact email}" caption in columns 1–4, sticky while scrolling. The accordion is in columns 6–12. **Mobile:** stacked, with the accordion under the heading.
+- **Desktop:** two columns under one full-width hairline. Eyebrow `§ 03 — FAQ`, H2 "Common questions." and the "Questions? Email {contact email}" caption in columns 1–4, sticky while scrolling. The accordion is in columns 6–12. **Mobile:** stacked, with the accordion under the heading.
 - **Accordion:** native `<details>`/`<summary>`, one per question. Rules:
   - All closed by default.
   - Multiple can be open at once.
@@ -140,17 +140,13 @@ getApplicationState(now: Date): ApplicationState
 - **Drafts:** an item with `draft: true` renders in development and on Vercel preview deployments, never on production (`VERCEL_ENV === "production"`). This lets officers review working answers on a preview link before publishing.
 - Additional questions may be appended through content. Recommended ≤ 8.
 
-### 4.5 Apply band
+### 4.5 Closing band
 
-- `CTABand`, using the same state as the status block (§3).
-- **Open:** H2 "Ready when you are.", lead "Applications close {Fri, Feb 6}." (omitted with no deadline), button `inverse` "Apply ↗".
-- **Closed with interest form:** H2 "Don't miss the next cycle.", lead "Applications open {Mon, Jan 12}. We'll email you when they do." or, with no future date, "We'll email you when applications open.", button `inverse` "Keep me posted ↗".
-- **Closed with no interest form:** H2 "Applications are closed for now.", with the "Email us" / "Read the FAQ" fallback.
-- This is the page's single navy band.
+- `/apply` has no band of its own. The footer's CTA zone (spec 07) closes the page, with the same "We're between cycles." copy as every other page, so "Keep me posted" appears once there instead of twice.
 
 ### 4.6 Measurement
 
-Analytics are defined in [spec 06 §7](06-admin.md). Every Apply and "Keep me posted" action on this page carries the §7.1 tracking attributes, with placements `apply-header`, `apply-benefits` and `band`, so the dashboard can compare clicks by section.
+Analytics are defined in [spec 06 §7](06-admin.md). Every Apply and "Keep me posted" action on this page carries the §7.1 tracking attributes, with placements `apply-header`, `apply-benefits` and (in the footer) `band`, so the dashboard can compare clicks by section.
 
 ---
 
@@ -233,7 +229,7 @@ export const apply = {
 ## 9. Acceptance criteria
 
 1. With `applicationsOpen: true` and a future deadline, the header shows the open state, and Apply opens `applyUrl` in a new tab with `rel="noopener noreferrer"`.
-2. With `applicationsOpen: false`, the header leads with "Be first to know when applications open.", the header has exactly one link ("Keep me posted"), and the band reads "Don't miss the next cycle." Every "Keep me posted" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
+2. With `applicationsOpen: false`, the header leads with "Be first to know when applications open.", the header has exactly one link ("Keep me posted"), and the footer CTA zone reads "We're between cycles." Every "Keep me posted" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
 3. With `applicationsOpen: true` but a deadline in the past *at build time*, every page renders the closed state.
 4. With the deadline passing *after* the build, `/apply` swaps to the closed state in the browser, the change is announced via `aria-live`, and there's no layout shift beyond the swapped text.
 5. All dates render from ISO values in America/New_York with the formats shown in §4. No typed display strings appear in content.

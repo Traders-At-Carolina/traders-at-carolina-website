@@ -8,7 +8,8 @@ export const site: Site = {
   name: "Traders at Carolina",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   mission: "Preparing UNC students for careers in quantitative trading, research and engineering.",
-  // Pending from the club (00 §14): contact email, disclaimer.
+  contactEmail: "tradersatcarolina@gmail.com",
+  // Pending from the club (00 §14): disclaimer.
   social: {
     instagram: "https://www.instagram.com/tradersatcarolina/",
     linkedin: "https://www.linkedin.com/company/carolinainvestmentgroup",

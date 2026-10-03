@@ -71,7 +71,7 @@ One `SiteFooter` component: a navy CTA zone on top of a black base made of three
 
 ### 3.1 CTA zone (`CTABand`, now rendered only by `SiteFooter`)
 
-- The existing `CTABand` markup moves inside the footer unchanged: a full-bleed `navy` section, H2 in `white`, optional lead in `bone`, an `inverse` button. It counts as the page's one navy band (00 §4.3). The footer is the only place a navy band appears, except on `/apply`, which also has its own band above it (spec 05 §4.4).
+- The existing `CTABand` markup moves inside the footer unchanged: a full-bleed `navy` section, H2 in `white`, optional lead in `bone`, an `inverse` button. It counts as the page's one navy band (00 §4.3). The footer is the only place a navy band appears.
 - Copy and action come from `homeApplyCopy(state, recruiting, now).band` (spec 01 §5), the same helper Home used. Nothing new to write:
 
 | State | H2 | Lead | Button |
@@ -201,13 +201,13 @@ Work in this order so each step is shippable: footer rebuild → remove page ban
 
 ## 10. Acceptance criteria
 
-1. Every page ends with the same footer: the navy CTA zone directly above the black link grid. `/apply` additionally renders its own navy band above it. Only `ApplyPage` and the footer render `CTABand`; no other page component does.
+1. Every page ends with the same footer: the navy CTA zone directly above the black link grid. Only the footer renders `CTABand`; no page component does.
 2. With `applicationsOpen: false` and an interest form, the CTA zone reads "We're between cycles." (with a lead that says applications aren't open right now) and "Keep me posted" opens `interestFormUrl`; without one, it offers "See how it works →" to `/apply`. With `applicationsOpen: true`, it reads "Ready to start?" with "Apply" opening `applyUrl`, plus the deadline lead when one is set.
 3. With a deadline in the past at build time, the zone renders closed; with a future deadline it renders open and flips to closed in the browser at the deadline, on any page, with no flash.
 4. Club shows About, Membership, Team. Join shows Apply (state-aware), and Keep me posted only when an interest form exists. Reach and its heading are absent until a contact value is set, and each row appears only when its own value is set.
 5. The placement strip shows on every page, including `/team`, when `placementWall` is non-empty; marks keep their own colours on the black footer; the loop never shows an empty stretch up to 2560px wide; it is static under reduced motion; adding an entry to `placement-wall.ts` updates both the Team header and the footer.
 6. The Team header strip is visually unchanged.
-7. On every page, the section directly above the navy band (the footer's zone, or `/apply`'s own band) has the extra bottom padding and its tone runs up to the navy.
+7. On every page, the section directly above the navy band (the footer's zone) has the extra bottom padding and its tone runs up to the navy.
 8. Layout holds at 375, 768 and 1280px: no horizontal scroll, touch rows at least 44px, long email addresses wrap, nothing truncates.
 9. Keyboard: tab order runs CTA button, Club, Join, Reach, strip, with a visible bone focus ring.
 10. `pnpm test` and `pnpm build` pass, and the old band assertions are gone from the page tests.
