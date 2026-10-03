@@ -163,16 +163,16 @@ type ImageAsset = { src: string; width: number; height: number; blurDataURL?: st
 
 ### 5.1 Tables
 
-The first group ships in phase 2 (migration `0001`). The rest ship with the phase that needs them.
+The first group ships in phase 2 (migrations `0001` and `0002`; the bold columns are `0002`). The rest ship with the phase that needs them.
 
 | Table | Columns | Replaces | Phase |
 |---|---|---|---|
-| `photos` | id, image, alt, caption, ratio (`3:2` \| `4:5`), home_order (1–3, nullable, unique), **membership_order (1–3, nullable, unique)**, timestamps | `home.photos` (01 §6), `membership.photos` (03) | 2, +3 |
+| `photos` | id, image, alt, caption, ratio (`3:2` \| `4:5`), home_order (1–3, nullable, unique), **membership_order (1–3, nullable, unique)**, timestamps | `home.photos` (01 §6), `membership.photos` (03) | 2 |
 | `tracks` | id (`trading` \| `research` \| `development`, primary key), role_label, name, description, good_fit?, sample_problem?, recommended_background[], lead_slug → people.slug | `membership.tracks` (03 §5) | 2 |
 | `sponsors` | id, name (unique, case-insensitive), relationship?, url?, logo? | `about.partners` (02 §5) | 2 |
 | `placements` | id, firm (unique, case-insensitive), logo?, logo_on_dark?, show_on_wall, wall_order? | `placements`, `CompanyMark`, and the PlacementWall list (04 §5) | 2 |
-| `people` | id, slug (unique; fixed after creation), name, role, group (`co-president` \| `exec` \| `director` \| `track-lead`), track?, sort_order, class_year?, major?, headshot?, alt?, placement_note?, company_id → placements, linkedin?, **visible (default true)** | `team.people` (04 §5) | 2, +5 |
-| `audit_log` | id, at, actor_id, actor_email, action, entity, entity_label, **entity_id, before (jsonb), after (jsonb)** | — | 2, +3 |
+| `people` | id, slug (unique; fixed after creation), name, role, group (`co-president` \| `exec` \| `director` \| `track-lead`), track?, sort_order, class_year?, major?, headshot?, alt?, placement_note?, company_id → placements, linkedin?, **visible (default true)** | `team.people` (04 §5) | 2 |
+| `audit_log` | id, at, actor_id, actor_email, action, entity, entity_label, **entity_id, before (jsonb), after (jsonb)**; index on (entity, entity_id, at desc) | — | 2 |
 | `settings` | key (`recruiting` \| `season` \| `portal`, primary key), value (jsonb, zod-validated per key), updated_at | `site.recruiting`, `home.stats.members`, `team.academicYear` | 6 |
 | `events` | id, title, type, starts_at, ends_at?, location?, description?, url?, audience, featured, timestamps | `home.upcoming` (01 §6) | 6 |
 | `members` | id, email (unique, case-insensitive), name, status (`active` \| `alumni` \| `inactive`), track?, class_year?, cohort?, user_id? (unique), notes?, timestamps | — | 4 |
@@ -185,7 +185,7 @@ The first group ships in phase 2 (migration `0001`). The rest ship with the phas
 
 **Audit actions.** Revision 1's set (`create`, `update`, `delete`, `reorder`, `grant-admin`, `revoke-admin`, `invite`, `revoke-invite`) gains `undo`, `add-members`, `update-members`, `remove-members`, `approve-request` and `decline-request`.
 
-If phase 2 has not merged when phase 3 starts, the `audit_log` columns are folded into migration `0001`; otherwise they arrive in a new migration.
+Audit actions are a Drizzle text enum, so adding one needs no migration.
 
 ### 5.2 Settings shapes
 
@@ -506,7 +506,7 @@ Each phase is its own implementation plan and PR. A phase is implemented only wh
 |---|---|---|
 | 0 | Refactor with no behaviour change: `(site)` route group, `ImageAsset`, and the validator split | Done |
 | 1 | Analytics capture: tracking attributes, canonical URLs. Ships early so data accumulates. | Done (footer notice still to add) |
-| 2 | Infrastructure and auth shell: Clerk, Neon, Blob; `proxy.ts`, sign-in, Admins screen, schema `0001`, seed | In progress |
+| 2 | Infrastructure and auth shell: Clerk, Neon, Blob; `proxy.ts`, sign-in, Admins screen, schema `0001` + `0002` (undo columns, Membership photo slots, officer visibility), seed | In review (PR #26) |
 | 3 | **Editor framework + Photos.** `lib/data/public.ts`, `lib/admin/action.ts`, `ImageUpload`, save toast with Undo, History, the console sidebar groups. Photos end to end with Home and Membership slots. The template for every other editor. | |
 | 4 | **Members.** Roster, bulk add with optional invitations, requests, all accounts, CSV export, `lib/members/resolve.ts` and `audience.ts`. | |
 | 5 | **Website lists.** Sponsors → Placements → Officers (visible flag, academic year) → Tracks, each with its public page cut over. | |
