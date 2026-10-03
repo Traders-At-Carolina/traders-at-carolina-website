@@ -174,10 +174,10 @@ The first group ships in phase 2 (migrations `0001` and `0002`; the bold columns
 | `people` | id, slug (unique; fixed after creation), name, role, group (`co-president` \| `exec` \| `director` \| `track-lead`), track?, sort_order, class_year?, major?, headshot?, alt?, placement_note?, company_id → placements, linkedin?, **visible (default true)** | `team.people` (04 §5) | 2 |
 | `audit_log` | id, at, actor_id, actor_email, action, entity, entity_label, **entity_id, before (jsonb), after (jsonb)**; index on (entity, entity_id, at desc) | — | 2 |
 | `settings` | key (`recruiting` \| `season` \| `portal`, primary key), value (jsonb, zod-validated per key), updated_at | `site.recruiting`, `home.stats.members`, `team.academicYear` | 6 |
-| `events` | id, title, type, starts_at, ends_at?, location?, description?, url?, audience, featured, timestamps | `home.upcoming` (01 §6) | 6 |
+| `events` | id, title, type (`general-meeting` \| `workshop` \| `speaker` \| `competition` \| `social` \| `recruiting` \| `other`), starts_at, ends_at?, location?, description?, url?, audience, featured, timestamps | `home.upcoming` (01 §6) | 6 |
 | `members` | id, email (unique, case-insensitive), name, status (`active` \| `alumni` \| `inactive`), track?, class_year?, cohort?, user_id? (unique), notes?, timestamps | — | 4 |
 | `membership_requests` | id, user_id, email, name, note?, status (`pending` \| `approved` \| `declined`), decided_by?, decided_at?, created_at. At most one pending request per user. | — | 4 |
-| `resources` | id, title, kind, section, tracks[] (empty means all), description?, file? (`{pathname, size, contentType}`, private store), url?, audience, pinned, sort_order, hidden, timestamps | — | 7 |
+| `resources` | id, title, kind (`slides` \| `notes` \| `textbook` \| `problem-set` \| `video` \| `link`), section (`learning` \| `interview-prep` \| `recruiting` \| `other`), tracks[] (empty means all), description?, file? (`{pathname, size, contentType}`, private store), url?, audience, pinned, sort_order, hidden, timestamps | — | 7 |
 | `announcements` | id, title, body, audience, pinned, show_from?, show_until?, timestamps | — | 7 |
 | `portal_links` | id, label, url, description?, audience, sort_order | — | 7 |
 
