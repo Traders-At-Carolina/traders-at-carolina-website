@@ -1,6 +1,7 @@
 import { UndoButton } from "@/components/admin/UndoButton";
 import { historyFacets, latestIdsFor, listHistory } from "@/lib/admin/audit";
 import { changedFields } from "@/lib/admin/diff";
+import { LIST_AREAS } from "@/lib/admin/lists-undo";
 import { MEMBER_AREAS } from "@/lib/admin/members-undo";
 import { canUndoEntity } from "@/lib/admin/undo";
 import { requirePage } from "@/lib/auth/admin";
@@ -8,7 +9,7 @@ import { requirePage } from "@/lib/auth/admin";
 export const metadata = { title: "History" };
 
 const when = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "America/New_York" });
-const AREA: Record<string, string> = { photo: "Photos", "photo-slots": "Photo slots", admin: "Admins", ...MEMBER_AREAS };
+const AREA: Record<string, string> = { photo: "Photos", "photo-slots": "Photo slots", admin: "Admins", ...MEMBER_AREAS, ...LIST_AREAS };
 
 const show = (v: unknown) => (v === undefined || v === null ? "—" : typeof v === "string" ? v : JSON.stringify(v));
 

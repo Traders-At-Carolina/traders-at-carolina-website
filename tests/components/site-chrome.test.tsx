@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import NotFound from "@/app/not-found";
 import { SiteChrome } from "@/components/SiteChrome";
 
+vi.mock("@/lib/data/public", () => ({ getPlacements: async () => ({ firms: [], wall: [] }) }));
+
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 describe("SiteChrome", () => {
@@ -23,8 +25,8 @@ describe("SiteChrome", () => {
 });
 
 describe("NotFound", () => {
-  it("keeps the site header and footer on unknown URLs", () => {
-    render(<NotFound />);
+  it("keeps the site header and footer on unknown URLs", async () => {
+    render(await NotFound());
     expect(screen.getByRole("banner")).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveTextContent("This page isn't here.");
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { HomePage } from "@/components/home/HomePage";
-import { about } from "@/content/about";
 import { events } from "@/content/events";
 import { home } from "@/content/home";
 import { site } from "@/content/site";
 import { resolvePartnerFirms, sortPartners } from "@/lib/about";
-import { getHomePhotos } from "@/lib/data/public";
+import { getHomePhotos, getSponsors } from "@/lib/data/public";
 import { validateEvents } from "@/lib/validate-events";
 import { validateHome } from "@/lib/validate-home";
 
@@ -18,16 +17,17 @@ export const metadata: Metadata = {
   description: home.hero.subhead,
 };
 
-/** Photos come from the admin photo library (spec 06 §6.6); the rest of Home is still content/home.ts. */
+/** Photos and sponsors come from the admin (spec 06 §6.6, §6.7); the rest of Home is still content/home.ts. */
 export default async function Page() {
   // The partner stat counts the About partner list unless set explicitly, so the two never disagree (spec 02 §5).
+  const [photos, partners] = await Promise.all([getHomePhotos(), getSponsors()]);
   const content = {
     ...home,
-    photos: await getHomePhotos(),
-    stats: { ...home.stats, partnerFirms: resolvePartnerFirms(home.stats.partnerFirms, about.partners) },
+    photos,
+    stats: { ...home.stats, partnerFirms: resolvePartnerFirms(home.stats.partnerFirms, partners) },
   };
   // Inside the page function: a bad save fails this regeneration and the last good page keeps being served.
   validateHome(content);
-  const sponsors = sortPartners(about.partners).map(({ name, logo }) => ({ name, logo }));
+  const sponsors = sortPartners(partners).map(({ name, logo }) => ({ name, logo }));
   return <HomePage home={content} recruiting={site.recruiting} sponsors={sponsors} events={events} now={new Date()} />;
 }

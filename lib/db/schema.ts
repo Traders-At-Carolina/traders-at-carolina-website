@@ -219,3 +219,13 @@ export const membershipRequests = pgTable(
     index("membership_requests_user_idx").on(t.userId, t.createdAt.desc()),
   ],
 );
+
+/**
+ * Site-wide settings, one zod-validated JSON value per key (spec 06 §5.2). Phase 5 uses `season` (academic year);
+ * phase 6 adds `recruiting` and the member-count mode, and phase 7 `portal`.
+ */
+export const settings = pgTable("settings", {
+  key: text("key", { enum: ["recruiting", "season", "portal"] }).primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
