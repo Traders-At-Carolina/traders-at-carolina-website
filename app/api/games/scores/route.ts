@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
 import { SAVES_PER_HOUR, nameThreshold, scoreRequest, scoreSubmission, shouldAskName } from "@/lib/games/scores";
 import { claimPlayer, hasContact, hashIp, insertScore, personalBest, savesInLastHour, scoreStats } from "@/lib/games/scores-db";
+import { sessionUserId } from "@/lib/games/session";
 
 export type SaveScoreResponse = {
   scoreId: number;
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Too many saves. Try again later." }, { status: 429 });
   }
 
-  const { userId } = await auth();
+  const userId = await sessionUserId(request);
   if (userId) await claimPlayer(playerId, userId);
 
   const previous = await personalBest(scored.game, userId ? { userId } : { playerId });
