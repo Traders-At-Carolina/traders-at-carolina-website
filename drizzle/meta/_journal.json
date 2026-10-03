@@ -8,6 +8,13 @@
       "when": 1791050807188,
       "tag": "0000_game_scores",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791055409911,
+      "tag": "0001_wild_the_liberteens",
+      "breakpoints": true
     }
   ]
 }
