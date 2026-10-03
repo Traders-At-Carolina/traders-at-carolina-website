@@ -30,7 +30,7 @@ function useReducedMotion() {
   );
 }
 
-/** Band visibility: the loop runs above VISIBLE, and the scroll-in load starts at START (spec 06 §5). */
+/** Band visibility: the loop runs above VISIBLE, and the scroll-in load starts at START (spec 08 §5). */
 const VISIBLE = 0.1;
 const START = 0.4;
 /** The letter mask is drawn this many times larger than the grid, then averaged down per cell. */
@@ -39,7 +39,7 @@ const MASK_SCALE = 4;
 type Pointer = { x: number; y: number; radius: number };
 
 /**
- * Decorative footer band (spec 06): a field of 0s and 1s that starts scrambled, resolves into "Traders at Carolina"
+ * Decorative footer band (spec 08): a field of 0s and 1s that starts scrambled, resolves into "Traders at Carolina"
  * each time it scrolls into view, and lights up around the pointer. One canvas, no animation library. All the
  * decisions (grid, mask, load, hover, per-cell look) live in bitWordmarkScene.ts; this component owns the DOM.
  */

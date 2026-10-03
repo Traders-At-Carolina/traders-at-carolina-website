@@ -12,7 +12,7 @@ type ExpectationsProps = {
 /** Time, attendance and prerequisites as a definition list, on graphite (spec 03 §3.5). */
 export function Expectations({ index, title, expectations }: ExpectationsProps) {
   return (
-    <Section tone="graphite" labelledBy="expectations-title">
+    <Section tone="graphite" id="expectations" labelledBy="expectations-title">
       <SectionHeader index={index} eyebrow="Expectations" title={title} id="expectations-title" />
       <Reveal className="mt-12 md:mt-16">
         <dl className="border-t border-rule">

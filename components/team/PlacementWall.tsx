@@ -8,6 +8,8 @@ import type { CompanyMark } from "@/content/types";
 
 type PlacementWallProps = {
   companies: CompanyMark[];
+  /** `inverse` draws bone marks and hairlines for black backgrounds (the footer, spec 07 §3.3). */
+  tone?: "default" | "inverse";
 };
 
 /** Idle drift, px per second. */
@@ -16,18 +18,19 @@ const DRIFT = 24;
 const FRICTION = 4;
 const MAX_FLICK = 3000;
 
-function Cells({ companies }: PlacementWallProps) {
+function Cells({ companies, tone = "default" }: PlacementWallProps) {
+  const inverse = tone === "inverse";
   return companies.map((company) => (
     <li key={company.name} className="flex h-28 w-48 shrink-0 flex-col items-center justify-center gap-3 px-4 lg:h-32">
-      {/* Marks are flattened to one ink colour on bone. The caption names the firm because some marks
-          (Infragrid's bare square) say nothing alone, so the image is decorative. */}
+      {/* Marks are flattened to one ink colour (bone on black when inverse). The caption names the firm because some
+          marks (Infragrid's bare square) say nothing alone, so the image is decorative. */}
       <Image
         src={company.logo}
         alt=""
         draggable={false}
-        className="h-auto max-h-8 w-auto max-w-full object-contain opacity-70 brightness-0"
+        className={`h-auto max-h-8 w-auto max-w-full object-contain opacity-70 ${inverse ? "brightness-0 invert" : "brightness-0"}`}
       />
-      <span className="text-caption text-ink-2">{company.name}</span>
+      <span className={`text-caption ${inverse ? "text-bone" : "text-ink-2"}`}>{company.name}</span>
     </li>
   ));
 }
@@ -40,7 +43,7 @@ const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: r
  * repeated once so the loop never shows a seam; the copy is aria-hidden. Layout and the mask live in globals.css
  * (.logo-strip); with reduced motion the strip is a static wrapped row and none of the motion below runs.
  */
-export function PlacementWall({ companies }: PlacementWallProps) {
+export function PlacementWall({ companies, tone = "default" }: PlacementWallProps) {
   const stripRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   // Mutable motion state; kept out of React state because it changes every frame.
@@ -114,10 +117,10 @@ export function PlacementWall({ companies }: PlacementWallProps) {
 
   return (
     <Reveal>
-      <Eyebrow>{"Where we've worked"}</Eyebrow>
+      <Eyebrow tone={tone}>{"Where we've worked"}</Eyebrow>
       <div
         ref={stripRef}
-        className="logo-strip mt-6 border-y border-rule"
+        className={`logo-strip mt-6 border-y ${tone === "inverse" ? "border-rule-inverse" : "border-rule"}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
@@ -127,10 +130,10 @@ export function PlacementWall({ companies }: PlacementWallProps) {
       >
         <div ref={trackRef} className="logo-strip-track">
           <ul className="logo-strip-list">
-            <Cells companies={companies} />
+            <Cells companies={companies} tone={tone} />
           </ul>
           <ul aria-hidden="true" className="logo-strip-list logo-strip-copy">
-            <Cells companies={companies} />
+            <Cells companies={companies} tone={tone} />
           </ul>
         </div>
       </div>

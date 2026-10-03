@@ -22,7 +22,7 @@ Give visitors who want more than the Home page a clear sense of **why the club e
 | How did it start? | Our story |
 | What's it like to be part of it? | Principles |
 | Who supports it? | Partners and advisors |
-| How do I join? | Apply band |
+| How do I join? | Footer CTA zone |
 
 ---
 
@@ -36,7 +36,6 @@ Give visitors who want more than the Home page a clear sense of **why the club e
 | 02 | Our story | bone | — |
 | 03 | Principles | bone | — |
 | 04 | Partners and advisors | white | — |
-| — | Apply band (`CTABand`) | navy | — |
 | — | `SiteFooter` | black | — |
 
 ---
@@ -135,11 +134,9 @@ Give visitors who want more than the Home page a clear sense of **why the club e
 | 0 | ≥ 1 | Eyebrow becomes `§ 04 — ADVISORS`, H2 "Our advisors." |
 | 0 | 0 | Section omitted; numbering stays sequential (no gap) |
 
-### 3.6 Apply band
+### 3.6 Apply band (removed 2026-10-02)
 
-- `CTABand` with the shared Apply behavior from spec 01 §5 (open/closed copy and buttons are identical across pages).
-- H2 working copy (open): "Want to be part of the next chapter?"
-- This is the page's single navy band.
+The closing Apply call to action now lives in the footer on every page (spec 07). About no longer renders `CTABand`.
 
 ---
 
@@ -211,7 +208,7 @@ export const timeline: Array<{
 
 ## 8. Acceptance criteria
 
-1. The page renders the sections in §2 order with the listed backgrounds. There's exactly one navy band.
+1. The page renders the sections in §2 order with the listed backgrounds. There is no navy band on the page; the footer's CTA zone supplies it (spec 07).
 2. With fewer than 3 timeline entries, no milestones list or leftover spacing renders. Adding a third entry makes it appear with no code change.
 3. Removing `story.quote` reflows the story to prose only, with no empty column on desktop.
 4. Each of the four partners/advisors states in §3.5 renders as specified, including the section being omitted when both lists are empty.

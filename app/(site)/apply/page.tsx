@@ -12,6 +12,7 @@ const state = getApplicationState(new Date(), site.recruiting);
 
 export const metadata: Metadata = {
   title: "Apply",
+  alternates: { canonical: "/apply" },
   description:
     state.status === "open" && site.recruiting.cycleLabel && state.deadline
       ? `Applications for ${site.recruiting.cycleLabel} are open through ${formatWeekdayMonthDay(state.deadline)}.`

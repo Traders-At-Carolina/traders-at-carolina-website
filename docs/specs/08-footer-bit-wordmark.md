@@ -1,4 +1,4 @@
-# Spec 06 — Footer bit wordmark
+# Spec 08 — Footer bit wordmark
 
 **Status:** Implemented · **Date:** 2026-10-02 · **Route:** every page (inside `SiteFooter`) · **Depends on:** [Spec 00 §3, §9.2, §10](00-vision-and-style.md)
 

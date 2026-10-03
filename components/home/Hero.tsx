@@ -5,6 +5,7 @@ import { TextLink } from "@/components/TextLink";
 import { VolSurfaceFigure } from "@/components/home/VolSurfaceFigure";
 import type { ReactNode } from "react";
 import type { HomeContent } from "@/content/types";
+import { ctaFromLabel } from "@/lib/analytics/attributes";
 import type { HomeApplyCopy } from "@/lib/home";
 
 type HeroProps = {
@@ -31,10 +32,16 @@ export function HeroActions({ apply }: { apply: HomeApplyCopy["hero"] }) {
   return (
     <>
       <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
-        <Button href={apply.href} external={apply.external} arrow={apply.arrow} className="w-full sm:w-auto">
+        <Button
+          href={apply.href}
+          external={apply.external}
+          arrow={apply.arrow}
+          className="w-full sm:w-auto"
+          track={{ cta: ctaFromLabel(apply.label), placement: "hero" }}
+        >
           {apply.label}
         </Button>
-        <TextLink href="/membership" arrow className="hit-target whitespace-nowrap">
+        <TextLink href="/membership" arrow className="hit-target whitespace-nowrap" track={{ cta: "how-membership-works", placement: "hero" }}>
           How membership works
         </TextLink>
       </div>

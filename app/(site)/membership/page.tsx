@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { MembershipPage } from "@/components/membership/MembershipPage";
 import { membership } from "@/content/membership";
-import { site } from "@/content/site";
 import { team } from "@/content/team";
 import { trackLeadNames } from "@/lib/team";
 import { validateMembership } from "@/lib/validate-membership";
@@ -16,9 +15,10 @@ validateMembership(
 
 export const metadata: Metadata = {
   title: "Membership",
+  alternates: { canonical: "/membership" },
   description: membership.header.lead,
 };
 
 export default function Page() {
-  return <MembershipPage membership={membership} leadNames={leadNames} recruiting={site.recruiting} now={new Date()} />;
+  return <MembershipPage membership={membership} leadNames={leadNames} />;
 }

@@ -28,6 +28,15 @@ import {
 } from "@/components/home/volSurfaceScene";
 import { DOMAIN, impliedVol, surfaceGrid, type VolParams } from "@/lib/vol-surface";
 
+// @react-three/fiber 9.8.1 still builds its store with THREE.Clock, which three 0.186 deprecates. Dev-only noise; drop this once fiber moves to THREE.Timer.
+if (process.env.NODE_ENV !== "production" && typeof window !== "undefined") {
+  const warn = console.warn;
+  console.warn = (...args: unknown[]) => {
+    if (typeof args[0] === "string" && args[0].startsWith("THREE.Clock:")) return;
+    warn(...args);
+  };
+}
+
 type VolSurfaceCanvasProps = {
   params: VolParams;
   /** Whether the idle spin runs (off while the user is interacting, offscreen or under reduced motion). */

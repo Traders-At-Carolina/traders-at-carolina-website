@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { aboutSectionKeys, resolvePartnerFirms, showMilestones, sortPartners, sortTimeline } from "@/lib/about";
-import { validateAbout } from "@/lib/validate-about";
+import { collectAboutProblems, validateAbout } from "@/lib/validate-about";
 import type { AboutContent, TimelineEntry } from "@/content/types";
 
 const about: AboutContent = {
@@ -86,5 +86,16 @@ describe("validateAbout", () => {
 
   it("rejects non-integer or implausible milestone years", () => {
     expect(() => validateAbout(about, [{ year: 20.5, title: "x" }])).toThrow(/timeline/);
+  });
+});
+
+describe("collectAboutProblems", () => {
+  it("returns no problems for valid content", () => {
+    expect(collectAboutProblems(about, [])).toEqual([]);
+  });
+
+  it("returns problems instead of throwing", () => {
+    const partners = [{ name: "Optiver" }, { name: "optiver" }];
+    expect(collectAboutProblems({ ...about, partners }, [])).toEqual(['partners: duplicate name "optiver"']);
   });
 });

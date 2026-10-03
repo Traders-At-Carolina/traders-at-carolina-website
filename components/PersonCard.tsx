@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { LinkedInIcon } from "@/components/LinkedInIcon";
 import type { CompanyMark, Person } from "@/content/types";
+import { trackAttrs } from "@/lib/analytics/attributes";
 import { initials, personMeta } from "@/lib/team";
 
 type PersonCardProps = {
@@ -40,7 +41,7 @@ export function PersonCard({ person, sizes = "(min-width: 640px) 192px, 50vw" }:
             alt={person.alt ?? ""}
             fill
             sizes={sizes}
-            placeholder="blur"
+            placeholder={person.headshot.blurDataURL ? "blur" : "empty"}
             className="object-cover object-[50%_25%]"
           />
         ) : (
@@ -64,6 +65,7 @@ export function PersonCard({ person, sizes = "(min-width: 640px) 192px, 50vw" }:
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${person.name} on LinkedIn`}
+            {...trackAttrs({ cta: "linkedin", target: person.slug })}
             className="mt-1 inline-flex min-h-11 min-w-11 items-center justify-center text-navy hover:text-navy-press"
           >
             <LinkedInIcon />

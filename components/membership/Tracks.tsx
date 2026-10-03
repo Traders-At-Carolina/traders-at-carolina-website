@@ -70,7 +70,7 @@ export function Tracks({ index, title, tracks, leadNames }: TracksProps) {
                   </ul>
                   {lead ? (
                     <p className="mt-6 text-caption">
-                      <TextLink href={`/team#${track.leadSlug}`}>Led by {lead}</TextLink>
+                      <TextLink href={`/team#${track.leadSlug}`} track={{ cta: "track-lead", target: track.leadSlug }}>Led by {lead}</TextLink>
                     </p>
                   ) : null}
                 </div>

@@ -21,7 +21,14 @@ function Photo({ photo, ratio, sizes, className = "" }: { photo: HomePhoto; rati
   return (
     <figure className={className}>
       <div className={`relative overflow-hidden ${ratio === "4:5" ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
-        <Image src={photo.src} alt={photo.alt} fill sizes={sizes} placeholder="blur" className="object-cover saturate-[0.88]" />
+        <Image
+          src={photo.src}
+          alt={photo.alt}
+          fill
+          sizes={sizes}
+          placeholder={photo.src.blurDataURL ? "blur" : "empty"}
+          className="object-cover saturate-[0.88]"
+        />
       </div>
       <figcaption className="mt-3 text-caption text-ink-3">{photo.caption}</figcaption>
     </figure>
@@ -41,7 +48,7 @@ function UpcomingCard({ upcoming }: { upcoming: NonNullable<HomeContent["upcomin
       <p className="mt-1 text-caption text-ink-3">{upcoming.location}</p>
       {upcoming.link ? (
         <p className="mt-5">
-          <TextLink href={upcoming.link.href} external={external} arrow>
+          <TextLink href={upcoming.link.href} external={external} arrow track={{ cta: "upcoming-event", target: upcoming.title }}>
             {upcoming.link.label}
           </TextLink>
         </p>

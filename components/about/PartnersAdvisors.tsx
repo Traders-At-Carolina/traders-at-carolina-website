@@ -35,7 +35,7 @@ export function PartnersAdvisors({ index, headings, partners, advisors }: Partne
               <li key={partner.name} className="border-t border-rule py-5">
                 <h3 className="flex items-center gap-4 text-h3">
                   {partner.url ? (
-                    <TextLink href={partner.url} external>
+                    <TextLink href={partner.url} external track={{ cta: "sponsor", target: partner.name }}>
                       {partner.name}
                     </TextLink>
                   ) : (

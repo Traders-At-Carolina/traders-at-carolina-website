@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { membership } from "@/content/membership";
 import { expectationRows, formatActivityTracks } from "@/lib/membership";
-import { validateMembership } from "@/lib/validate-membership";
+import { collectMembershipProblems, validateMembership } from "@/lib/validate-membership";
 
 describe("formatActivityTracks", () => {
   it("says All tracks, or joins track names", () => {
@@ -44,5 +44,18 @@ describe("validateMembership", () => {
   it("requires 2–4 recommended background items", () => {
     const tracks = membership.tracks.map((t, i) => (i === 2 ? { ...t, recommendedBackground: ["Python"] } : t));
     expect(() => validateMembership({ ...membership, tracks }, [])).toThrow(/recommendedBackground/);
+  });
+});
+
+describe("collectMembershipProblems", () => {
+  it("returns no problems for the shipped content", () => {
+    expect(collectMembershipProblems(membership, [])).toEqual([]);
+  });
+
+  it("returns problems instead of throwing", () => {
+    const tracks = membership.tracks.map((t, i) => (i === 0 ? { ...t, leadSlug: "jane-doe" } : t));
+    expect(collectMembershipProblems({ ...membership, tracks }, [])).toEqual([
+      'tracks.trading.leadSlug "jane-doe" is not a person in content/team.ts',
+    ]);
   });
 });

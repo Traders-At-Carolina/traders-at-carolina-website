@@ -1,5 +1,5 @@
 /**
- * Pure logic for the footer bit wordmark (spec 06). Everything the canvas component needs to decide, with no DOM:
+ * Pure logic for the footer bit wordmark (spec 08). Everything the canvas component needs to decide, with no DOM:
  * the grid, the letter mask, the scroll-in load, the hover falloff and what each cell shows. Unit-tested.
  */
 
@@ -16,7 +16,7 @@ const LOAD_SOFTNESS = 0.12;
 export const GLITCH_TICK_MS = 110;
 const GLITCH_SHARE = 4;
 
-/** Opacity of the bone glyphs in each state (spec 06 §4). */
+/** Opacity of the bone glyphs in each state (spec 08 §4). */
 export const ALPHA = { scrambled: 0.4, field: 0.12, letter: 1, glitchLetter: 0.5 } as const;
 
 export type Glyph = "0" | "1";

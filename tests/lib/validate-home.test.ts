@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { StaticImageData } from "next/image";
-import { validateHome } from "@/lib/validate-home";
+import { collectHomeProblems, validateHome } from "@/lib/validate-home";
 import type { HomeContent, HomePhoto } from "@/content/types";
 
 const image = { src: "/images/events/x.jpg", width: 1800, height: 1200 } as StaticImageData;
@@ -51,5 +51,20 @@ describe("validateHome", () => {
   it("rejects a malformed upcoming date", () => {
     const upcoming = { title: "Mock trading night", date: "Oct 16", location: "Gardner Hall" };
     expect(() => validateHome({ ...valid, upcoming })).toThrow(/upcoming\.date/);
+  });
+});
+
+describe("collectHomeProblems", () => {
+  it("returns no problems for valid content", () => {
+    expect(collectHomeProblems(valid)).toEqual([]);
+  });
+
+  it("returns each problem as a message instead of throwing", () => {
+    const bad = { ...photo(1), alt: " ", caption: "" };
+    expect(collectHomeProblems({ ...valid, photos: [bad] })).toEqual([
+      "photos must have 0 or 2–3 entries (got 1)",
+      "photos[0].alt must not be empty",
+      "photos[0].caption must not be empty",
+    ]);
   });
 });
