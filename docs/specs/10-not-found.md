@@ -1,6 +1,6 @@
 # Spec 10 — 404 page: a 3D "404" in bits
 
-**Status:** Draft · **Date:** 2026-10-03 · **Route:** any unmatched URL (`app/not-found.tsx`) · **Depends on:** [Spec 00 §3, §4, §9.2, §10](00-vision-and-style.md), [Spec 08](08-footer-bit-wordmark.md)
+**Status:** Implemented · **Date:** 2026-10-03 · **Route:** any unmatched URL (`app/not-found.tsx`) · **Depends on:** [Spec 00 §3, §4, §9.2, §10](00-vision-and-style.md), [Spec 08](08-footer-bit-wordmark.md)
 
 All tokens, type roles and components are defined in spec 00. References like (00 §9.2) point there. This spec adds one component, `Bit404`, to the 404 page, and moves the bit primitives that it shares with spec 08's `BitWordmark` into one module.
 
@@ -47,7 +47,7 @@ Inside `SiteChrome`, in one `Container` with `py-24 md:py-32`, top to bottom:
 ## 4. Shape
 
 - **Mask:** on mount, after `document.fonts` loads, and on resize, "404" is drawn once to an offscreen canvas in `--font-chivo` 800, fitted so its width is 70% of the canvas width and centered. The pixels are averaged down to a grid of square cells: 9px from `md` up, 6px below. A cell is a **letter cell** if its coverage is at least 50% (`buildLetterMask`, spec 08 §4).
-- **Extrusion:** the mask is extruded into a solid. The depth is 0.35 × the cap height of "404", rounded to whole cells, with a minimum of 4 layers. Layers are one cell apart.
+- **Extrusion:** the mask is extruded into a solid. The depth is 0.3 × the cap height of "404", rounded to whole cells, with a minimum of 4 layers. Layers are one cell apart.
 - **Voxel shell:** only the visible surface becomes bits:
   - the **front face** and **back face**: every letter cell, at the two outer layers
   - the **side walls**: on each layer between the faces, every **edge cell** (a letter cell with at least one non-letter neighbour above, below, left or right)
@@ -62,13 +62,14 @@ Inside `SiteChrome`, in one `Container` with `py-24 md:py-32`, top to bottom:
 - **Technique:** one `<canvas>`, a 2D context and a `requestAnimationFrame` loop. There's no WebGL, no three.js and no new dependency (00 §9.2). Only the bits' positions are 3D. Every glyph is drawn flat and facing the viewer, so it always reads as a `0` or a `1`.
 - **Sprites:** two glyph sprites (`0` and `1`), `navy`, in `--font-public-sans` 700 at about 1.3× the cell size, as in spec 08 §4. They're pre-rendered once per build and stamped per bit. The canvas is scaled by `devicePixelRatio`, capped at 2.
 - **Projection:** each frame, every bit is rotated by the current pose (yaw around the vertical axis, then pitch around the horizontal axis) and projected with perspective. The camera sits 3.5× the solid's width from its center, so the near face is visibly larger than the far one without distortion.
-- **Draw order:** bits are drawn back to front, sorted by depth each frame, so the near face covers the far one.
-- **Depth cues:**
+- **Draw order and occlusion:** bits are drawn back to front, sorted by depth each frame. Each glyph sits on an opaque `bone` tile the size of its cell, so nearer bits hide the ones behind them and the figure reads as a solid, not a see-through cloud. Head-on, only the front face shows.
+- **Shading and depth cues:**
 
-| Property | Nearest bit | Farthest bit |
+| Property | Front face | Walls and back face |
 |---|---|---|
-| Opacity | `navy` at 100% | `navy` at 30% (linear between) |
-| Size | The perspective scale (about 1.1×) | The perspective scale (about 0.9×) |
+| Base opacity | `navy` at 100% | `navy` at 60%, like the shaded sides of extruded type |
+| Depth fade (multiplies the base) | 100% for the nearest bit down to 65% for the farthest, linear | Same |
+| Size | The perspective scale (about 1.1× near to 0.9× far) | Same |
 
 - **No background field:** unlike spec 08, there's no dim field of bits behind the shape. The bone page is the background, so the silhouette stays legible from every angle.
 - **Bit values:** each bit has a seeded value keyed on its column, row and layer. The resolved figure is the same on every visit; only the scramble flicker and the glitch use time.
@@ -83,9 +84,9 @@ Inside `SiteChrome`, in one `Container` with `py-24 md:py-32`, top to bottom:
   - pitch = clamp(dy / (vh / 2), −1, 1) × 25°
 
   Signs are chosen so the **front face turns toward the cursor**. Cursor to the right: the face turns right. Cursor above: the face tilts up. The tilt is bounded, so "404" always reads the right way round.
-- **Easing:** the current pose eases toward the target with exponential smoothing (time constant about 140ms, framerate-independent). The figure swings smoothly and never snaps.
+- **Easing:** the current pose eases toward the target with exponential smoothing, framerate-independent. The time constant is about 140ms while following the pointer and 600ms when drifting back to rest or into the sway. The figure swings smoothly and never snaps.
 - **Rest pose:** yaw −12°, pitch 8°. The figure sits here before any pointer arrives, eases back to it when the pointer leaves the window (`pointerleave` on `document.documentElement`, or `pointerout` with no `relatedTarget`), and eases back when a touch ends. The rest pose is a three-quarter view, so the shape reads as 3D even when it's still.
-- **Idle sway:** after 2.5s with no pointer movement (and from the start on touch-only devices), the target becomes a slow sway around the rest pose: yaw ±10° at about 0.1 Hz, and pitch ±4° at about 0.07 Hz. The figure never sits dead still while motion is allowed. The sway's phase stays continuous, so it starts from wherever the pose is.
+- **Idle sway:** 2.5s after the last pointer movement, or 2.5s after the figure first draws if the pointer never moved (so touch-only devices sway right after the decode), the target becomes a slow sway around the rest pose: yaw ±10° at about 0.1 Hz, and pitch ±4° at about 0.07 Hz. The figure never sits dead still while motion is allowed. The sway's phase stays continuous, so it starts from wherever the pose is.
 - **Touch:** dragging a finger anywhere on the page sets the target like a cursor does. The canvas sets `touch-action: pan-y`, so vertical scrolling is never blocked. Lifting the finger returns to rest, then to idle sway.
 - **Cursor:** the default cursor. The figure isn't interactive and isn't focusable.
 
@@ -123,11 +124,11 @@ Same language as spec 08 §5, but it plays **once on load**, not on scroll-in, b
   - `buildLetterMask`
   - the load and glitch constants
 
-  `components/footer/bitWordmarkScene.ts` re-exports them, so `BitWordmark` and its tests are untouched. The `useReducedMotion` hook moves out of `BitWordmark.tsx` into `components/bits/useReducedMotion.ts`, and both components use it.
+  `components/footer/bitWordmarkScene.ts` re-exports them, so `BitWordmark` and its tests are untouched. `BitWordmark` drops its private copy of the reduced-motion hook, and both components use the site's shared `lib/use-reduced-motion.ts`. The pixel-to-mask averaging is shared too, as `maskFromPixels`.
 - **Pure module** `components/notfound/bit404Scene.ts`, unit-tested with vitest:
   - `buildShell(mask, cols, rows, layers)` → the bits' x / y / z (centered) and their col / row / layer
   - `project(point, pose, camera)` → screen x / y, scale and depth
-  - `depthAlpha(depth, near, far)` → 0.3 to 1
+  - `depthAlpha(depth, far, near)` → 0.65 to 1, and `layerShade(layer)` → 1 for the front face, 0.6 behind it
   - `targetPose(dx, dy, vw, vh)` → yaw and pitch, clamped and signed as in §6
   - `easePose(current, target, dtMs)` → the next pose
   - `idlePose(timeMs)` → the sway around the rest pose
@@ -145,7 +146,7 @@ Same language as spec 08 §5, but it plays **once on load**, not on scroll-in, b
 3. Moving the cursor anywhere on the page turns the figure's front face toward it, smoothly and within ±35° yaw and ±25° pitch. Moving the cursor out of the window eases the figure back to the three-quarter rest pose.
 4. After 2.5s without pointer movement, and on touch devices, the figure sways gently around the rest pose. A touch drag steers it without blocking vertical scroll.
 5. "404" reads clearly at every pose at 1440px, 1024px, 768px and 390px widths, and never clips at the canvas edges.
-6. The near face looks closer than the far face (larger, fully opaque bits), and the glyphs always face the viewer.
+6. The figure reads as a solid: nearer bits hide the ones behind, the front face is full navy, the walls are shaded lighter, and the glyphs always face the viewer.
 7. With `prefers-reduced-motion: reduce`, the finished figure shows statically at the rest pose, with no tracking, sway or glitch.
 8. The canvas is `aria-hidden`. Nothing new is announced by assistive tech or reachable by keyboard.
 9. There's no layout shift, and the loop is stopped while the figure is out of view or the tab is hidden.
@@ -157,4 +158,4 @@ Same language as spec 08 §5, but it plays **once on load**, not on scroll-in, b
 
 ## 11. Open items
 
-- The tilt limits, the easing time, the rest pose, the depth-opacity range, the extrusion depth and the sway amplitude are first guesses, to be tuned against the live page during implementation (as spec 08's values were).
+- Tuned against the live page during implementation. The first build had no occlusion, a 0.35 extrusion and a 30–100% depth fade: the walls and back face showed through the gaps between glyphs, and the turned-away half of the face washed out. Opaque tiles, a 0.3 extrusion, 60% wall shading and a gentle 65–100% fade fixed both. The tilt limits, rest pose, easing and sway are as first specified and can still be adjusted by feel.
