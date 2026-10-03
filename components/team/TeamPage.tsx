@@ -72,13 +72,6 @@ export function TeamPage({ team, placements, wall }: TeamPageProps) {
       ) : (
         tiers.map((tier, i) => <LeadershipTier key={tier.id} index={i + 1} {...tier} />)
       )}
-      {showField ? (
-        <Section labelledBy="firm-field-title" density="compact">
-          <TierHeader index={fieldIndex} eyebrow="Where we've worked" title="Where our members have worked" id="firm-field-title" />
-          <FirmField companies={wall} />
-        </Section>
-      ) : null}
-      {showPlacements(placements) ? <Placements index={placementsIndex} firms={sortFirms(placements)} /> : null}
       {team.note ? (
         // A paragraph this long reads better left-aligned; the heading stays centered with the tiers above it.
         <Section labelledBy="team-note-title" density="compact">
@@ -90,6 +83,15 @@ export function TeamPage({ team, placements, wall }: TeamPageProps) {
           </div>
         </Section>
       ) : null}
+      {/* Where members have worked closes the page, after the note. The note is unnumbered, so the § numbers still
+          run on from the tiers. */}
+      {showField ? (
+        <Section labelledBy="firm-field-title" density="compact">
+          <TierHeader index={fieldIndex} eyebrow="Where we've worked" title="Where our members have worked" id="firm-field-title" />
+          <FirmField companies={wall} />
+        </Section>
+      ) : null}
+      {showPlacements(placements) ? <Placements index={placementsIndex} firms={sortFirms(placements)} /> : null}
     </>
   );
 }

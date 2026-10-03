@@ -6,7 +6,7 @@ All tokens, type roles, motifs and components are defined in spec 00. References
 
 > **Revision (2026-10-01):** `/team` now shows Executive board (heavy black type), Co-Presidents, then Directors (square 1:1 headshots, role set large above the name), in that order. The Track leads section (§4.3) and the "Led by" dual-role line were removed; the Placements section follows the leadership tiers. Headshots are now full colour, smaller and all one size (fixed-width cards: 192px from 640px up, a two-up grid at about 160px on phones; the co-presidents are no larger than the other tiers), headshots have rounded corners, section spacing is tighter, and cards are centered with centered text. Where this note conflicts with §2–§4 below, this note wins. See `components/team/TeamPage.tsx`.
 
-> **Revision (2026-10-02):** A firm field (§4.6) now follows the leadership tiers: the firms from `content/placement-wall.ts`, floating loose in a bounded field that can be dragged and flicked. It takes the next § number (§ 04 with all three tiers), so § Placements moves to § 05. The header strip (§4.1) stays, so the same firms appear twice on the page on purpose. The §2 table below is updated to the current page.
+> **Revision (2026-10-02):** A firm field (§4.6) now closes the page, after the team note: the firms from `content/placement-wall.ts`, floating loose in a bounded field that can be dragged and flicked. The note is unnumbered, so the field takes the next § number after the tiers (§ 04 with all three), and § Placements follows it as § 05. The header strip (§4.1) stays, so the same firms appear twice on the page on purpose. The §2 table below is updated to the current page.
 
 ---
 
@@ -38,9 +38,9 @@ Put faces and names to the club, and show where its members go.
 | 01 | Executive board | bone | — (photos) |
 | 02 | Co-Presidents | bone | — (photos) |
 | 03 | Directors | bone | — (photos) |
+| — | Team note *(when `team.note` is set)* | bone | — |
 | 04 | Firm field *(when `placement-wall.ts` is non-empty)* | bone | Firm field (§4.6) |
 | 05 | Placements *(at 5+ firms)* | graphite | — |
-| — | Team note *(when `team.note` is set)* | bone | — |
 | — | `SiteFooter` | black | — |
 
 Tiers with nobody in them are omitted and the § numbers after them close up, so the firm field and Placements always take the next numbers in order.
@@ -141,7 +141,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 
 **Visibility and order**
 - Renders when `content/placement-wall.ts` is non-empty. With an empty list the section is omitted entirely, including its eyebrow number.
-- Sits directly after the last leadership tier and takes the next § number (§ 04 with all three tiers). § Placements (§4.4) follows it, and the team note stays last.
+- Sits after the team note ("How the team serves the mission"), or after the last leadership tier when there is no note. The note is unnumbered, so the field takes the next § number after the tiers (§ 04 with all three). § Placements (§4.4) follows it, so the page ends with where members have gone.
 
 **Content**
 - Heading: the same centered heading as the leadership tiers (`TierHeader` in `components/team/LeadershipTier.tsx`): eyebrow `§ 04 — Where we've worked` in sentence case, H2 in heavy Chivo, "Where our members have worked", without a period, like the tier titles. No lead.
@@ -263,7 +263,7 @@ export const placements: Array<{ firm: string }> = [];
 8. Lighthouse (mobile) ≥ 95 in all categories, with images served via `next/image` as AVIF/WebP.
 9. No hard-coded hex values or font stacks. Only spec-00 tokens.
 10. The header strip lists each firm in `content/placement-wall.ts` once to assistive tech, with its name, and shows no `RandomWalk`. It loops seamlessly, can be dragged, and is static under `prefers-reduced-motion`. With an empty list, the art column is absent.
-11. With a non-empty `placement-wall.ts`, the firm field (§4.6) renders directly after the last leadership tier as the next § number, before § Placements and the team note. With an empty list it is absent and the numbering stays contiguous.
+11. With a non-empty `placement-wall.ts`, the firm field (§4.6) renders after the team note, numbered next after the tiers, and before § Placements. With an empty list it is absent and the numbering stays contiguous.
 12. The field lists each firm once to assistive tech, with its name. First paint shows the seeded scatter with no hydration warning.
 13. Firms drift, bounce off each other and the edges without overlapping, can be dragged and flicked, and settle back to cruise speed. On touch, a drag that starts on empty field scrolls the page.
 14. The pause button stops and restarts all motion, and its label names the action it will take. The loop does not run while the field is off screen.

@@ -168,6 +168,17 @@ describe("TeamPage", () => {
     expect(within(region).getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Citadel", "AWS"]);
   });
 
+  it("puts the firm field, then placements, after the team note at the end of the page", () => {
+    renderTeam({ people: [pres], note: "The team runs the club." }, firms(5), [mark("Citadel")]);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent).slice(-3)).toEqual([
+      "How the team serves the mission",
+      "Where our members have worked",
+      "Where members have gone.",
+    ]);
+    // The note is unnumbered, so the field still takes the number after the tiers.
+    expect(eyebrows()).toEqual(["§ 01 — Operations", "§ 02 — Where we've worked", "§ 03 — Placements"]);
+  });
+
   it("numbers placements after the firm field", () => {
     renderTeam({ people: [] }, firms(5), [mark("Citadel")]);
     expect(eyebrows()).toEqual(["§ 01 — Operations", "§ 02 — Where we've worked", "§ 03 — Placements"]);
