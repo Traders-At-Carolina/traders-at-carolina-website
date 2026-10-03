@@ -246,25 +246,34 @@ describe("cellState", () => {
     expect(ahead.alpha).toBeCloseTo(ALPHA.scrambled, 5);
   });
 
-  it("glitches about 4% of a formed field in any window, and none when glitching is off", () => {
+  it("glitches about 4% of the letter cells in any window, and none when glitching is off", () => {
     let glitched = 0;
     const n = 6000;
     for (let i = 0; i < n; i++) {
-      const base = { ...formed, col: i % 100, row: Math.floor(i / 100), isLetter: false };
+      const base = { ...formed, col: i % 100, row: Math.floor(i / 100), isLetter: true };
       const off = cellState({ ...base, shimmer: false });
       const on = cellState({ ...base, shimmer: true });
-      expect(off.alpha).toBeCloseTo(ALPHA.field, 5);
+      expect(off.alpha).toBeCloseTo(ALPHA.letter, 5);
       if (on.glyph !== off.glyph) glitched++;
     }
     expect(glitched / n).toBeGreaterThan(0.025);
     expect(glitched / n).toBeLessThan(0.06);
   });
 
+  it("never glitches the background field once formed, at any moment", () => {
+    for (let t = 0; t < 3000; t += 110) {
+      for (let i = 0; i < 600; i++) {
+        const base = { ...formed, col: i % 100, row: Math.floor(i / 100), isLetter: false, time: t };
+        expect(cellState({ ...base, shimmer: true })).toEqual(cellState({ ...base, shimmer: false }));
+      }
+    }
+  });
+
   it("changes which cells glitch from one window to the next", () => {
     const set = (time: number) =>
       new Set(
         Array.from({ length: 1500 }, (_, i) => i).filter((i) => {
-          const base = { ...formed, col: i % 100, row: Math.floor(i / 100), isLetter: false, time };
+          const base = { ...formed, col: i % 100, row: Math.floor(i / 100), isLetter: true, time };
           return cellState({ ...base, shimmer: true }).glyph !== cellState({ ...base, shimmer: false }).glyph;
         }),
       );
@@ -273,17 +282,16 @@ describe("cellState", () => {
     expect([...a].filter((i) => b.has(i)).length).toBeLessThan(a.size);
   });
 
-  it("makes a glitching background cell flare up and a glitching letter cell dip", () => {
-    const find = (isLetter: boolean) => {
-      for (let i = 0; i < 4000; i++) {
-        const base = { ...formed, col: i % 100, row: Math.floor(i / 100), isLetter };
-        const on = cellState({ ...base, shimmer: true });
-        if (on.glyph !== cellState({ ...base, shimmer: false }).glyph) return on;
+  it("makes a glitching letter cell dip", () => {
+    for (let i = 0; i < 4000; i++) {
+      const base = { ...formed, col: i % 100, row: Math.floor(i / 100), isLetter: true };
+      const on = cellState({ ...base, shimmer: true });
+      if (on.glyph !== cellState({ ...base, shimmer: false }).glyph) {
+        expect(on.alpha).toBeCloseTo(ALPHA.glitchLetter, 5);
+        return;
       }
-      throw new Error("no glitching cell found");
-    };
-    expect(find(false).alpha).toBeCloseTo(ALPHA.glitchField, 5);
-    expect(find(true).alpha).toBeCloseTo(ALPHA.glitchLetter, 5);
+    }
+    throw new Error("no glitching cell found");
   });
 
   it("flickers a scrambled cell faster than 14 Hz", () => {

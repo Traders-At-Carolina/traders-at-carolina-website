@@ -65,7 +65,7 @@ The sequence **replays every time** the band enters view.
 1. **Scrambled (default state, and the state after leaving view).** Every cell flickers hard: its glyph re-rolls randomly at 14–28 Hz, per cell, and all cells sit at the same mid brightness (`bone` at 40%). No letters are visible.
 2. **Trigger.** An `IntersectionObserver` fires when 40% of the band is visible.
 3. **Load.** There is **no sweep**. After a **0.5s** hold of pure scramble, the bits lock in over **1.6s** (smooth ramp), each at its own random moment (a fixed per-cell threshold, spread evenly across the field and unrelated to position). A locking cell stops flickering and settles: letter cells to 100% and non-letter cells to 12%. The wordmark emerges out of the noise everywhere at once, like a decode.
-4. **Glitching.** Once formed, the field never goes still: about 4% of cells glitch in every 110ms window (a different set each window), flipping their glyph and jumping off their resting brightness. Background bits flare to 40%, and letter bits dip to 50% (the lettering stays readable).
+4. **Glitching (letters only).** Once formed, the lettering never goes still: about 4% of letter cells glitch in every 110ms window (a different set each window), flipping their glyph and dipping to 50% brightness. The background field is **static** once formed (it still flickers during the initial scramble, before it locks in).
 5. **Leaving view.** When less than 10% of the band is visible, the loop stops and the state resets to scrambled, so the next entry replays.
 
 The loop runs **only while the band is at least 10% visible** and the tab is visible (`document.hidden` false).
@@ -113,7 +113,7 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 ## 9. Acceptance criteria
 
 1. Every page's footer ends with the band, and its edges fade with no visible boundary.
-2. Scrolling the band into view plays the scramble-then-load sequence (bits lock in at random places with no left-to-right front); scrolling it out and back in plays it again. Once formed, the field keeps glitching.
+2. Scrolling the band into view plays the scramble-then-load sequence (bits lock in at random places with no left-to-right front); scrolling it out and back in plays it again. Once formed, the lettering keeps glitching while the background stays still.
 3. The resolved field reads "Traders at Carolina" clearly at 1440px, 1024px, 768px and 390px widths (two lines at ≥768px, three lines below), with the last line partly cut off by the bottom edge of the page.
 4. Hovering turns the letter bits within a tiny, soft-edged radius (16px) into glowing white `1`s, eases them back about 0.6s after the pointer leaves, and leaves the background field unchanged.
 5. On touch, dragging over the band lights up bits and does not block vertical page scroll.

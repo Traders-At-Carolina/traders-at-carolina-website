@@ -17,7 +17,7 @@ export const GLITCH_TICK_MS = 110;
 const GLITCH_SHARE = 4;
 
 /** Opacity of the bone glyphs in each state (spec 06 §4). */
-export const ALPHA = { scrambled: 0.4, field: 0.12, letter: 1, glitchField: 0.4, glitchLetter: 0.5 } as const;
+export const ALPHA = { scrambled: 0.4, field: 0.12, letter: 1, glitchLetter: 0.5 } as const;
 
 export type Glyph = "0" | "1";
 
@@ -132,7 +132,8 @@ export function cellState({ col, row, isLetter, time, settle, heat, shimmer }: C
   let glitch = false;
   if (settle > 0.5) {
     bit = seededBit(col, row);
-    if (shimmer && settle >= 1 && glitching(col, row, time)) {
+    // Only the lettering glitches once formed: the background field holds still.
+    if (shimmer && isLetter && settle >= 1 && glitching(col, row, time)) {
       glitch = true;
       bit = bit ? 0 : 1;
     }
@@ -140,8 +141,8 @@ export function cellState({ col, row, isLetter, time, settle, heat, shimmer }: C
     bit = flickerBit(col, row, time);
   }
   let alpha = ALPHA.scrambled + (resting - ALPHA.scrambled) * settle;
-  // A glitching cell jumps off its resting brightness: background bits flare up, letter bits dip.
-  if (glitch) alpha = isLetter ? Math.min(alpha, ALPHA.glitchLetter) : Math.max(alpha, ALPHA.glitchField);
+  // A glitching letter bit dips off its resting brightness.
+  if (glitch) alpha = Math.min(alpha, ALPHA.glitchLetter);
   const h = isLetter ? clamp01(heat) * settle : 0;
   return { glyph: h >= 0.5 ? "1" : bit ? "1" : "0", alpha: alpha * (1 - h) + h, lit: h };
 }
