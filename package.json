@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.9.10",
     "@neon/config": "^1.8.3",
     "@neon/env": "^1.4.8",
     "@react-three/drei": "^10.7.9",

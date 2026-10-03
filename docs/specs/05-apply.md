@@ -90,7 +90,7 @@ getApplicationState(now: Date): ApplicationState
 - `SectionHeader`: eyebrow `§ 01 — WHAT YOU GET`, H2 (working copy: "Everything you need to break into quant."), no lead. `id="what-you-get"`.
 - Exactly three benefits from `apply.benefits`, as columns divided by hairlines on desktop (the Membership "How it works" pattern) and stacked on mobile. Each has an H3 title, 1–2 sentences of body, and an optional `TextLink` into Membership or About.
 - After the columns: the page's primary action for the current state as a `secondary` button ("Apply ↗" / "Keep me posted ↗"; the email/FAQ fallback when closed with no interest form). It switches live at the deadline like the header.
-- **Planned:** a static row of firm marks ("Where our leadership has worked") reusing the Team page's company marks, shown only when that list is non-empty.
+- **Planned:** a static row of firm marks ("Where our members have worked") reusing the Team page's company marks, shown only when that list is non-empty.
 
 ### 4.3 Process and dates (§ 02)
 

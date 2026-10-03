@@ -1,5 +1,5 @@
 import type { CompanyMark } from "@/content/types";
-import aws from "@/public/images/companies/aws.png";
+import aws from "@/public/images/companies/aws-on-light.png";
 import citadel from "@/public/images/companies/citadel.png";
 import infragrid from "@/public/images/companies/infragrid.png";
 import jpmorganChase from "@/public/images/companies/jpmorgan-chase.svg";
@@ -8,6 +8,9 @@ import jpmorganChase from "@/public/images/companies/jpmorgan-chase.svg";
  * Firms shown in the scrolling strip in the /team header (docs/specs/04-team.md §4.1), in display order.
  * Separate from people (hover badges) and from content/placements.ts (the § 03 firm-name list).
  * To add a firm: put its official mark in public/images/companies and append an entry. Names are shown as captions.
+ * Use the full-colour mark made for light backgrounds: the /team header strip and § 04 firm field show it in colour on
+ * bone (the footer strip flattens it to bone). AWS is the dark-text aws-on-light.png; the white-text aws.png is for the
+ * dark headshot badge.
  */
 export const placementWall: CompanyMark[] = [
   { name: "Citadel", logo: citadel },

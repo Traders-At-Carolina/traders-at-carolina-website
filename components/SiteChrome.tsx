@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AdminLoginButton } from "@/components/AdminLoginButton";
 import { SectionProgress } from "@/components/SectionProgress";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -16,6 +17,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         {children}
       </main>
       <SiteFooter />
+      <AdminLoginButton />
     </>
   );
 }

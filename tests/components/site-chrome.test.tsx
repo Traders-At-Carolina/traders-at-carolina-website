@@ -6,7 +6,7 @@ import { SiteChrome } from "@/components/SiteChrome";
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 describe("SiteChrome", () => {
-  it("puts the skip link first, then header, main and footer around the page", () => {
+  it("puts the skip link first, then header, main and footer around the page, with the admin sign-in last", () => {
     const { container } = render(
       <SiteChrome>
         <h1>Page</h1>
@@ -18,7 +18,7 @@ describe("SiteChrome", () => {
     const main = screen.getByRole("main");
     expect(main).toHaveAttribute("id", "main");
     expect(main).toContainElement(screen.getByRole("heading", { name: "Page" }));
-    expect(Array.from(container.children).map((el) => el.tagName)).toEqual(["A", "HEADER", "MAIN", "FOOTER"]);
+    expect(Array.from(container.children).map((el) => el.tagName)).toEqual(["A", "HEADER", "MAIN", "FOOTER", "A"]);
   });
 });
 
