@@ -65,7 +65,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. The `/team` firm field (spec 04 §4.6) is a motif in its own section, well below the header strip, so the two never share a viewport. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
 
 ---
@@ -262,6 +262,7 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Header float | Docked bar morphs into the floating bar over 450ms, `--ease-soft` (no overshoot) |
 | Header nav highlight | One shared highlight trails the pointer between links: 70ms delay, then a 700ms `--ease-spring` (~4% overshoot). Header only |
 | Mobile menu card | Fades in and drops 8px over 250ms, `--ease-soft`. Header only |
+| Team firm field | Firm marks drift at 10–18px/s with soft collisions; drag and flick, with momentum easing back to cruise speed; only while on screen; a "Pause motion" button stops it (spec 04 §4.6) |
 
 - No parallax, marquees, scroll-jacking or auto-advancing carousels.
 - Under `prefers-reduced-motion: reduce`, every effect above is disabled and content renders in its final state.

@@ -6,6 +6,8 @@ All tokens, type roles, motifs and components are defined in spec 00. References
 
 > **Revision (2026-10-01):** `/team` now shows Executive board (heavy black type), Co-Presidents, then Directors (square 1:1 headshots, role set large above the name), in that order. The Track leads section (§4.3) and the "Led by" dual-role line were removed; the Placements section follows the leadership tiers. Headshots are now full colour, smaller and all one size (fixed-width cards: 192px from 640px up, a two-up grid at about 160px on phones; the co-presidents are no larger than the other tiers), headshots have rounded corners, section spacing is tighter, and cards are centered with centered text. Where this note conflicts with §2–§4 below, this note wins. See `components/team/TeamPage.tsx`.
 
+> **Revision (2026-10-02):** A firm field (§4.6) now follows the leadership tiers: the firms from `content/placement-wall.ts`, floating loose in a bounded field that can be dragged and flicked. It takes the next § number (§ 04 with all three tiers), so § Placements moves to § 05. The header strip (§4.1) stays, so the same firms appear twice on the page on purpose. The §2 table below is updated to the current page.
+
 ---
 
 ## 1. Goal
@@ -21,6 +23,7 @@ Put faces and names to the club, and show where its members go.
 |---|---|
 | Who runs the club? | Executive board |
 | Who leads the track I'm interested in? | Track leads |
+| Where has the leadership worked? | Header strip and firm field |
 | Where do members end up? | Placements (when data exists) |
 | How do I join them? | Footer CTA zone |
 
@@ -31,11 +34,16 @@ Put faces and names to the club, and show where its members go.
 | # | Section | Background | Motif (00 §3) |
 |---|---|---|---|
 | — | `SiteHeader` | bone | — |
-| — | `PageHeader` | bone + grid | Random walk + grid (one composition) |
+| — | `PageHeader` | bone + grid | Placement strip + grid (one composition, §4.1) |
 | 01 | Executive board | bone | — (photos) |
-| 02 | Track leads | bone | — (photos) |
-| 03 | Placements *(conditional)* | white | — |
+| 02 | Co-Presidents | bone | — (photos) |
+| 03 | Directors | bone | — (photos) |
+| 04 | Firm field *(when `placement-wall.ts` is non-empty)* | bone | Firm field (§4.6) |
+| 05 | Placements *(at 5+ firms)* | graphite | — |
+| — | Team note *(when `team.note` is set)* | bone | — |
 | — | `SiteFooter` | black | — |
+
+Tiers with nobody in them are omitted and the § numbers after them close up, so the firm field and Placements always take the next numbers in order.
 
 ---
 
@@ -88,6 +96,7 @@ Put faces and names to the club, and show where its members go.
   - With an empty list, the art column is left out and the header is text only. It never falls back to the `RandomWalk`.
   - Separate from § 03 Placements (§4.4), which stays text-only and threshold-gated.
   - The footer's placement strip (spec 07 §3.3) is hidden on `/team`, because this header already shows the same firms.
+  - The strip stays when the firm field (§4.6) is shown lower on the page. Both read `content/placement-wall.ts`, and the repeat is deliberate: the strip is header art, the field is a section to play with.
 
 ### 4.2 Executive board (§ 01)
 
@@ -109,7 +118,7 @@ Put faces and names to the club, and show where its members go.
 
 ### 4.4 Placements (§ 03): conditional
 
-**Visibility:** the section renders only when `content/placements.ts` has **5 or more** firms. Below that, it's omitted entirely, including its eyebrow number, with no leftover space. Adding the fifth firm makes it appear with no code change.
+**Visibility:** the section renders only when `content/placements.ts` has **5 or more** firms. Below that, it's omitted entirely, including its eyebrow number, with no leftover space. Adding the fifth firm makes it appear with no code change. It follows the firm field (§4.6) and takes the number after it (§ 05 with all three tiers and the field), or the number after the last tier when the field is absent.
 
 **Content**
 - `SectionHeader`: eyebrow `§ 03 — PLACEMENTS`, H2 (working copy: "Where members have gone."), and a lead: "Firms where Traders at Carolina members and alumni have interned or worked full-time."
@@ -125,6 +134,50 @@ Put faces and names to the club, and show where its members go.
 ### 4.5 Apply band (removed 2026-10-02)
 
 The closing Apply call to action now lives in the footer on every page (spec 07). Team no longer renders `CTABand`.
+
+### 4.6 Firm field (§ 04), added 2026-10-02
+
+The firms from the header strip, floating loose in a field below the leadership tiers. The header strip (§4.1) stays as it is; lower on the page there is room to play with the same firms. Numbered §4.6 so existing references to §4.4 and §4.5 stay valid; on the page it comes before § Placements.
+
+**Visibility and order**
+- Renders when `content/placement-wall.ts` is non-empty. With an empty list the section is omitted entirely, including its eyebrow number.
+- Sits directly after the last leadership tier and takes the next § number (§ 04 with all three tiers). § Placements (§4.4) follows it, and the team note stays last.
+
+**Content**
+- `SectionHeader`: eyebrow `§ 04 — WHERE WE'VE WORKED`, H2 (working copy: "Where our leadership has worked.", see open items below), no lead.
+- **Firms:** `content/placement-wall.ts`, the same list as the header strip and the footer strip (spec 07 §3.3). Adding an entry there updates all three.
+
+**Layout and look**
+- Bone section, not graphite, so it doesn't run into the graphite § Placements band below it.
+- The field spans the container width: 420px tall from 768px up, 320px below, with `rule` hairlines top and bottom. No graph-paper grid (00 §7.3).
+- Each firm is a bare mark with its name as a caption beneath, the same cell as the header strip: the mark flattened to ink (00 §7.5) at about 32px tall, the caption in `ink-2`. No circle, tile or border. Collisions use an invisible circle sized to the cell.
+- **Growth:** the field keeps its base height until the cells' circles would cover more than 30% of its area, then grows taller to stay at 30%.
+- Unlike the header strip, the field also shows below 768px.
+
+**Motion**
+- **First paint:** start positions come from a fixed seed (`lib/float-field.ts`) and are rendered on the server as percentages of the field, so there is no hydration mismatch and no jump when the script takes over. Seeded positions don't overlap in a 1200px-wide field at its height for that many firms (see Growth); at other widths the first frame pushes any overlaps apart.
+- **Drift:** each firm has a seeded heading and a cruise speed of 10–18px/s, slower than the header strip. No rotation.
+- **Collisions:** firms bounce softly off each other (equal mass, restitution 0.9, overlap resolved in the same frame) and off the field's edges. After a bump or a flick, each firm's speed eases back to its cruise speed, so the field never stalls or speeds up over time.
+- **Drag and flick:** a firm can be grabbed with a mouse, pen or finger. It follows the pointer and pushes the others aside while held. On release it keeps the smoothed pointer velocity, capped at 1500px/s, which decays back to cruise. The cursor is `grab` / `grabbing` on the firms only.
+- **Touch:** a drag that starts on a firm moves the firm (`touch-action: none` on the cells). A drag that starts on empty field scrolls the page (`touch-action: pan-y` on the field).
+- **Hover:** the hovered firm holds still and its mark goes to full ink. The others keep drifting.
+- **When it runs:** only while the field is on screen (IntersectionObserver). The frame step is clamped to 0.1s, so returning to a background tab doesn't make firms jump. A ResizeObserver keeps every firm inside the field when it resizes.
+- **Pause (WCAG 2.2.2):** a caption-size text button at the field's bottom-right reads "Pause motion" or "Play motion" and carries `aria-pressed`. While paused, the firms stop where they are and can't be dragged.
+- Built with `requestAnimationFrame` and pointer events, following `PlacementWall`'s pattern. No animation or physics library (00 §9.2).
+
+**Reduced motion**
+- No drift, collisions, drag or pause button. The firms render as a centered, wrapped static row (the header strip's fallback), and the field drops its fixed height to fit the row.
+
+**Accessibility**
+- The field is a `<ul>` with one `<li>` per firm, inside the section labelled by its H2. Each firm appears once; the caption carries the name and the mark is decorative (`alt=""`).
+- Dragging is decorative and not keyboard-operable; nothing depends on it. The pause button is the field's only focusable element.
+
+**Files**
+- `components/team/FirmField.tsx` (client component), `lib/float-field.ts` (seeded layout and a pure `step()` function), styles in `app/globals.css` next to `.logo-strip`.
+
+**Open items**
+- [ ] **H2 copy.** "Where our leadership has worked." may overclaim: nobody in `content/team.ts` is linked to JPMorgan Chase, and Esther Yu's Citadel entry is a competition result. Alternative: "Firms in our orbit."
+- [ ] **Follow-up, separate change:** the header strip (§4.1) also moves for more than 5 seconds with no pause control (WCAG 2.2.2).
 
 ---
 
@@ -209,3 +262,8 @@ export const placements: Array<{ firm: string }> = [];
 8. Lighthouse (mobile) ≥ 95 in all categories, with images served via `next/image` as AVIF/WebP.
 9. No hard-coded hex values or font stacks. Only spec-00 tokens.
 10. The header strip lists each firm in `content/placement-wall.ts` once to assistive tech, with its name, and shows no `RandomWalk`. It loops seamlessly, can be dragged, and is static under `prefers-reduced-motion`. With an empty list, the art column is absent.
+11. With a non-empty `placement-wall.ts`, the firm field (§4.6) renders directly after the last leadership tier as the next § number, before § Placements and the team note. With an empty list it is absent and the numbering stays contiguous.
+12. The field lists each firm once to assistive tech, with its name. First paint shows the seeded scatter with no hydration warning.
+13. Firms drift, bounce off each other and the edges without overlapping, can be dragged and flicked, and settle back to cruise speed. On touch, a drag that starts on empty field scrolls the page.
+14. The pause button stops and restarts all motion and reports its state with `aria-pressed`. The loop does not run while the field is off screen.
+15. Under `prefers-reduced-motion`, the field is a static wrapped row with no transforms and no pause button.
