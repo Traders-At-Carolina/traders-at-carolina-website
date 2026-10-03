@@ -16,7 +16,7 @@ type SectionProps = {
 
 const tones = {
   bone: "bg-bone",
-  white: "bg-white",
+  white: "on-dark surface-graphite",
   graphite: "on-dark surface-graphite",
 } as const;
 
