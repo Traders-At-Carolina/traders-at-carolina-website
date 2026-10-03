@@ -18,6 +18,8 @@ export type FermiQuestion = {
 };
 
 export const ROUNDS = 3;
+/** Largest answer in the bank: quotable in billions, never astronomical. */
+export const MAX_ANSWER = 1e10;
 export const MAX_ROUND_SCORE = 100;
 /** Points lost per order of magnitude of spread width (10× wide scores 75). */
 export const WIDTH_PENALTY = 25;
@@ -25,8 +27,9 @@ export const WIDTH_PENALTY = 25;
 export const MIN_HIT_SCORE = 5;
 
 /**
- * Answers are stable facts, exact counts or well-cited estimates. Year-stamped figures drift: officers should
- * refresh them (and spot-check the rest) before each recruiting season.
+ * Answers are stable facts, exact counts or well-cited estimates, all between 100 and 10 billion so they can be
+ * quoted with k, m and b. Year-stamped figures drift: officers should refresh them (and spot-check the rest)
+ * before each recruiting season.
  */
 export const QUESTIONS: FermiQuestion[] = [
   { id: "seconds-year", prompt: "How many seconds are in a (non-leap) year?", value: 31_536_000, why: "60 × 60 × 24 × 365." },
@@ -44,19 +47,11 @@ export const QUESTIONS: FermiQuestion[] = [
   { id: "world-pop", prompt: "What was the world population in 2024?", value: 8.2e9, approx: true, why: "UN estimate for 2024: about 8.2 billion." },
   { id: "nc-pop", prompt: "What was North Carolina's population in 2023?", value: 10.8e6, approx: true, why: "Census Bureau estimate for July 2023: about 10.8 million." },
   { id: "nyc-pop", prompt: "What was New York City's population in 2023?", value: 8.3e6, approx: true, why: "Census Bureau estimate for July 2023: about 8.3 million." },
-  {
-    id: "ever-lived",
-    prompt: "Roughly how many people have ever lived?",
-    value: 117e9,
-    approx: true,
-    why: "The Population Reference Bureau's estimate: about 117 billion, so today's 8 billion are under 7% of everyone.",
-  },
   { id: "unc-students", prompt: "How many students were enrolled at UNC-Chapel Hill in fall 2024?", value: 32_000, approx: true, why: "About 20,000 undergraduates and 12,000 graduate and professional students." },
   { id: "hp-words", prompt: "How many words are in the seven Harry Potter books combined?", value: 1_084_000, approx: true, why: "Seven books averaging about 155,000 words." },
   { id: "moon", prompt: "How far is the Moon from Earth, in kilometres?", value: 384_400, unit: "km", why: "The average Earth–Moon distance; about 30 Earths side by side." },
   { id: "sun", prompt: "How far is the Sun from Earth, in kilometres?", value: 149.6e6, unit: "km", approx: true, why: "One astronomical unit: light takes about 8 minutes 20 seconds to cover it." },
   { id: "light-ms", prompt: "How fast does light travel, in metres per second?", value: 299_792_458, unit: "m/s", why: "Exact by definition of the metre: about 300,000 km every second." },
-  { id: "light-year", prompt: "How many kilometres are in a light-year?", value: 9.46e12, unit: "km", approx: true, why: "300,000 km/s × 31.6 million seconds in a year." },
   { id: "circumference", prompt: "How long is Earth's equator, in kilometres?", value: 40_075, unit: "km", why: "The metre was first defined so the pole-to-equator distance was 10,000 km." },
   { id: "everest", prompt: "How tall is Mount Everest, in metres?", value: 8_849, unit: "m", why: "The 2020 China–Nepal survey: 8,848.86 m." },
   {
@@ -67,14 +62,9 @@ export const QUESTIONS: FermiQuestion[] = [
     why: "40,075 km ÷ 0.75 m: about 53 million.",
   },
   { id: "hairs", prompt: "About how many hairs are on a typical human head?", value: 100_000, approx: true, why: "Roughly 100,000, a little more for blondes and fewer for redheads." },
-  { id: "cells", prompt: "About how many cells are in the human body?", value: 37e12, approx: true, why: "A 2013 estimate tallying organ by organ: about 37 trillion." },
-  { id: "trees", prompt: "About how many trees are on Earth?", value: 3e12, approx: true, why: "A 2015 study combining satellite and ground counts: about 3 trillion." },
   { id: "pool", prompt: "How many litres of water fill an Olympic swimming pool?", value: 2_500_000, unit: "L", why: "50 m × 25 m × 2 m = 2,500 m³, and each m³ is 1,000 L." },
   { id: "747", prompt: "What's the maximum takeoff weight of a Boeing 747-400, in kilograms?", value: 397_000, unit: "kg", approx: true, why: "Boeing's figure: 396,890 kg, about 875,000 lb." },
-  { id: "m1", prompt: "How many transistors are on Apple's M1 chip?", value: 16e9, approx: true, why: "Apple's figure at launch in 2020: 16 billion." },
   { id: "dollar-mile", prompt: "How many $1 bills, stacked flat, make a pile one mile high?", value: 14.7e6, approx: true, why: "A bill is about 0.0043 in thick; 63,360 in ÷ 0.0043 is about 14.7 million." },
-  { id: "us-gdp", prompt: "What was US GDP in 2023, in dollars?", value: 27.4e12, unit: "USD", approx: true, why: "BEA's nominal figure: about $27.4 trillion." },
-  { id: "us-debt", prompt: "What was the US federal debt in mid-2024, in dollars?", value: 35e12, unit: "USD", approx: true, why: "Treasury's total public debt passed $35 trillion in July 2024." },
   { id: "trading-days", prompt: "How many trading days does the NYSE have in a typical year?", value: 252, why: "365 days, minus 104 weekend days, minus about 9 market holidays." },
   { id: "bitcoin", prompt: "What's the maximum number of bitcoin that can ever exist?", value: 21_000_000, why: "Fixed by the protocol: the block reward halves every 210,000 blocks." },
   { id: "mcdonalds", prompt: "How many McDonald's restaurants were there worldwide at the end of 2023?", value: 41_800, approx: true, why: "McDonald's 2023 annual report: about 41,800." },
@@ -84,15 +74,18 @@ export const QUESTIONS: FermiQuestion[] = [
   { id: "poker-hands", prompt: "How many different 5-card poker hands can be dealt from a 52-card deck?", value: 2_598_960, why: "52 choose 5 = (52 × 51 × 50 × 49 × 48) ÷ 120." },
   { id: "lottery", prompt: "How many ways are there to pick 6 numbers from 1 to 49?", value: 13_983_816, why: "49 choose 6, which is why a single ticket wins about once in 14 million draws." },
   { id: "ipv4", prompt: "How many IPv4 addresses are there?", value: 4_294_967_296, why: "Addresses are 32 bits: 2³² of them." },
-  { id: "rubiks", prompt: "How many positions can a 3×3 Rubik's Cube reach?", value: 4.3252e19, approx: true, why: "43,252,003,274,489,856,000: about 43 quintillion." },
-  { id: "deck-orders", prompt: "How many ways can a 52-card deck be shuffled?", value: 8.0658e67, approx: true, why: "52! — every well-shuffled deck is almost certainly a first in history." },
-  {
-    id: "seconds-ad",
-    prompt: "How many seconds have passed since 1 January in the year 1 AD (as of 2024)?",
-    value: 6.39e10,
-    approx: true,
-    why: "2,023 years × about 31.6 million seconds a year.",
-  },
+  { id: "minutes-week", prompt: "How many minutes are in a week?", value: 10_080, why: "60 × 24 × 7." },
+  { id: "hours-year", prompt: "How many hours are in a (non-leap) year?", value: 8_760, why: "24 × 365." },
+  { id: "billion-seconds", prompt: "How many days does it take for a billion seconds to pass?", value: 11_574, approx: true, why: "1,000,000,000 ÷ 86,400 seconds a day: about 31.7 years." },
+  { id: "marathon", prompt: "How long is a marathon, in metres?", value: 42_195, unit: "m", why: "Fixed at 26 miles 385 yards since the 1908 London Olympics." },
+  { id: "bones", prompt: "How many bones are in an adult human body?", value: 206, why: "Babies start with about 300; many fuse as they grow." },
+  { id: "chess-squares", prompt: "How many squares of any size are on a chessboard?", value: 204, why: "1² + 2² + … + 8²: 64 small squares, 49 two-by-twos, and so on." },
+  { id: "line-up-5", prompt: "In how many orders can 5 people stand in a line?", value: 120, why: "5! = 5 × 4 × 3 × 2 × 1." },
+  { id: "two-cards", prompt: "How many different 2-card hands can be dealt from a 52-card deck?", value: 1_326, why: "52 choose 2 = 52 × 51 ÷ 2." },
+  { id: "pins", prompt: "How many different 4-digit PINs are there?", value: 10_000, why: "10 choices for each of 4 digits: 10⁴." },
+  { id: "lowercase-6", prompt: "How many 6-letter passwords can be made from lowercase letters alone?", value: 308_915_776, why: "26 choices for each of 6 letters: 26⁶." },
+  { id: "dean-dome", prompt: "How many seats are in UNC's Dean E. Smith Center?", value: 21_750, approx: true, why: "About 21,750: one of the largest on-campus arenas in college basketball." },
+  { id: "chapel-hill", prompt: "What was Chapel Hill's population in the 2020 census?", value: 61_960, approx: true, why: "The 2020 census counted about 62,000, students included." },
 ];
 
 /** `n` distinct questions in a seeded order. */
@@ -109,9 +102,13 @@ export function pickRounds(seed: number, n: number = ROUNDS, bank: FermiQuestion
 
 const SUFFIXES: Record<string, number> = { k: 1e3, thousand: 1e3, m: 1e6, million: 1e6, b: 1e9, bn: 1e9, billion: 1e9, t: 1e12, trillion: 1e12 };
 
-/** "250k", "3.5 m", "2e9", "1,200,000", "4 billion" → a positive number; anything else → null. */
+/**
+ * Plain numbers, decimals and k / m / b / t shorthand, any case: "250", "2.5", "300k", "3.5 M", "1.2b", "4t",
+ * "1,200,000", "4 billion" (and "2e9"). A trailing dot ("2.") reads as 2, so typing "2.5k" never passes through an
+ * invalid state. Anything else → null.
+ */
 export function parseAmount(text: string): number | null {
-  const match = text.trim().toLowerCase().replace(/[,_$\s]/g, "").match(/^(\d*\.?\d+(?:e[+-]?\d+)?)([a-z]*)$/);
+  const match = text.trim().toLowerCase().replace(/[,_$\s]/g, "").match(/^((?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)([a-z]*)$/);
   if (!match) return null;
   const [, num, suffix] = match;
   const multiplier = suffix === "" ? 1 : SUFFIXES[suffix];
@@ -141,7 +138,7 @@ const SUPERSCRIPT = "⁰¹²³⁴⁵⁶⁷⁸⁹";
 const superscript = (n: number) => [...String(n)].map((d) => SUPERSCRIPT[Number(d)]).join("");
 const NAMES = ["", "K", "M", "B", "T"];
 
-/** Compact: 950, 31.5M, 4.29B, 9.46T, then 4.3 × 10¹⁹. Three significant figures at most. */
+/** Compact: 950, 150.5, 2.5, then 31.5M, 4.29B, 9.46T (three significant figures), then 4.3 × 10¹⁹. Below 1,000 keeps four, so typed decimals survive. */
 export function formatAmount(n: number): string {
   if (n >= 1e15) {
     let exp = Math.floor(Math.log10(n));
@@ -152,7 +149,7 @@ export function formatAmount(n: number): string {
     }
     return `${mantissa} × 10${superscript(exp)}`;
   }
-  if (n < 1000) return String(Number(n.toPrecision(3)));
+  if (n < 1000) return String(Number(n.toPrecision(4)));
   let k = Math.min(NAMES.length - 1, Math.floor(Math.log10(n) / 3));
   let scaled = Number((n / 10 ** (3 * k)).toPrecision(3));
   if (scaled >= 1000 && k < NAMES.length - 1) {

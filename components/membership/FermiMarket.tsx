@@ -40,6 +40,8 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
   const [round, setRound] = useState(0);
   const [lowText, setLowText] = useState("");
   const [highText, setHighText] = useState("");
+  // Format errors wait until a field is left or a quote is tried, so half-typed values ("2.", "3 bi") never flag.
+  const [touched, setTouched] = useState({ low: false, high: false });
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [best, setBest] = useState<BestScore | null>(null);
   const lowRef = useRef<HTMLInputElement>(null);
@@ -60,6 +62,7 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
     setRound(0);
     setLowText("");
     setHighText("");
+    setTouched({ low: false, high: false });
     setQuotes([]);
     setBest(null);
     setPhase("playing");
@@ -77,6 +80,7 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
     setRound(round + 1);
     setLowText("");
     setHighText("");
+    setTouched({ low: false, high: false });
   };
 
   if (phase === "idle") {
@@ -105,6 +109,7 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
         unit={`of ${ROUNDS * MAX_ROUND_SCORE}`}
         detail={`Caught ${hits} of ${ROUNDS} · typical spread ${formatRatio(typical)}`}
         best={best}
+        payload={{ game: "fermi", quotes: quotes.map((q, i) => ({ id: rounds[i].id, low: q.low, high: q.high })) }}
         note="Market-making interviews ask exactly this: a range you'd trade on, tight enough to be useful and wide enough to be right. Knowing how sure you are is half the skill."
         onReplay={start}
         cta={cta}
@@ -115,12 +120,14 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
   const low = parseAmount(lowText);
   const high = parseAmount(highText);
   const valid = low !== null && high !== null && low <= high;
-  const unreadable = (lowText.trim() !== "" && low === null) || (highText.trim() !== "" && high === null);
-  const error = unreadable
-    ? "Try a number like 250k, 3.5m or 2e9."
-    : low !== null && high !== null && low > high
-      ? "Low should be at or below high."
-      : null;
+  const lowBad = touched.low && lowText.trim() !== "" && low === null;
+  const highBad = touched.high && highText.trim() !== "" && high === null;
+  const error =
+    lowBad || highBad
+      ? "Use a number, a decimal or k, m, b, t: 450, 2.5k, 3m, 1.2b."
+      : touched.low && touched.high && low !== null && high !== null && low > high
+        ? "Low should be at or below high."
+        : null;
 
   const spread = revealed ? quote : valid ? { low, high } : null;
   const domain = revealed
@@ -129,6 +136,7 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
 
   const lockIn = () => {
     if (valid) setQuotes((q) => [...q, { low, high }]);
+    else setTouched({ low: true, high: true });
   };
 
   // Enter in Low moves on to an empty High; otherwise Enter locks in.
@@ -160,13 +168,14 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
             value={revealed ? formatAmount(quote.low) : lowText}
             onChange={(e) => setLowText(e.target.value)}
             onKeyDown={onEnter}
+            onBlur={() => setTouched((t) => ({ ...t, low: true }))}
             disabled={revealed}
             placeholder="e.g. 200k"
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="next"
             aria-describedby="fermi-prompt fermi-help"
-            aria-invalid={lowText.trim() !== "" && low === null}
+            aria-invalid={lowBad}
             className={INPUT_CLASSES}
           />
         </label>
@@ -177,19 +186,20 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
             value={revealed ? formatAmount(quote.high) : highText}
             onChange={(e) => setHighText(e.target.value)}
             onKeyDown={onEnter}
+            onBlur={() => setTouched((t) => ({ ...t, high: true }))}
             disabled={revealed}
             placeholder="e.g. 5m"
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="go"
             aria-describedby="fermi-prompt fermi-help"
-            aria-invalid={highText.trim() !== "" && high === null}
+            aria-invalid={highBad}
             className={INPUT_CLASSES}
           />
         </label>
       </div>
       <p id="fermi-help" className="mt-2 min-h-5 text-caption text-ink-3" aria-live="polite">
-        {revealed ? null : (error ?? (valid ? `${formatRatio(high / low)} wide` : "Shorthand works: k, m, b, t."))}
+        {revealed ? null : (error ?? (valid ? `${formatRatio(high / low)} wide` : "Numbers, decimals, or k, m, b, t: 2.5m, 300k, 1.2b."))}
       </p>
 
       <NumberLine domain={domain} spread={spread} truth={revealed ? question.value : null} hit={revealed ? isHit(quote.low, quote.high, question.value) : null} />

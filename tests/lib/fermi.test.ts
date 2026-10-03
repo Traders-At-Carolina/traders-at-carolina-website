@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_DOMAIN,
+  MAX_ANSWER,
   QUESTIONS,
   ROUNDS,
   axisDomain,
@@ -22,6 +23,8 @@ describe("Fermi bank", () => {
     expect(new Set(QUESTIONS.map((q) => q.id)).size).toBe(QUESTIONS.length);
     for (const q of QUESTIONS) {
       expect(q.value).toBeGreaterThanOrEqual(100);
+      // Quotable with k, m and b: nothing astronomical.
+      expect(q.value).toBeLessThanOrEqual(MAX_ANSWER);
       expect(q.prompt).toMatch(/\?$/);
       expect(q.why.length).toBeGreaterThan(0);
     }
@@ -46,11 +49,21 @@ describe("parseAmount", () => {
     ["1.2bn", 1.2e9],
     ["$27t", 27e12],
     [".5k", 500],
+    ["450", 450],
+    ["2.5", 2.5],
+    ["0.75", 0.75],
+    ["2.", 2],
+    ["2.5k", 2_500],
+    ["1.5K", 1_500],
+    ["3.25 M", 3_250_000],
+    ["1.2B", 1.2e9],
+    ["4t", 4e12],
+    ["1,500.5", 1_500.5],
   ])("reads %s", (text, value) => {
     expect(parseAmount(text)).toBeCloseTo(value, 6);
   });
 
-  it.each(["", "abc", "0", "-5", "5x", "1.2.3", "k"])("rejects %s", (text) => {
+  it.each(["", "abc", "0", "-5", "5x", "1.2.3", "k", ".", "2.5q", "1..5"])("rejects %s", (text) => {
     expect(parseAmount(text)).toBeNull();
   });
 });
@@ -75,6 +88,8 @@ describe("scoring", () => {
 describe("formatting", () => {
   it("compacts amounts to three significant figures", () => {
     expect(formatAmount(950)).toBe("950");
+    expect(formatAmount(150.5)).toBe("150.5");
+    expect(formatAmount(2.5)).toBe("2.5");
     expect(formatAmount(31_536_000)).toBe("31.5M");
     expect(formatAmount(999_999)).toBe("1M");
     expect(formatAmount(9.46e12)).toBe("9.46T");
