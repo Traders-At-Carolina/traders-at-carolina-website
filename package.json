@@ -10,7 +10,9 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node --env-file-if-exists=.env.local --import tsx --import ./scripts/register-assets.mjs scripts/seed.ts",
+    "vercel-build": "sh -c 'if [ \"$VERCEL_ENV\" = production ]; then drizzle-kit migrate || exit 1; fi; next build'"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.10",
@@ -19,6 +21,7 @@
     "@neondatabase/serverless": "^1.2.0",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",
+    "@vercel/blob": "^2.8.0",
     "drizzle-orm": "^0.45.3",
     "lucide-react": "^1.49.0",
     "next": "16.3.8",
@@ -42,7 +45,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "jsdom": "^30.1.1",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.3"
   },

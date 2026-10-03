@@ -31,7 +31,7 @@ export default async function GameScoresPage() {
   const names = await accountNames([...sprintTop, ...fermiTop, ...recent].flatMap((r) => (r.userId ? [r.userId] : [])));
 
   return (
-    <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-16">
+    <div>
       <p>
         <Link href="/admin" className="link-underline text-navy">
           Admin
@@ -126,6 +126,6 @@ export default async function GameScoresPage() {
           </tbody>
         </table>
       </section>
-    </main>
+    </div>
   );
 }
