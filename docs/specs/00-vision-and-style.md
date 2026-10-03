@@ -255,7 +255,7 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
 | Header random walk / depth chart | Stroke draw-in over 1.2s on load (depth-chart fills fade in alongside) |
 | Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 60s, eased in after a drag; stops on interaction, resumes after 1.5s |
-| Section markers | The § 01 / 02 / 03 hairline draws left to right (900ms) and the eyebrow wipes in behind it, once, on entering the viewport; static under reduced motion or without JS |
+| Section markers | The § 01 / 02 / 03 hairline draws left to right (900ms) and the eyebrow sweeps in behind it with a feathered, eased edge (fade + 6px drift), once, on entering the viewport; static under reduced motion or without JS |
 | Section progress rail | Thin fixed line down the left edge (md+): fills with page scroll, tick per section, current section's tick emphasised; decorative, hidden on pages with under two sections |
 | Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
 | Home intro | On every full load of Home: graph paper sweeps in, logo and name rise, then it dissolves into the hero grid over ~2.15s; any key, click or scroll skips it (spec 01 §3.6) |

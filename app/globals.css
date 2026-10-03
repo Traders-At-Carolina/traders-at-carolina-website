@@ -329,9 +329,18 @@ main:has(+ footer [data-cta-band]) > section:last-child {
     transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  /* A feathered edge sweeps left to right (mask twice the width, slid across) while the label fades and drifts in. */
   html.js .section-marker .eyebrow {
-    clip-path: inset(0 100% 0 0);
-    transition: clip-path 700ms steps(14, end) 250ms;
+    opacity: 0;
+    transform: translateX(-6px);
+    mask-image: linear-gradient(to right, #000 40%, transparent 50%);
+    mask-size: 250% 100%;
+    mask-position: 100% 0;
+    mask-repeat: no-repeat;
+    transition:
+      mask-position 900ms cubic-bezier(0.22, 1, 0.36, 1) 200ms,
+      opacity 500ms ease-out 200ms,
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1) 200ms;
   }
 
   html.js .section-marker.is-drawn .section-rule {
@@ -339,7 +348,9 @@ main:has(+ footer [data-cta-band]) > section:last-child {
   }
 
   html.js .section-marker.is-drawn .eyebrow {
-    clip-path: inset(0);
+    opacity: 1;
+    transform: none;
+    mask-position: 0 0;
   }
 
   .draw-in path {
