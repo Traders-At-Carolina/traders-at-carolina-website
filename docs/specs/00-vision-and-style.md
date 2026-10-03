@@ -66,7 +66,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 **Restraint rules**
 
 - At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. The `/team` firm field (spec 04 §4.6) is a motif in its own section, well below the header strip, so the two never share a viewport. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
-- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** the footer's `BitWordmark` (a decorative field of 0s and 1s, drawn in the site's own sans, [spec 08](08-footer-bit-wordmark.md)) is allowed. It counts as a motif and appears nowhere else.
+- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** decorative bits (0s and 1s drawn in the site's own sans) are allowed in exactly two places: the footer's `BitWordmark` ([spec 08](08-footer-bit-wordmark.md)) and the 404 page's navy 3D `Bit404` ([spec 10](10-not-found.md)). Each counts as a motif. Bits appear nowhere else.
 
 ---
 
@@ -289,6 +289,9 @@ Page specs reference these by name. Each one is built once and reused.
 - Contact, social and the UNC student-organization disclaimer still depend on §14.
 - The very bottom of the footer carries the `BitWordmark` band: a decorative, scroll-triggered field of 0s and 1s that resolves into "Traders at Carolina" and lights up around the cursor ([spec 08](08-footer-bit-wordmark.md)).
 
+### `Bit404`
+- 404 page only ([spec 10](10-not-found.md)): a solid 3D "404" built from navy 0s and 1s that decodes on load, keeps glitching and turns to face the cursor. It shares its bit primitives with `BitWordmark` (`components/bits/bitCore.ts`).
+
 ### `Button`
 All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (32px tall, 6px × 20px padding).
 
@@ -397,6 +400,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 06 | `06-admin.md` | Admin dashboard: member roster and access requests, website lists and seasonal settings (photos, officers, tracks, sponsors, placements, recruiting, events), portal content, undo and history, admin access, usage analytics |
 | 08 | `08-footer-bit-wordmark.md` | Footer 0s-and-1s wordmark: scroll-in scramble and load, glitching letters, cursor-lit hover, cropped at the page end |
 | 09 | `09-portal.md` | Signed-in portal: recruiting, interview prep, events, tracks and the club for everyone; learning, internship tracker and competitions for members |
+| 10 | `10-not-found.md` | 404 page: a 3D "404" of navy bits that decodes on load, glitches and turns to face the cursor |
 
 **Every page spec contains:**
 1. The page's goal, and the visitor questions it answers.
