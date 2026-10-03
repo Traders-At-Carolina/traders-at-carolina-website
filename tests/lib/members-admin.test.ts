@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const session = vi.hoisted(() => ({ admin: true }));
-vi.mock("next/cache", () => ({ updateTag: vi.fn(), revalidatePath: vi.fn() }));
+vi.mock("next/cache", () => ({ updateTag: vi.fn(), revalidatePath: vi.fn(), unstable_cache: (fn: unknown) => fn }));
 vi.mock("next/headers", () => ({ headers: async () => new Headers({ host: "localhost:3000" }) }));
 vi.mock("next/navigation", () => ({ notFound: vi.fn(), redirect: vi.fn() }));
 const invitations = vi.hoisted(() => ({ createInvitation: vi.fn(async () => ({ id: "inv_1" })) }));

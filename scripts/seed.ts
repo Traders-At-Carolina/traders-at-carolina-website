@@ -12,14 +12,16 @@ import { put } from "@vercel/blob";
 import { count } from "drizzle-orm";
 import sharp from "sharp";
 import { about } from "@/content/about";
+import { events as contentEvents } from "@/content/events";
 import { home } from "@/content/home";
 import { membership } from "@/content/membership";
 import { placementWall } from "@/content/placement-wall";
 import { placements as firmList } from "@/content/placements";
+import { site } from "@/content/site";
 import { team } from "@/content/team";
 import type { ImageAsset } from "@/content/types";
 import { db } from "@/lib/db/client";
-import { people, photos, placements, sponsors, tracks } from "@/lib/db/schema";
+import { events, people, photos, placements, settings, sponsors, tracks } from "@/lib/db/schema";
 import { buildSeed } from "@/lib/seed/build";
 
 const TYPES: Record<string, string> = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml" };
@@ -43,13 +45,13 @@ async function upload(src: string): Promise<ImageAsset> {
   return { src: blob.url, width: meta.width ?? 0, height: meta.height ?? 0, ...(blur ? { blurDataURL: blur } : {}) };
 }
 
-async function isEmpty(table: typeof photos | typeof placements | typeof people | typeof tracks | typeof sponsors) {
+async function isEmpty(table: typeof photos | typeof placements | typeof people | typeof tracks | typeof sponsors | typeof events) {
   const [{ n }] = await db().select({ n: count() }).from(table);
   return n === 0;
 }
 
 async function main() {
-  const input = { home, about, membership, team, placements: firmList, wall: placementWall };
+  const input = { home, about, membership, team, placements: firmList, wall: placementWall, recruiting: site.recruiting, events: contentEvents };
   console.log(`Seeding ${new URL(process.env.DATABASE_URL ?? "postgres://unset").hostname.split(".")[0]}`);
 
   // Pass 1 collects every local image; upload each once; pass 2 swaps in the stored copies.
@@ -80,6 +82,16 @@ async function main() {
     if (values.length === 0) continue;
     if (await isEmpty(table)) await db().insert(table).values(values as never);
     else console.log(`  ${name}: has rows, skipped`);
+  }
+
+  // Phase 6: the recruiting setting only if none has been saved, and events only into an empty table.
+  if (rows.recruiting) {
+    const inserted = await db().insert(settings).values({ key: "recruiting", value: rows.recruiting }).onConflictDoNothing().returning();
+    console.log(inserted.length ? "  recruiting: seeded" : "  recruiting: already set, skipped");
+  }
+  if (rows.events.length) {
+    if (await isEmpty(events)) await db().insert(events).values(rows.events.map((e) => ({ ...e, endsAt: e.endsAt ?? null })));
+    else console.log("  events: has rows, skipped");
   }
 
   console.log(

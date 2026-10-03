@@ -6,7 +6,7 @@ import { HowItWorks } from "@/components/membership/HowItWorks";
 import { PhotoBand } from "@/components/membership/PhotoBand";
 import { Tracks } from "@/components/membership/Tracks";
 import { PageHeader } from "@/components/PageHeader";
-import type { MembershipContent } from "@/content/types";
+import type { MembershipContent, Recruiting } from "@/content/types";
 import { numberSections } from "@/lib/home";
 import { showExpectations } from "@/lib/membership";
 
@@ -14,6 +14,8 @@ type MembershipPageProps = {
   membership: MembershipContent;
   /** slug → name for track leads (content/team.ts). */
   leadNames: Record<string, string>;
+  /** Recruiting for the games' Apply button (spec 06 §6.5). */
+  recruiting?: Recruiting;
 };
 
 type SectionKey = "how" | "tracks" | "games" | "expectations" | "activities";
@@ -24,7 +26,7 @@ type SectionKey = "how" | "tracks" | "games" | "expectations" | "activities";
  * and it appears only once it can answer more than prerequisites (which the Tracks lead already covers).
  * Numbering stays sequential.
  */
-export function MembershipPage({ membership, leadNames }: MembershipPageProps) {
+export function MembershipPage({ membership, leadNames, recruiting }: MembershipPageProps) {
   const { headings } = membership;
 
   const withExpectations = showExpectations(membership.expectations);
@@ -45,7 +47,7 @@ export function MembershipPage({ membership, leadNames }: MembershipPageProps) {
       <HowItWorks index={n.how} title={headings.how} steps={membership.steps} switchingPolicy={membership.switchingPolicy} />
       {wide ? <PhotoBand photos={[wide]} /> : null}
       <Tracks index={n.tracks} title={headings.tracks} tracks={membership.tracks} leadNames={leadNames} />
-      <Games index={n.games} title={headings.games} />
+      <Games index={n.games} title={headings.games} recruiting={recruiting} />
       {withExpectations ? (
         <Expectations index={n.expectations} title={headings.expectations} expectations={membership.expectations} />
       ) : null}

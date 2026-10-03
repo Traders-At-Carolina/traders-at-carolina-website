@@ -79,3 +79,16 @@ describe("buildSeed", () => {
     expect(rows.people[0].headshot?.src).toBe("https://blob.test/images/team/a.jpg");
   });
 });
+
+describe("buildSeed (phase 6)", () => {
+  it("copies recruiting with an explicit mode and passes events through", () => {
+    const rows = buildSeed(
+      input({
+        recruiting: { applicationsOpen: false, applyUrl: "" },
+        events: [{ id: "x", title: "Kickoff", type: "general-meeting", startsAt: "2026-10-16T19:00", audience: "public", featured: true }],
+      }),
+    );
+    expect(rows.recruiting).toMatchObject({ applicationsOpen: false, mode: "closed" });
+    expect(rows.events).toEqual([{ title: "Kickoff", type: "general-meeting", startsAt: "2026-10-16T19:00", audience: "public", featured: true }]);
+  });
+});

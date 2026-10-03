@@ -4,7 +4,7 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { SiteChrome } from "@/components/SiteChrome";
 import { TextLink } from "@/components/TextLink";
 import { Bit404 } from "@/components/notfound/Bit404";
-import { getPlacements } from "@/lib/data/public";
+import { getPlacements, getRecruiting } from "@/lib/data/public";
 
 export const metadata: Metadata = { title: "Page not found" };
 
@@ -13,9 +13,9 @@ export const metadata: Metadata = { title: "Page not found" };
  * (spec 10) is decorative; the eyebrow, heading and link carry the message.
  */
 export default async function NotFound() {
-  const { wall } = await getPlacements();
+  const [{ wall }, recruiting] = await Promise.all([getPlacements(), getRecruiting()]);
   return (
-    <SiteChrome wall={wall}>
+    <SiteChrome wall={wall} recruiting={recruiting}>
       {/* One screen: the section fills the viewport below the 64 / 80px header and the figure takes what's left. */}
       <Container className="flex min-h-[calc(100svh-4rem)] flex-col justify-center py-10 md:min-h-[calc(100svh-5rem)] md:py-12">
         <Eyebrow>Error 404</Eyebrow>

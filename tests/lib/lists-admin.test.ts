@@ -28,6 +28,7 @@ const dbm = vi.hoisted(() => ({
   tierOrder: vi.fn(),
   setOrders: vi.fn(),
   setSeasonSetting: vi.fn(async (v: unknown) => ({ before: {}, after: v })),
+  getSeasonSetting: vi.fn(async () => ({ academicYear: "2025–26", memberCount: { mode: "auto" } })),
   getTrack: vi.fn(async () => ({ id: "trading" })),
   listPeople: vi.fn(async () => [{ slug: "ada", visible: true }]),
   listTracks: vi.fn(async () =>
@@ -104,7 +105,8 @@ describe("officers", () => {
 
   it("stores the academic year with an en dash", async () => {
     await officers.saveAcademicYear({}, form({ academicYear: "2026-27" }));
-    expect(dbm.setSeasonSetting).toHaveBeenCalledWith({ academicYear: "2026–27" });
+    // Merges into the season, keeping the member-count mode.
+    expect(dbm.setSeasonSetting).toHaveBeenCalledWith({ academicYear: "2026–27", memberCount: { mode: "auto" } });
     expect((await officers.saveAcademicYear({}, form({ academicYear: "Fall" }))).fieldErrors?.academicYear).toMatch(/2026–27/);
   });
 });

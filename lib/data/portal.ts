@@ -1,8 +1,7 @@
-import { events as contentEvents } from "@/content/events";
-import { site } from "@/content/site";
 import type { ClubEvent, Recruiting, TrackId } from "@/content/types";
 import { upcomingEvents } from "@/lib/events";
 import { desc, eq } from "drizzle-orm";
+import { getEvents, getRecruiting } from "@/lib/data/public";
 import { db } from "@/lib/db/client";
 import { membershipRequests } from "@/lib/db/schema";
 import { canSee, type AudienceViewer } from "@/lib/members/audience";
@@ -11,10 +10,8 @@ import { portalAccessSettings } from "@/lib/members/settings";
 /**
  * Portal getters (spec 06 §8). Uncached and per viewer; every one filters with canSee on the server.
  *
- * Requests are real (phase 4). INTERIM bodies until spec 06 phases 6 and 7 add the tables: events come from
- * content/events.ts, recruiting from content/site.ts, the internship tracker from a server-only environment variable,
- * and everything else is empty.
- * Those phases replace the bodies; the signatures and return types stay, so the portal needs no changes.
+ * Requests (phase 4), events and recruiting (phase 6) are real. INTERIM bodies until spec 06 phase 7 adds the tables:
+ * the internship tracker comes from a server-only environment variable, and resources and announcements are empty.
  */
 
 export type ResourceKind = "slides" | "notes" | "textbook" | "problem-set" | "video" | "link";
@@ -43,7 +40,7 @@ export const NO_RESOURCES: Record<ResourceSection, PortalResource[]> = { learnin
 /** Upcoming events the viewer may see, soonest first. Competitions are `type === "competition"`. */
 export async function portalEvents(viewer: AudienceViewer, now: Date = new Date()): Promise<ClubEvent[]> {
   return upcomingEvents(
-    contentEvents.filter((event) => canSee(event.audience, viewer)),
+    (await getEvents()).filter((event) => canSee(event.audience, viewer)),
     now,
   );
 }
@@ -86,9 +83,9 @@ export async function portalSettings(): Promise<PortalSettings> {
 /** Recruiting settings plus upcoming `recruiting` events, for the non-member timeline. Interim: content files. */
 export async function recruitingTimeline(now: Date = new Date()): Promise<RecruitingTimeline> {
   return {
-    recruiting: site.recruiting,
+    recruiting: await getRecruiting(),
     events: upcomingEvents(
-      contentEvents.filter((event) => event.type === "recruiting" && canSee(event.audience, "signed_in")),
+      (await getEvents()).filter((event) => event.type === "recruiting" && canSee(event.audience, "signed_in")),
       now,
     ),
   };

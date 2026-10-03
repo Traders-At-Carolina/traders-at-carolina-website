@@ -229,3 +229,25 @@ export const settings = pgTable("settings", {
   value: jsonb("value").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * Club events (spec 06 §5.1, §6.10). Times are stored as the ISO "YYYY-MM-DDTHH:mm" America/New_York strings the site
+ * already uses (ClubEvent), so content/events.ts seeds straight in and no timezone conversion happens on save.
+ */
+export const events = pgTable(
+  "events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    type: text("type", { enum: ["general-meeting", "workshop", "speaker", "competition", "social", "recruiting", "other"] }).notNull(),
+    startsAt: text("starts_at").notNull(),
+    endsAt: text("ends_at"),
+    location: text("location"),
+    description: text("description"),
+    url: text("url"),
+    audience: text("audience", { enum: ["public", "signed_in", "members"] }).notNull().default("public"),
+    featured: boolean("featured").notNull().default(false),
+    ...timestamps,
+  },
+  (t) => [index("events_starts_idx").on(t.startsAt)],
+);

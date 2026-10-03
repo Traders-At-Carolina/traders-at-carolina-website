@@ -3,7 +3,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import NotFound from "@/app/not-found";
 import { Bit404 } from "@/components/notfound/Bit404";
 
-vi.mock("@/lib/data/public", () => ({ getPlacements: async () => ({ firms: [], wall: [] }) }));
+vi.mock("@/lib/data/public", async () => ({
+  getPlacements: async () => ({ firms: [], wall: [] }),
+  getRecruiting: async () => (await import("@/content/site")).site.recruiting,
+}));
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 

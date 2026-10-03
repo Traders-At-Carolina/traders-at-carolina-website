@@ -1,4 +1,4 @@
-import type { AboutContent, CompanyMark, HomeContent, ImageAsset, MembershipContent, Person, Placement, TeamContent } from "@/content/types";
+import type { AboutContent, ClubEvent, CompanyMark, HomeContent, ImageAsset, MembershipContent, Person, Placement, Recruiting, TeamContent } from "@/content/types";
 
 /** Today's content modules: the source the database is seeded from (spec 06 §3). */
 export type SeedInput = {
@@ -8,6 +8,9 @@ export type SeedInput = {
   team: TeamContent;
   placements: Placement[];
   wall: CompanyMark[];
+  /** Phase 6: recruiting settings and events. Optional so earlier callers keep working. */
+  recruiting?: Recruiting;
+  events?: ClubEvent[];
 };
 
 export type PlacementRow = { firm: string; logo?: ImageAsset; logoOnDark?: ImageAsset; showOnWall: boolean; wallOrder?: number };
@@ -42,6 +45,9 @@ export type SeedRows = {
     leadSlug?: string;
   }>;
   sponsors: Array<{ name: string; relationship?: string; url?: string; logo?: ImageAsset }>;
+  /** Stored with an explicit mode so the Recruiting screen opens on the right choice. */
+  recruiting?: Recruiting;
+  events: Array<Omit<ClubEvent, "id">>;
 };
 
 const key = (firm: string) => firm.trim().toLowerCase();
@@ -105,5 +111,7 @@ export function buildSeed(input: SeedInput, resolve: (image: ImageAsset) => Imag
       leadSlug: t.leadSlug,
     })),
     sponsors: input.about.partners.map((p) => ({ name: p.name, relationship: p.relationship, url: p.url, logo: img(p.logo) })),
+    recruiting: input.recruiting ? { ...input.recruiting, mode: input.recruiting.mode ?? (input.recruiting.applicationsOpen ? "open" : "closed") } : undefined,
+    events: (input.events ?? []).map(({ id: _id, ...e }) => (void _id, e)),
   };
 }

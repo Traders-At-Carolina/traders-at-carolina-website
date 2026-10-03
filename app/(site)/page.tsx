@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import { HomePage } from "@/components/home/HomePage";
-import { events } from "@/content/events";
 import { home } from "@/content/home";
-import { site } from "@/content/site";
 import { resolvePartnerFirms, sortPartners } from "@/lib/about";
-import { getHomePhotos, getSponsors } from "@/lib/data/public";
+import { getEvents, getHomePhotos, getMemberCount, getRecruiting, getSponsors } from "@/lib/data/public";
 import { validateEvents } from "@/lib/validate-events";
 import { validateHome } from "@/lib/validate-home";
-
-// Events are still content/events.ts until phase 6 moves them to the database, so they validate at build time.
-validateEvents(events);
 
 export const metadata: Metadata = {
   title: { absolute: "Traders at Carolina · Quantitative Finance at UNC" },
@@ -17,17 +12,22 @@ export const metadata: Metadata = {
   description: home.hero.subhead,
 };
 
-/** Photos and sponsors come from the admin (spec 06 §6.6, §6.7); the rest of Home is still content/home.ts. */
+/**
+ * Photos, sponsors, recruiting, the member count and the Upcoming event come from the admin (spec 06 §6.5–6.7, §6.10);
+ * the rest of Home is still content/home.ts. Regenerates at least every 5 minutes (layout), so Upcoming drops off
+ * when an event ends.
+ */
 export default async function Page() {
+  const [photos, partners, recruiting, members, events] = await Promise.all([getHomePhotos(), getSponsors(), getRecruiting(), getMemberCount(), getEvents()]);
   // The partner stat counts the About partner list unless set explicitly, so the two never disagree (spec 02 §5).
-  const [photos, partners] = await Promise.all([getHomePhotos(), getSponsors()]);
   const content = {
     ...home,
     photos,
-    stats: { ...home.stats, partnerFirms: resolvePartnerFirms(home.stats.partnerFirms, partners) },
+    stats: { ...home.stats, members, partnerFirms: resolvePartnerFirms(home.stats.partnerFirms, partners) },
   };
   // Inside the page function: a bad save fails this regeneration and the last good page keeps being served.
   validateHome(content);
+  validateEvents(events);
   const sponsors = sortPartners(partners).map(({ name, logo }) => ({ name, logo }));
-  return <HomePage home={content} recruiting={site.recruiting} sponsors={sponsors} events={events} now={new Date()} />;
+  return <HomePage home={content} recruiting={recruiting} sponsors={sponsors} events={events} now={new Date()} />;
 }

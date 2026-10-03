@@ -4,6 +4,7 @@ import { Grid } from "@/components/Container";
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
 import { GameCard } from "@/components/membership/GameCard";
+import type { Recruiting } from "@/content/types";
 
 const PLACEMENT = "membership-games";
 const INTERVIEW_HREF = "/apply#process";
@@ -11,6 +12,8 @@ const INTERVIEW_HREF = "/apply#process";
 type GamesProps = {
   index: number;
   title: string;
+  /** From the admin Recruiting screen; defaults to content. */
+  recruiting?: Recruiting;
 };
 
 /**
@@ -19,13 +22,13 @@ type GamesProps = {
  * and Apply links are rendered here on the server and handed to the client card, so Apply resolves the same way it
  * does everywhere else.
  */
-export function Games({ index, title }: GamesProps) {
+export function Games({ index, title, recruiting }: GamesProps) {
   const cta = (
     <>
       <Button href={INTERVIEW_HREF} arrow variant="light" shape="rounded" track={{ cta: "game-interview", placement: PLACEMENT }}>
         See how interviews work
       </Button>
-      <ApplyButton variant="light-outline" shape="rounded" placement={PLACEMENT} />
+      <ApplyButton variant="light-outline" shape="rounded" placement={PLACEMENT} recruiting={recruiting} />
     </>
   );
 
