@@ -67,15 +67,69 @@ export type HomeContent = {
   pillars: Array<{ title: string; body: string; link: ContentLink }>;
   /** Real, defensible numbers only. Missing values are omitted from the page. */
   stats: { members?: number; foundedYear?: number; partnerFirms?: number };
-  /** 0 (section hidden) or 2–3 photos. */
+  /** 0 (section hidden) or 2–3 photos. The Upcoming card beside them is the next event in content/events.ts. */
   photos: HomePhoto[];
-  upcoming?: {
-    title: string;
-    /** ISO "YYYY-MM-DDTHH:mm", America/New_York. */
-    date: string;
-    location: string;
-    link?: ContentLink;
+};
+
+/**
+ * Who may see an item (spec 06 §5.1). `public` items show on the website and in the portal; `signed_in` and
+ * `members` only in the portal. Resources, announcements and portal links never use `public`.
+ */
+export type Audience = "public" | "signed_in" | "members";
+
+export type EventType = "general-meeting" | "workshop" | "speaker" | "competition" | "social" | "recruiting" | "other";
+
+/**
+ * A club event (spec 09 §5.2). Same shape as spec 06's `events` table, so its seed copies content/events.ts straight
+ * in. Home's Upcoming card shows the next featured public event (spec 01 §3.4).
+ */
+export type ClubEvent = {
+  title: string;
+  type: EventType;
+  /** ISO "YYYY-MM-DDTHH:mm", America/New_York. */
+  startsAt: string;
+  /** Same format; on or after startsAt. */
+  endsAt?: string;
+  location?: string;
+  /** One or two sentences; shown in the portal, not on Home. */
+  description?: string;
+  /** https only. */
+  url?: string;
+  audience: Audience;
+  /** Candidate for Home's Upcoming card. Only valid with audience "public". */
+  featured: boolean;
+};
+
+/**
+ * Portal copy (spec 09 §5.1). Public copy only: this repository is public, so member links never go here
+ * (they come from lib/data/portal.ts, spec 06 §8). Every link must be internal.
+ */
+export type PortalContent = {
+  header: { visitorLead: string; memberLead: string };
+  /** H2 copy for each section. */
+  headings: { recruiting: string; prep: string; events: string; tracks: string; club: string; learning: string; tools: string };
+  /** Preparing for the club's own interview, not firm interviews. */
+  interviewPrep: {
+    lead: string;
+    /** One paragraph on the format. */
+    expect: string;
+    /** 2–5 items. */
+    lookFor: string[];
+    /** 2–5 items, each with an optional internal link. */
+    prepare: Array<{ text: string; link?: ContentLink }>;
   };
+  /** Shown when no event is upcoming. */
+  eventsEmpty: string;
+  learning: { lead: string; empty: string };
+  tools: {
+    /** Stands in for the member links (tracker, Slack, Drive) until an admin adds some. */
+    linksPending: { title: string; body: string; pending: string };
+    competitions: { title: string; body: string };
+  };
+  /** Request access, for signed-in non-members while requests are open (spec 06 §8, §9). */
+  requestAccess: { prompt: string; button: string; notePlaceholder: string; pending: string; declined: string };
+  /** 1–4 internal links under The club. */
+  clubLinks: ContentLink[];
 };
 
 export type Partner = {

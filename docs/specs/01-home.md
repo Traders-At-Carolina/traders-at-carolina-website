@@ -4,6 +4,8 @@
 
 > **Revision (2026-10-02, hero):** the live readout moved from above the plot to below it. With the surface drawn low in its canvas, a readout at the top of the figure column floated away from what it describes; under the plot it reads as the figure's data line, and on mobile it brings the top of the surface into the first screen. The gap between the hero text and the figure is also tighter below 1024px (32px, was 48px).
 
+> **Revision (2026-10-03, events):** the Upcoming card (§3.4) now shows the next **featured public** event from `content/events.ts`, the one list of events shared with the portal (spec 09 §5.2). Spec 06 phase 6 moves that list into its `events` table with the same rule. `upcoming` is gone from `content/home.ts` (§6). The card shows an end time when an event has one; otherwise its layout and rules are unchanged.
+
 > **Revision (2026-10-02):** two Home sections changed. **By the numbers** no longer shows a one-item stat row: a lone stat becomes the section heading (§3.3). **Inside the club** with three photos now uses one large lead photo with the other two stacked beside it, instead of a 3-up row of equal thumbnails (§3.4). Where this note conflicts with §3 below, this note wins.
 
 All tokens, type roles, motifs and components named here are defined in spec 00. Section references like (00 §7.2) point there.

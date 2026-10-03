@@ -97,6 +97,7 @@ getApplicationState(now: Date): ApplicationState
 - `SectionHeader`: eyebrow `§ 02 — PROCESS AND DATES`, H2 (working copy: "What happens after you apply."), and a lead: "We recruit each fall and spring. Here's how the {cycle label} cycle works."
   - When closed, the lead reads: "We open applications each fall and spring. Here's how a typical cycle works."
 - `id="process"` on the section.
+- The portal (spec 09 §4.2) reuses this rail with its own number, eyebrow, H2, id and one action under it. `/apply` is unchanged.
 - Three stages as an `<ol>` stepped timeline. Each stage shows a caption line (numeral, then the date column value, then "OPEN NOW" on the current stage), the H3 title, an effort line (caption, `ink-3`) and the description.
 
 | # | Stage (H3) | Effort (working copy) | Date |

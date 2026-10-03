@@ -8,13 +8,20 @@ export const INTERNAL_FLAG = "tac:internal";
 
 export type TrackContext = { pathname: string; internal: boolean; doNotTrack: boolean; globalPrivacyControl: boolean };
 
+const inSegment = (pathname: string, segment: string) => pathname === segment || pathname.startsWith(`${segment}/`);
+
 export function isAdminPath(pathname: string): boolean {
-  return pathname === "/admin" || pathname.startsWith("/admin/");
+  return inSegment(pathname, "/admin");
 }
 
-/** Visitors only: never /admin, never a browser that has signed in to /admin, never with DNT or GPC on. */
+/** Signed-in areas that are never tracked: /admin, /account and /portal, so member links never reach PostHog (spec 06 §7.1). */
+export function isPrivatePath(pathname: string): boolean {
+  return isAdminPath(pathname) || inSegment(pathname, "/account") || inSegment(pathname, "/portal");
+}
+
+/** Visitors only: never a private path, never a browser that has signed in to /admin, never with DNT or GPC on. */
 export function shouldTrack(ctx: TrackContext): boolean {
-  return !isAdminPath(ctx.pathname) && !ctx.internal && !ctx.doNotTrack && !ctx.globalPrivacyControl;
+  return !isPrivatePath(ctx.pathname) && !ctx.internal && !ctx.doNotTrack && !ctx.globalPrivacyControl;
 }
 
 function isInternalBrowser(win: Window): boolean {
@@ -59,7 +66,7 @@ export function posthogConfig(ingestHost: string, isInternal: () => boolean): Pa
     respect_dnt: true,
     before_send: ((event: CaptureEvent) => {
       if (!event) return null;
-      if (isAdminPath(event.properties?.$pathname ?? "") || isInternal()) return null;
+      if (isPrivatePath(event.properties?.$pathname ?? "") || isInternal()) return null;
       return event;
     }) as PostHogConfig["before_send"],
   };

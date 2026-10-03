@@ -19,7 +19,7 @@ const valid: HomeContent = {
 };
 
 describe("validateHome", () => {
-  it("accepts content with no stats, photos or upcoming event", () => {
+  it("accepts content with no stats or photos", () => {
     expect(() => validateHome(valid)).not.toThrow();
   });
 
@@ -46,11 +46,6 @@ describe("validateHome", () => {
 
   it("requires exactly three pillars", () => {
     expect(() => validateHome({ ...valid, pillars: valid.pillars.slice(0, 2) })).toThrow(/pillars/);
-  });
-
-  it("rejects a malformed upcoming date", () => {
-    const upcoming = { title: "Mock trading night", date: "Oct 16", location: "Gardner Hall" };
-    expect(() => validateHome({ ...valid, upcoming })).toThrow(/upcoming\.date/);
   });
 });
 

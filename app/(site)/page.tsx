@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import { HomePage } from "@/components/home/HomePage";
 import { about } from "@/content/about";
+import { events } from "@/content/events";
 import { home } from "@/content/home";
 import { site } from "@/content/site";
 import { resolvePartnerFirms, sortPartners } from "@/lib/about";
 import { getHomePhotos } from "@/lib/data/public";
+import { validateEvents } from "@/lib/validate-events";
 import { validateHome } from "@/lib/validate-home";
+
+// Events are still content/events.ts until phase 6 moves them to the database, so they validate at build time.
+validateEvents(events);
 
 export const metadata: Metadata = {
   title: { absolute: "Traders at Carolina · Quantitative Finance at UNC" },
@@ -24,5 +29,5 @@ export default async function Page() {
   // Inside the page function: a bad save fails this regeneration and the last good page keeps being served.
   validateHome(content);
   const sponsors = sortPartners(about.partners).map(({ name, logo }) => ({ name, logo }));
-  return <HomePage home={content} recruiting={site.recruiting} sponsors={sponsors} now={new Date()} />;
+  return <HomePage home={content} recruiting={site.recruiting} sponsors={sponsors} events={events} now={new Date()} />;
 }

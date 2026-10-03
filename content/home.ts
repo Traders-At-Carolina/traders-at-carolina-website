@@ -11,7 +11,8 @@ import generalMeeting from "@/public/images/events/general-meeting.jpg";
  *     import mockTrading from "@/public/images/events/mock-trading.jpg";
  *     { src: mockTrading, alt: "…", caption: "Mock trading night, Spring 2026", ratio: "3:2" }
  *   "Inside the club" stays hidden until there are at least 2.
- * - upcoming: optional; hidden automatically once the event's day has passed (at build time).
+ * - The Upcoming card beside the photos is the next featured public event in content/events.ts; it hides itself once
+ *   the event has finished (at build time).
  */
 export const home: HomeContent = {
   hero: {
