@@ -110,7 +110,7 @@ The next visitor gets the updated page. Writes that touch several rows (reorderi
 - If a regeneration fails at runtime, the last good page keeps being served.
 - There is no silent fallback to seed content in production.
 
-**Seed data.** `scripts/seed.ts` loads the current `content/*.ts` data and `public/images/**` into the database and Blob, including `site.recruiting` and `home.upcoming` (as an event). It fills only empty tables, so it never overwrites admin edits, and it is safe to re-run. Once a collection is cut over, its `content/*.ts` export is seed input only, and its header comment says so.
+**Seed data.** `scripts/seed.ts` loads the current `content/*.ts` data and `public/images/**` into the database and Blob, including `site.recruiting`, `home.upcoming` and spec 09's interim `content/events.ts` (as events). It fills only empty tables, so it never overwrites admin edits, and it is safe to re-run. Once a collection is cut over, its `content/*.ts` export is seed input only, and its header comment says so.
 
 ---
 
@@ -174,7 +174,7 @@ The first group ships in phase 2 (migrations `0001` and `0002`; the bold columns
 | `people` | id, slug (unique; fixed after creation), name, role, group (`co-president` \| `exec` \| `director` \| `track-lead`), track?, sort_order, class_year?, major?, headshot?, alt?, placement_note?, company_id → placements, linkedin?, **visible (default true)** | `team.people` (04 §5) | 2 |
 | `audit_log` | id, at, actor_id, actor_email, action, entity, entity_label, **entity_id, before (jsonb), after (jsonb)**; index on (entity, entity_id, at desc) | — | 2 |
 | `settings` | key (`recruiting` \| `season` \| `portal`, primary key), value (jsonb, zod-validated per key), updated_at | `site.recruiting`, `home.stats.members`, `team.academicYear` | 6 |
-| `events` | id, title, type (`general-meeting` \| `workshop` \| `speaker` \| `competition` \| `social` \| `recruiting` \| `other`), starts_at, ends_at?, location?, description?, url?, audience, featured, timestamps | `home.upcoming` (01 §6) | 6 |
+| `events` | id, title, type (`general-meeting` \| `workshop` \| `speaker` \| `competition` \| `social` \| `recruiting` \| `other`), starts_at, ends_at?, location?, description?, url?, audience, featured, timestamps | `home.upcoming` (01 §6), `content/events.ts` (09, interim) | 6 |
 | `members` | id, email (unique, case-insensitive), name, status (`active` \| `alumni` \| `inactive`), track?, class_year?, cohort?, user_id? (unique), notes?, timestamps | — | 4 |
 | `membership_requests` | id, user_id, email, name, note?, status (`pending` \| `approved` \| `declined`), decided_by?, decided_at?, created_at. At most one pending request per user. | — | 4 |
 | `resources` | id, title, kind (`slides` \| `notes` \| `textbook` \| `problem-set` \| `video` \| `link`), section (`learning` \| `interview-prep` \| `recruiting` \| `other`), tracks[] (empty means all), description?, file? (`{pathname, size, contentType}`, private store), url?, audience, pinned, sort_order, hidden, timestamps | — | 7 |
@@ -405,7 +405,7 @@ Exists. Volunteered contacts, the top 10 per game and recent plays (03 §3.7).
 - Visitors are anonymous: there are no person profiles unless identified, and the site never identifies anyone.
 - The visitor ID is stored in `localStorage`, not a cookie.
 - **Not tracked:**
-  - `/admin`, `/account` and the portal;
+  - `/admin`, `/account` and `/portal`, excluded by one path check in `lib/analytics/client-config.ts` (spec 09 adds `isPrivatePath`);
   - any browser that has signed in to `/admin` (an internal flag is set there);
   - visitors with Do Not Track or Global Privacy Control enabled.
 - **Proxy.** Events go through a same-origin path (`/rp/*`, via `next.config.ts` rewrites) so ad blockers don't drop them. This needs `skipTrailingSlashRedirect`, so each page sets `alternates.canonical`.
@@ -445,7 +445,9 @@ async function getMembership(user: { id: string; verifiedEmails: string[] }): Pr
 2. If none, find it by any verified email (case-insensitive) and set its `user_id`.
 3. Return `null` for no row, an `inactive` row, or an `alumni` row while `alumniAccess` is off.
 
-Admins are treated as active members. The resolver runs per request on portal pages, which are per-user and dynamic. Public pages never call it.
+`getMembership` reads only the roster. The caller treats admins as members: `isMember = isAdmin || membership !== null`, where `isAdmin` comes from `isAdminClaims` (`lib/auth/roles.ts`). The resolver runs per request on portal pages, which are per-user and dynamic. Public pages never call it.
+
+**Ownership.** Spec 09 creates `lib/members/resolve.ts` and `lib/members/audience.ts` with exactly these signatures. Until phase 4, `getMembership` is a stub that returns `null`, so only admins see the member view. Phase 4 replaces the body without changing the signature, and the portal needs no changes. The portal never reads membership from Clerk metadata, not even as a stand-in.
 
 **Visibility.** `lib/members/audience.ts` exports `canSee(audience, viewer)`, where the viewer is `"signed_in" | "member"`. Every portal query filters with it on the server; nothing members-only is sent to a non-member's browser.
 
@@ -508,7 +510,7 @@ Each phase is its own implementation plan and PR. A phase is implemented only wh
 | 1 | Analytics capture: tracking attributes, canonical URLs. Ships early so data accumulates. | Done (footer notice still to add) |
 | 2 | Infrastructure and auth shell: Clerk, Neon, Blob; `proxy.ts`, sign-in, Admins screen, schema `0001` + `0002` (undo columns, Membership photo slots, officer visibility), seed | In review (PR #26) |
 | 3 | **Editor framework + Photos.** `lib/data/public.ts`, `lib/admin/action.ts`, `ImageUpload`, save toast with Undo, History, the console sidebar groups. Photos end to end with Home and Membership slots. The template for every other editor. | |
-| 4 | **Members.** Roster, bulk add with optional invitations, requests, all accounts, CSV export, `lib/members/resolve.ts` and `audience.ts`. | |
+| 4 | **Members.** Roster, bulk add with optional invitations, requests, all accounts, CSV export. Fills in the `lib/members/resolve.ts` stub that spec 09 creates. | |
 | 5 | **Website lists.** Sponsors → Placements → Officers (visible flag, academic year) → Tracks, each with its public page cut over. | |
 | 6 | **Recruiting, season and events.** The `settings` and `events` tables, the recruiting cut-over, Home "Upcoming" from events, member-count modes, the 5-minute backstop, the games `DeadlineSwitch` fix. | |
 | 7 | **Portal content.** Resources (private Blob store and the file route), Announcements, Portal settings and links, `lib/data/portal.ts`. Can run alongside spec 09. | |
@@ -593,5 +595,6 @@ Members (phase 4) come right after the framework because the portal depends on t
 - [ ] Whether the club has (or will register) a custom domain. This decides the Clerk production setup.
 - [ ] Who the first admins are.
 - [ ] Whether alumni should keep member access by default (this spec assumes yes).
-- [ ] Spec 09: the portal pages for members and signed-in non-members, built on §8.
+- [ ] **Clerk sign-up mode.** It is currently Restricted in the Clerk dashboard. This spec and spec 09 assume Public. While it stays Restricted, only invited people can have accounts, so the non-member portal, Request access and account-linked game scores work only for them.
+- [ ] Spec 09: the portal pages for members and signed-in non-members, built on §8 (drafted on `claude/portal-page-design-c96b48`).
 - [ ] Later revisions: page copy editing, contact and socials, the Fermi question bank, an Editor role.
