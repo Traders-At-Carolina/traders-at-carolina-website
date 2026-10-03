@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { Container, Grid } from "@/components/Container";
+import { Container } from "@/components/Container";
 import { Eyebrow } from "@/components/Eyebrow";
+import { SectionRule } from "@/components/SectionRule";
 
 type SectionProps = {
   children: ReactNode;
@@ -45,10 +46,10 @@ type SectionHeaderProps = {
   tone?: "default" | "inverse";
 };
 
-/** Hairline, eyebrow, H2 and optional lead within the 7-column text span (00 §10). */
+/** Drawn hairline, eyebrow, H2 and optional lead within the 7-column text span (00 §10). */
 export function SectionHeader({ index, eyebrow, title, lead, id, tone = "default" }: SectionHeaderProps) {
   return (
-    <Grid className={`border-t pt-6 md:pt-8 ${tone === "inverse" ? "border-rule-inverse" : "border-rule"}`}>
+    <SectionRule inverse={tone === "inverse"}>
       <div className="col-span-12 lg:col-span-7">
         <Eyebrow index={index} tone={tone}>
           {eyebrow}
@@ -58,6 +59,6 @@ export function SectionHeader({ index, eyebrow, title, lead, id, tone = "default
         </h2>
         {lead ? <p className={`mt-4 text-lead ${tone === "inverse" ? "text-bone" : "text-ink-2"}`}>{lead}</p> : null}
       </div>
-    </Grid>
+    </SectionRule>
   );
 }

@@ -19,9 +19,9 @@ function CompanyBadge({ company }: { company: CompanyMark }) {
   return (
     <span
       aria-hidden="true"
-      className="absolute bottom-2 left-2 flex size-8 translate-y-1 items-end justify-start opacity-0 transition duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
+      className="absolute bottom-2 left-2 flex size-11 translate-y-1 items-end justify-start opacity-0 transition duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
     >
-      <Image src={company.logo} alt="" sizes="32px" className="max-h-full w-auto max-w-full object-contain" />
+      <Image src={company.logo} alt="" sizes="44px" className="max-h-full w-auto max-w-full object-contain" />
     </span>
   );
 }
