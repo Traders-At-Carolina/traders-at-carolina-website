@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
 import type { ApplyContent } from "@/content/types";
@@ -11,16 +12,34 @@ type ProcessProps = {
   lead: string;
   /** Index of the stage happening now (the Application stage while open). */
   current?: number;
+  /** Section number, eyebrow, H2 and id default to /apply's; the portal reuses the rail with its own (spec 09 §4.2). */
+  index?: number;
+  eyebrow?: string;
+  title?: string;
+  id?: string;
+  /** One action under the rail (the portal's Apply or Keep me posted). /apply has its own actions elsewhere. */
+  action?: ReactNode;
 };
 
 /**
  * § 02 — application, interview and decision as a stepped timeline (spec 05 §4.3).
  * A horizontal rail on desktop, a vertical one on mobile; the current stage's node is filled.
  */
-export function Process({ stages, dates, efforts, lead, current }: ProcessProps) {
+export function Process({
+  stages,
+  dates,
+  efforts,
+  lead,
+  current,
+  index = 2,
+  eyebrow = "Process and dates",
+  title = "What happens after you apply.",
+  id = "process",
+  action,
+}: ProcessProps) {
   return (
-    <Section id="process" labelledBy="process-title" className="scroll-mt-20">
-      <SectionHeader index={2} eyebrow="Process and dates" title="What happens after you apply." lead={lead} id="process-title" />
+    <Section id={id} labelledBy={`${id}-title`} className="scroll-mt-20">
+      <SectionHeader index={index} eyebrow={eyebrow} title={title} lead={lead} id={`${id}-title`} />
       <Reveal as="ol" className="mt-12 grid grid-cols-1 md:mt-16 lg:grid-cols-3 lg:gap-x-8">
         {stages.map((stage, i) => {
           const when = dates[i] ?? stage.genericTiming;
@@ -48,6 +67,7 @@ export function Process({ stages, dates, efforts, lead, current }: ProcessProps)
           );
         })}
       </Reveal>
+      {action ? <div className="mt-12 md:mt-16">{action}</div> : null}
     </Section>
   );
 }

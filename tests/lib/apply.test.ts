@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { apply } from "@/content/apply";
 import type { Recruiting } from "@/content/types";
-import { applyBandCopy, applyPrimaryAction, applyStatusCopy, formatDateRange, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
+import { applyBandCopy, applyPrimaryAction, applyStatusCopy, formatDateRange, processLead, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
 import { getApplicationState } from "@/lib/applications";
 import { inlineToPlainText, parseInline } from "@/lib/inline-markdown";
 import { collectApplyProblems, validateApply } from "@/lib/validate-apply";
@@ -82,6 +82,14 @@ describe("applyPrimaryAction", () => {
     const notify = { ...closed, interestFormUrl: "https://forms.gle/notify" };
     expect(applyPrimaryAction(getApplicationState(now, notify), notify, undefined).label).toBe("Keep me posted");
     expect(applyPrimaryAction(getApplicationState(now, closed), closed, "hi@club.org").href).toBe("mailto:hi@club.org");
+  });
+});
+
+describe("processLead", () => {
+  it("names the cycle while open, and describes a typical cycle otherwise", () => {
+    expect(processLead(getApplicationState(now, open), open.cycleLabel)).toBe("We recruit each fall and spring. Here's how the Spring 2027 cycle works.");
+    expect(processLead(getApplicationState(now, open))).toBe("We open applications each fall and spring. Here's how a typical cycle works.");
+    expect(processLead({ status: "closed" }, "Spring 2027")).toBe("We open applications each fall and spring. Here's how a typical cycle works.");
   });
 });
 

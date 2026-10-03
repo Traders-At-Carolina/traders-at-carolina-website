@@ -1,20 +1,16 @@
 import Image from "next/image";
-import { Card } from "@/components/Card";
 import { Grid } from "@/components/Container";
-import { Eyebrow } from "@/components/Eyebrow";
+import { EventCard } from "@/components/EventCard";
 import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeader } from "@/components/Section";
-import { TextLink } from "@/components/TextLink";
-import type { HomeContent, HomePhoto } from "@/content/types";
-import { parseEasternDateTime } from "@/lib/eastern-time";
-import { formatEventDateTime } from "@/lib/format";
+import type { ClubEvent, HomePhoto } from "@/content/types";
 
 type InsideTheClubProps = {
   index: number;
   title: string;
   photos: HomePhoto[];
-  /** Already filtered to upcoming events by the caller. */
-  upcoming?: HomeContent["upcoming"];
+  /** The next featured public event from content/events.ts, already chosen by the caller. */
+  upcoming?: ClubEvent;
 };
 
 function Photo({
@@ -48,28 +44,6 @@ function Photo({
   );
 }
 
-function UpcomingCard({ upcoming }: { upcoming: NonNullable<HomeContent["upcoming"]> }) {
-  const when = parseEasternDateTime(upcoming.date);
-  const external = upcoming.link ? /^https?:\/\//.test(upcoming.link.href) : false;
-  return (
-    <Card>
-      <Eyebrow>Upcoming</Eyebrow>
-      <h3 className="mt-3 text-h3">{upcoming.title}</h3>
-      <p className="mt-3 text-body tabular">
-        <time dateTime={when.toISOString()}>{formatEventDateTime(when)}</time>
-      </p>
-      <p className="mt-1 text-caption text-ink-3">{upcoming.location}</p>
-      {upcoming.link ? (
-        <p className="mt-5">
-          <TextLink href={upcoming.link.href} external={external} arrow track={{ cta: "upcoming-event", target: upcoming.title }}>
-            {upcoming.link.label}
-          </TextLink>
-        </p>
-      ) : null}
-    </Card>
-  );
-}
-
 /**
  * § 04 — event photos and an optional Upcoming card (spec 01 §3.4).
  * DOM order is photo, card, remaining photos (the mobile reading order); desktop placement is set per layout.
@@ -86,7 +60,7 @@ export function InsideTheClub({ index, title, photos, upcoming }: InsideTheClubP
           <Grid className="items-start gap-y-10">
             <Photo photo={first} ratio={first.ratio} sizes="(min-width: 1024px) 50vw, 100vw" className="col-span-12 lg:col-span-6" />
             <div className="col-span-12 md:col-span-6 lg:col-span-3 lg:col-start-10 lg:row-start-1">
-              <UpcomingCard upcoming={upcoming} />
+              <EventCard event={upcoming} label="Upcoming" />
             </div>
             <Photo
               photo={second}

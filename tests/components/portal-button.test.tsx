@@ -1,17 +1,20 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { AdminLoginButton } from "@/components/AdminLoginButton";
 import { MarkInternalBrowser } from "@/components/admin/MarkInternalBrowser";
+import { PortalButton } from "@/components/PortalButton";
 import { SiteChrome } from "@/components/SiteChrome";
 import { INTERNAL_FLAG } from "@/lib/analytics/client-config";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+const pathname = vi.fn(() => "/");
+vi.mock("next/navigation", () => ({ usePathname: () => pathname() }));
 
-describe("AdminLoginButton", () => {
-  it("is a circular link to the admin sign-in, fixed in the bottom-right corner", () => {
-    render(<AdminLoginButton />);
-    const link = screen.getByRole("link", { name: "Admin sign in" });
-    expect(link).toHaveAttribute("href", "/admin/sign-in");
+beforeEach(() => pathname.mockReturnValue("/"));
+
+describe("PortalButton", () => {
+  it("is a circular plain link to the portal, fixed in the bottom-right corner", () => {
+    render(<PortalButton />);
+    const link = screen.getByRole("link", { name: "Member portal" });
+    expect(link).toHaveAttribute("href", "/portal");
     expect(link).toHaveAttribute("rel", "nofollow");
     expect(link.className).toMatch(/\bfixed\b/);
     expect(link.className).toMatch(/\bbottom-4\b/);
@@ -20,13 +23,20 @@ describe("AdminLoginButton", () => {
     expect(link.className).toMatch(/\bsize-11\b/);
   });
 
+  it("is hidden on the portal itself", () => {
+    pathname.mockReturnValue("/portal");
+    const { container } = render(<PortalButton />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it("appears on every public page through the site chrome", () => {
+    pathname.mockReturnValue("/membership");
     render(
       <SiteChrome>
         <h1>Page</h1>
       </SiteChrome>,
     );
-    expect(screen.getByRole("link", { name: "Admin sign in" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Member portal" })).toBeInTheDocument();
   });
 });
 

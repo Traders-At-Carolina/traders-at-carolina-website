@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { act, render, screen, within } from "@testing-library/react";
 import type { StaticImageData } from "next/image";
 import { HomePage } from "@/components/home/HomePage";
-import type { HomeContent, HomePhoto, Recruiting } from "@/content/types";
+import type { ClubEvent, HomeContent, HomePhoto, Recruiting } from "@/content/types";
 
 const now = new Date("2027-01-05T17:00:00Z");
 const image = { src: "/images/events/x.jpg", width: 1800, height: 1200, blurDataURL: "data:image/png;base64,iVBORw0KGgo=" } as StaticImageData;
@@ -162,16 +162,21 @@ describe("HomePage", () => {
     expect(marks[0].closest("li")).toHaveTextContent("Jane Street");
   });
 
-  it("shows the Upcoming card only for events that haven't passed", () => {
-    const upcoming = { title: "Mock trading night", date: "2027-01-14T19:00", location: "Gardner Hall 105" };
+  it("shows the next featured public event as the Upcoming card, and none once it has passed", () => {
+    const upcoming: ClubEvent = { title: "Mock trading night", type: "workshop", startsAt: "2027-01-14T19:00", location: "Gardner Hall 105", audience: "public", featured: true };
+    const later: ClubEvent = { ...upcoming, title: "Citadel challenge", type: "competition", startsAt: "2027-02-01T18:00" };
+    const membersOnly: ClubEvent = { ...upcoming, title: "Members social", startsAt: "2027-01-07T19:00", audience: "members", featured: false };
     const withPhotos = { ...base, photos: [photo(1), photo(2, "4:5")] };
 
-    const { unmount } = render(<HomePage home={{ ...withPhotos, upcoming }} recruiting={closed} now={now} />);
+    const { unmount } = render(<HomePage home={withPhotos} events={[later, membersOnly, upcoming]} recruiting={closed} now={now} />);
+    expect(screen.getByText("Upcoming")).toBeInTheDocument();
     expect(screen.getByText("Mock trading night")).toBeInTheDocument();
     expect(screen.getByText("Thu, Jan 14 · 7:00 PM")).toBeInTheDocument();
+    expect(screen.queryByText("Citadel challenge")).not.toBeInTheDocument();
+    expect(screen.queryByText("Members social")).not.toBeInTheDocument();
     unmount();
 
-    render(<HomePage home={{ ...withPhotos, upcoming: { ...upcoming, date: "2027-01-02T19:00" } }} recruiting={closed} now={now} />);
+    render(<HomePage home={withPhotos} events={[{ ...upcoming, startsAt: "2027-01-02T19:00" }]} recruiting={closed} now={now} />);
     expect(screen.queryByText("Mock trading night")).not.toBeInTheDocument();
     // Photo figures only; the hero's random-walk figure has no image.
     expect(screen.getAllByRole("figure").filter((f) => f.querySelector("img"))).toHaveLength(2);
