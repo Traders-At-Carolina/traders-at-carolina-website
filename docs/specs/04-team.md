@@ -22,7 +22,7 @@ Put faces and names to the club, and show where its members go.
 | Who runs the club? | Executive board |
 | Who leads the track I'm interested in? | Track leads |
 | Where do members end up? | Placements (when data exists) |
-| How do I join them? | Apply band |
+| How do I join them? | Footer CTA zone |
 
 ---
 
@@ -35,7 +35,6 @@ Put faces and names to the club, and show where its members go.
 | 01 | Executive board | bone | — (photos) |
 | 02 | Track leads | bone | — (photos) |
 | 03 | Placements *(conditional)* | white | — |
-| — | Apply band (`CTABand`) | navy | — |
 | — | `SiteFooter` | black | — |
 
 ---
@@ -88,6 +87,7 @@ Put faces and names to the club, and show where its members go.
   - **Keyboard and assistive tech:** the strip is not keyboard-operable. Every firm is in the accessible list once, with its name, so nothing depends on dragging.
   - With an empty list, the art column is left out and the header is text only. It never falls back to the `RandomWalk`.
   - Separate from § 03 Placements (§4.4), which stays text-only and threshold-gated.
+  - The footer's placement strip (spec 07 §3.3) is hidden on `/team`, because this header already shows the same firms.
 
 ### 4.2 Executive board (§ 01)
 
@@ -122,11 +122,9 @@ Put faces and names to the club, and show where its members go.
 - **Grid:** 3 columns at ≥ 1024px, 2 at 768–1023px, 1 below that.
 - `rule` hairlines between rows, 20px vertical padding per row.
 
-### 4.5 Apply band
+### 4.5 Apply band (removed 2026-10-02)
 
-- `CTABand` with the shared Apply behavior from spec 01 §5.
-- H2 working copy (open): "Want to see your name here next year?"
-- This is the page's single navy band.
+The closing Apply call to action now lives in the footer on every page (spec 07). Team no longer renders `CTABand`.
 
 ---
 

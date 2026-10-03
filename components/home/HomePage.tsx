@@ -1,6 +1,4 @@
 import type { ReactNode } from "react";
-import { Button } from "@/components/Button";
-import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
 import { ByTheNumbers } from "@/components/home/ByTheNumbers";
 import { Hero, HeroActions } from "@/components/home/Hero";
@@ -8,7 +6,6 @@ import { InsideTheClub } from "@/components/home/InsideTheClub";
 import { IntroOverlay } from "@/components/home/IntroOverlay";
 import { Pillars } from "@/components/home/Pillars";
 import type { StatItem } from "@/components/Stat";
-import { ctaFromLabel } from "@/lib/analytics/attributes";
 import type { HomeContent, Partner, Recruiting } from "@/content/types";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 import { homeApplyCopy, isUpcoming, numberSections, type HomeApplyCopy } from "@/lib/home";
@@ -26,7 +23,7 @@ type SectionKey = "hero" | "pillars" | "numbers" | "inside";
 
 /**
  * Composes the Home page (spec 01 §2). Sections without real content are omitted and numbering stays sequential.
- * When open with a deadline, the hero actions and band render both variants and DeadlineSwitch flips them
+ * When open with a deadline, the hero actions render both variants and DeadlineSwitch flips them
  * in the browser once it passes, matching /apply.
  */
 export function HomePage({ home, recruiting, sponsors = [], now }: HomePageProps) {
@@ -65,17 +62,6 @@ export function HomePage({ home, recruiting, sponsors = [], now }: HomePageProps
       {showInside ? (
         <InsideTheClub index={n.inside} title={home.headings.inside} photos={home.photos} upcoming={upcoming} />
       ) : null}
-      {live(({ band }) => (
-        <CTABand
-          title={band.title}
-          lead={band.lead}
-          action={
-            <Button href={band.href} external={band.external} arrow={band.arrow} variant="inverse" track={{ cta: ctaFromLabel(band.label), placement: "band" }}>
-              {band.label}
-            </Button>
-          }
-        />
-      ))}
     </>
   );
 }

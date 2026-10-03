@@ -49,7 +49,7 @@ export function applyStatusCopy(state: ApplicationState, recruiting: Recruiting,
       title: "Be first to know when applications open.",
       statusLine: `Applications are closed · ${when}`,
       lead: "Leave your email and we'll let you know as soon as the next cycle opens.",
-      action: { label: "Get notified", href: interest, external: true },
+      action: { label: "Keep me posted", href: interest, external: true },
       note: `Name and email only · ${NO_EXPERIENCE}`,
     };
   }
@@ -84,7 +84,7 @@ export function applyBandCopy(state: ApplicationState, recruiting: Recruiting, c
       lead: nextOpen
         ? `Applications open ${formatWeekdayMonthDay(nextOpen)}. We'll email you when they do.`
         : "We'll email you when applications open.",
-      action: { label: "Get notified", href: recruiting.interestFormUrl, external: true },
+      action: { label: "Keep me posted", href: recruiting.interestFormUrl, external: true },
     };
   }
   return { title: "Applications are closed for now.", action: closedFallback(contactEmail) };
@@ -94,7 +94,7 @@ export function applyBandCopy(state: ApplicationState, recruiting: Recruiting, c
 export function applyPrimaryAction(state: ApplicationState, recruiting: Recruiting, contactEmail: string | undefined): ApplyAction {
   if (state.status === "open") return { label: "Apply", href: recruiting.applyUrl, external: true };
   return recruiting.interestFormUrl
-    ? { label: "Get notified", href: recruiting.interestFormUrl, external: true }
+    ? { label: "Keep me posted", href: recruiting.interestFormUrl, external: true }
     : closedFallback(contactEmail);
 }
 

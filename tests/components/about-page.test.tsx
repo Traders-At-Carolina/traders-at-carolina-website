@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { AboutPage } from "@/components/about/AboutPage";
-import type { AboutContent, Recruiting, TimelineEntry } from "@/content/types";
-
-const now = new Date("2027-01-05T17:00:00Z");
-const closed: Recruiting = { applicationsOpen: false, applyUrl: "" };
-const open: Recruiting = { applicationsOpen: true, applyUrl: "https://forms.gle/apply" };
+import type { AboutContent, TimelineEntry } from "@/content/types";
 
 const base: AboutContent = {
   header: { h1: "Built by students, for the long game.", lead: "Lead." },
@@ -26,14 +22,14 @@ const milestones = (n: number): TimelineEntry[] => Array.from({ length: n }, (_,
 const story = { paragraphs: ["Founded in a dorm room.", "Grew every semester."] };
 
 const eyebrows = () => screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent);
-const renderAbout = (about: Partial<AboutContent> = {}, timeline: TimelineEntry[] = [], recruiting = closed) =>
-  render(<AboutPage about={{ ...base, ...about }} timeline={timeline} recruiting={recruiting} now={now} />);
+const renderAbout = (about: Partial<AboutContent> = {}, timeline: TimelineEntry[] = []) =>
+  render(<AboutPage about={{ ...base, ...about }} timeline={timeline} />);
 
 describe("AboutPage", () => {
-  it("renders the page header as the only h1 and one navy band", () => {
+  it("renders the page header as the only h1 and no navy band (the footer owns it)", () => {
     const { container } = renderAbout();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
+    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
   });
 
   it("hides story and partners without content and keeps numbering sequential", () => {
@@ -102,11 +98,5 @@ describe("AboutPage", () => {
     const four = screen.getByRole("region", { name: "How we operate." }).querySelector("ol");
     expect(four?.className).toContain("lg:grid-cols-2");
     expect(within(four as HTMLElement).getAllByRole("listitem")).toHaveLength(4);
-  });
-
-  it("uses the About band copy when applications are open", () => {
-    renderAbout({}, [], open);
-    expect(screen.getByRole("heading", { name: "Want to be part of the next chapter?" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /^Apply/ })).toHaveAttribute("href", "https://forms.gle/apply");
   });
 });

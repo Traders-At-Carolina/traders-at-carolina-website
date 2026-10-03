@@ -46,33 +46,36 @@ describe("homeApplyCopy", () => {
     const closed = { ...recruiting, applicationsOpen: false, interestFormUrl: form };
     const copy = homeApplyCopy(getApplicationState(now, closed), closed, now);
     expect(copy.hero).toEqual({
-      label: "Get notified",
+      label: "Keep me posted",
       href: form,
       external: true,
       arrow: false,
-      status: "Applications are closed. We recruit each fall and spring.",
+      status: "We're between cycles. We open applications each fall and spring.",
     });
-    expect(copy.band).toMatchObject({ title: "Applications are closed for now.", label: "Get notified", href: form, external: true });
-    expect(copy.band.lead).toMatch(/Leave your email/);
+    expect(copy.band).toMatchObject({ title: "We're between cycles.", label: "Keep me posted", href: form, external: true });
+    expect(copy.band.lead).toBe(
+      "Applications aren't open right now. We open applications each fall and spring. Leave your email and we'll tell you the moment the next one opens.",
+    );
   });
 
   it("names the next open date in the closed status line", () => {
     const closed = { ...recruiting, applicationsOpen: false, nextApplicationOpenDate: "2027-01-12" };
     const copy = homeApplyCopy(getApplicationState(now, closed), closed, now);
-    expect(copy.hero.status).toBe("Applications are closed. The next cycle opens Tue, Jan 12.");
+    expect(copy.hero.status).toBe("We're between cycles. Our next cycle opens Tue, Jan 12.");
   });
 
-  it("falls back to 'How to apply' without an interest form, never promising a notification", () => {
+  it("falls back to 'See how it works' without an interest form, never promising a notification", () => {
     const closed = { ...recruiting, applicationsOpen: false };
     const copy = homeApplyCopy(getApplicationState(now, closed), closed, now);
-    expect(copy.hero).toMatchObject({ label: "How to apply", href: "/apply", external: false, arrow: true });
-    expect(copy.band).toMatchObject({ label: "How to apply", href: "/apply" });
-    expect(copy.band.lead).toBe("We recruit each fall and spring.");
+    expect(copy.hero).toMatchObject({ label: "See how it works", href: "/apply", external: false, arrow: true });
+    expect(copy.band).toMatchObject({ label: "See how it works", href: "/apply" });
+    expect(copy.band.lead).toBe("Applications aren't open right now. We open applications each fall and spring.");
+    expect(copy.band.lead).not.toMatch(/email|notif/i);
   });
 
   it("ignores a next open date that is already in the past", () => {
     const closed = { ...recruiting, applicationsOpen: false, nextApplicationOpenDate: "2027-01-02" };
     const copy = homeApplyCopy(getApplicationState(now, closed), closed, now);
-    expect(copy.hero.status).toBe("Applications are closed. We recruit each fall and spring.");
+    expect(copy.hero.status).toBe("We're between cycles. We open applications each fall and spring.");
   });
 });
