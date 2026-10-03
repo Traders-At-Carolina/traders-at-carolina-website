@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { FermiMarket } from "@/components/membership/FermiMarket";
 import { MathSprint } from "@/components/membership/MathSprint";
+import { claimHistory } from "@/lib/games/save-score";
 
 const GAMES = [
   { id: "sprint", label: "Mental math sprint" },
@@ -19,6 +20,15 @@ export function GameCard({ cta }: { cta: ReactNode }) {
   const [active, setActive] = useState<GameId>("sprint");
   const tabs = useRef<Array<HTMLButtonElement | null>>([]);
   const index = GAMES.findIndex((g) => g.id === active);
+
+  // Back from sign-in (?claim=1): move this browser's anonymous scores onto the account, then tidy the URL.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("claim") !== "1") return;
+    url.searchParams.delete("claim");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    void claimHistory();
+  }, []);
 
   // Roving focus with automatic activation (WAI-ARIA tabs pattern).
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -70,7 +80,7 @@ export function GameCard({ cta }: { cta: ReactNode }) {
         // Fixed to the tallest state (a Fermi round with its answer revealed) at each breakpoint, so the card never
         // changes height between tabs, rounds or results; shorter states lay themselves out to fill it. Below
         // 1280px the card is narrower and the longest prompts wrap more; from 1280px the section fits within 720px.
-        className="game-enter flex min-h-[37rem] flex-col px-5 pt-4 pb-6 md:min-h-[33rem] md:px-8 md:pt-5 md:pb-7 xl:min-h-[31rem]"
+        className="game-enter flex min-h-[39rem] flex-col px-5 pt-4 pb-6 md:min-h-[33rem] md:px-8 md:pt-5 md:pb-7 xl:min-h-[31rem]"
       >
         {active === "sprint" ? <MathSprint cta={cta} /> : <FermiMarket cta={cta} />}
       </div>

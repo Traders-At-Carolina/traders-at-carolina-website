@@ -18,7 +18,8 @@ if (!("IntersectionObserver" in globalThis)) {
   } as unknown as typeof IntersectionObserver;
 }
 
-if (!window.matchMedia) {
+// Route handler tests run in the node environment, where there's no window to stub.
+if (typeof window !== "undefined" && !window.matchMedia) {
   window.matchMedia = (query: string) =>
     ({
       matches: false,

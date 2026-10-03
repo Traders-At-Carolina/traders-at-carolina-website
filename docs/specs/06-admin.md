@@ -43,7 +43,7 @@ Let the club's officers keep the site current and see how it is used, without a 
 - Editing page copy such as hero text, FAQ, mission and principles. That copy stays in `content/*.ts`.
 - Recruiting configuration (`content/site.ts` `recruiting`). It is a candidate for a later revision.
 - A public gallery page. The photo library is built so one can be added later with its own spec.
-- Identifying individual visitors. Analytics are anonymous.
+- Identifying individual visitors. Analytics are anonymous. (Exception, by choice: the membership games save scores under a random browser id, and visitors may sign in or volunteer a name; spec 03 §3.7.)
 
 ---
 
@@ -51,7 +51,7 @@ Let the club's officers keep the site current and see how it is used, without a 
 
 | Concern | Choice | Notes |
 |---|---|---|
-| Admin auth | Clerk, invite-only (Restricted sign-up mode) | Vercel Marketplace. Loaded only under `/admin`. |
+| Admin auth | Clerk (Public sign-up mode since 2026-10-03; admin is still `role: "admin"` only) | Vercel Marketplace. Loaded only under `/admin` and `/account`. |
 | Content store | Neon Postgres, via Drizzle (`@neondatabase/serverless`, HTTP driver) | Vercel Marketplace. Migrations committed in `drizzle/`. |
 | Images | Vercel Blob (public store) | Uploaded from the browser, straight to Blob. |
 | Analytics | PostHog | Vercel Marketplace. Captured on public pages. Queried server-side for `/admin`. |
@@ -89,7 +89,9 @@ The next visitor gets the updated page.
   - Pages use `requirePage()`, which redirects signed-out users and returns a 404 to signed-in non-admins.
   - Layouts do not check auth (per the Next 16 authentication guide).
 - **Isolation from the public site**
-  - Clerk's provider and scripts load only under `app/admin/`. Public pages ship no Clerk JavaScript.
+  - Clerk's provider and scripts load only under `app/admin/` and `app/account/` (visitor sign-in for game scores, spec 03 §3.7). Public pages ship no Clerk JavaScript.
+  - `proxy.ts` also runs on `/account/*` and `/api/games/*` so those routes can read the session; it protects only `/admin` and `/api/admin`.
+  - `/api/games/*` is the site's first public write path: zod-validated, rate-limited per browser id and hashed IP, Fermi rescored server-side. `/admin/games` lists scores and volunteered contacts.
   - Public routes move into an `app/(site)/` route group. URLs do not change.
 - **Indexing.** `/admin` is `noindex`, and `robots.txt` disallows it.
 - **First admin.** Bootstrapped by hand in the Clerk dashboard. After that, admins invite each other (§6.7).

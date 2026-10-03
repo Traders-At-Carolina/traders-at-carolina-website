@@ -15,6 +15,11 @@ export default async function AdminHome() {
       </div>
       <p className="mt-6 text-lead text-ink-2">You&apos;re signed in. Editors for photos, officers, tracks, sponsors and placements arrive next.</p>
       <p className="mt-8">
+        <Link href="/admin/games" className="link-underline text-navy">
+          Game scores and contacts
+        </Link>
+      </p>
+      <p className="mt-4">
         <Link href="/" className="link-underline text-navy">
           Back to the site
         </Link>

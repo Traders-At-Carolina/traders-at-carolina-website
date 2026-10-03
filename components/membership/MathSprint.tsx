@@ -110,6 +110,7 @@ export function MathSprint({ cta }: { cta: ReactNode }) {
         unit="correct in 120 seconds"
         detail={skipped ? `${skipped} skipped` : undefined}
         best={best}
+        payload={{ game: "sprint", correct, skipped }}
         note="Zetamac is the two-minute drill trading candidates practise on, so your score compares directly. Our interview is a conversation: we care how you reason, not how fast you type."
         onReplay={start}
         cta={cta}

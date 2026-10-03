@@ -40,7 +40,7 @@ export function Games({ index, title }: GamesProps) {
             title={title}
             id="games-title"
             fullWidth
-            lead="The kind of question you'll work through out loud in an interview. Nothing to sign up for; your best score stays in this browser."
+            lead="The kind of question you'll work through out loud in an interview. No sign-up needed: scores are saved anonymously, and you can sign in to keep them with an account."
           />
         </div>
         <Reveal className="col-span-12 lg:col-span-8">
