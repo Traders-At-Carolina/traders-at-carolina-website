@@ -20,19 +20,27 @@ type WordmarkProps = {
   /** `inverse` swaps in the one-colour bone logo for black and navy backgrounds (00 §8.1). */
   tone?: "default" | "inverse";
   size?: keyof typeof SIZES;
+  /** The header's name slides in behind the mark as the page scrolls (`--logo-tuck`, 00 §10). */
+  tuck?: boolean;
 };
 
 /**
  * The club's logo mark beside the typeset name (00 §8.1). The mark is decorative, because the link's
  * accessible name already says the club name. On very narrow phones the name is dropped so the mark,
- * Apply and the menu button still fit.
+ * Apply and the menu button still fit. With `tuck`, the name sits in a track clipped at the mark's edge
+ * and slides out of sight behind it as the page scrolls; hovering or focusing the logo brings it back.
  */
-export function Wordmark({ tone = "default", size = "md" }: WordmarkProps) {
+export function Wordmark({ tone = "default", size = "md", tuck = false }: WordmarkProps) {
+  const name = (
+    <>
+      Traders <em>at</em> Carolina
+    </>
+  );
   return (
     <Link
       href="/"
       aria-label="Traders at Carolina, home"
-      className={`hit-target inline-flex items-center gap-2.5 font-display ${SIZES[size].text} leading-none whitespace-nowrap ${tone === "inverse" ? "text-bone" : "text-black"}`}
+      className={`hit-target group inline-flex items-center ${tuck ? "" : "gap-2.5"} font-display ${SIZES[size].text} leading-none whitespace-nowrap ${tone === "inverse" ? "text-bone" : "text-black"}`}
     >
       <Image
         src={MARKS[tone]}
@@ -43,9 +51,13 @@ export function Wordmark({ tone = "default", size = "md" }: WordmarkProps) {
         priority
         className={`${SIZES[size].mark} w-auto shrink-0`}
       />
-      <span className="max-[359px]:hidden">
-        Traders <em>at</em> Carolina
-      </span>
+      {tuck ? (
+        <span data-wordmark-track className="wordmark-track pl-2.5 max-[359px]:hidden">
+          <span className="wordmark-name block">{name}</span>
+        </span>
+      ) : (
+        <span className="max-[359px]:hidden">{name}</span>
+      )}
     </Link>
   );
 }
