@@ -22,13 +22,14 @@ function Cells({ companies, tone = "default" }: PlacementWallProps) {
   const inverse = tone === "inverse";
   return companies.map((company) => (
     <li key={company.name} className="flex h-28 w-48 shrink-0 flex-col items-center justify-center gap-3 px-4 lg:h-32">
-      {/* Marks are flattened to one ink colour (bone on black when inverse). The caption names the firm because some
-          marks (Infragrid's bare square) say nothing alone, so the image is decorative. */}
+      {/* Marks show in their own colours on bone (00 §7.5 exception). On black (inverse) they're flattened to bone,
+          since dark marks like JPMorgan's would disappear. The caption names the firm because some marks (Infragrid's
+          bare square) say nothing alone, so the image is decorative. */}
       <Image
         src={company.logo}
         alt=""
         draggable={false}
-        className={`h-auto max-h-8 w-auto max-w-full object-contain opacity-70 ${inverse ? "brightness-0 invert" : "brightness-0"}`}
+        className={`h-auto max-h-8 w-auto max-w-full object-contain ${inverse ? "opacity-70 brightness-0 invert" : ""}`}
       />
       <span className={`text-caption ${inverse ? "text-bone" : "text-ink-2"}`}>{company.name}</span>
     </li>

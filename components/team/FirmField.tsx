@@ -209,7 +209,7 @@ export function FirmField({ companies }: FirmFieldProps) {
                   if (motion.current.hovered === i) motion.current.hovered = null;
                 }}
               >
-                {/* In the firm's own colours (the one exception to 00 §7.5's ink marks) and decorative; the caption
+                {/* In the firm's own colours, like the header strip (00 §7.5 exception), and decorative; the caption
                     names the firm (Infragrid's mark is a bare square). */}
                 <Image src={company.logo} alt="" draggable={false} className="h-auto max-h-8 w-auto max-w-full object-contain" />
                 <span className="whitespace-nowrap text-caption text-ink-2">{company.name}</span>

@@ -88,7 +88,7 @@ Tiers with nobody in them are omitted and the § numbers after them close up, so
 - **Art:** `PlacementWall` in place of the usual `RandomWalk`, hidden below 768px.
   - Eyebrow "Where we've worked", then a slow looping strip of firm marks that fades out at both edges.
   - **Firms:** `content/placement-wall.ts`, in display order: Citadel, JPMorgan Chase, AWS, Infragrid. It is separate from people (`person.company`, used for the headshot hover badge) and from `content/placements.ts` (§4.4).
-  - Marks render as flat ink silhouettes with the firm name beneath as a caption, because some marks say nothing alone (Infragrid's is a bare square). The image itself is decorative (`alt=""`).
+  - Marks render in the firm's own colours (an exception to 00 §7.5's monochrome marks, 2026-10-03), using the versions made for light backgrounds, with the firm name beneath as a caption, because some marks say nothing alone (Infragrid's is a bare square). The image itself is decorative (`alt=""`). The footer reuse (spec 07 §3.3) still flattens them to bone on black.
   - **Motion:** the strip drifts left at about 24px/s, driven from JS (`components/team/PlacementWall.tsx`). The list is repeated once and the offset wraps at one list's width, so the loop is seamless in both directions. The repeat is `aria-hidden`. Edges fade with a CSS mask.
   - **Drag:** the strip can be dragged or flicked left or right with a mouse, pen or finger. A flick keeps its momentum and eases out; the drift then resumes. The cursor is `grab` / `grabbing`. Horizontal drags move the strip and vertical drags still scroll the page (`touch-action: pan-y`). The drift pauses while the pointer rests on the strip.
   - **Reduced motion:** no drift, drag, mask or repeat; the firms show as a centered, wrapped static row.
@@ -150,7 +150,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 **Layout and look**
 - Bone section, not graphite, so it doesn't run into the graphite § Placements band below it.
 - The field spans the container width: 420px tall from 768px up, 320px below, with `rule` hairlines top and bottom. No graph-paper grid (00 §7.3).
-- Each firm is a bare mark with its name as a caption beneath: the mark in the firm's own colours at about 32px tall (the one exception to 00 §7.5's monochrome marks), the caption in `ink-2`. No circle, tile or border. Collisions use an invisible circle sized to the cell.
+- Each firm is a bare mark with its name as a caption beneath: the mark in the firm's own colours at about 32px tall, as in the header strip (00 §7.5 exception), the caption in `ink-2`. No circle, tile or border. Collisions use an invisible circle sized to the cell.
 - Marks must be the full-colour versions made for light backgrounds, since they sit on bone. AWS uses `aws-on-light.png` (dark text); the white-text `aws.png` stays for the dark headshot badge.
 - **Growth:** the field keeps its base height until the cells' circles would cover more than 30% of its area, then grows taller to stay at 30%.
 - Unlike the header strip, the field also shows below 768px.
