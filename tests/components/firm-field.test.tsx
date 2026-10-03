@@ -72,24 +72,36 @@ describe("FirmField", () => {
     expect(screen.getByRole("button", { name: "Pause motion" })).toBeInTheDocument();
   });
 
-  it("only runs the loop once the field is on screen", () => {
+  describe("the loop", () => {
     const original = globalThis.IntersectionObserver;
-    let report: IntersectionObserverCallback = () => {};
-    globalThis.IntersectionObserver = class {
-      constructor(callback: IntersectionObserverCallback) {
-        report = callback;
-      }
-      observe() {}
-      disconnect() {}
-    } as unknown as typeof IntersectionObserver;
-    try {
+    let report: (visible: boolean) => void = () => {};
+    beforeEach(() => {
+      globalThis.IntersectionObserver = class {
+        constructor(callback: IntersectionObserverCallback) {
+          report = (visible) => callback([{ isIntersecting: visible } as IntersectionObserverEntry], {} as IntersectionObserver);
+        }
+        observe() {}
+        disconnect() {}
+      } as unknown as typeof IntersectionObserver;
+    });
+    afterEach(() => {
+      globalThis.IntersectionObserver = original;
+    });
+
+    it("only runs once the field is on screen", () => {
       render(<FirmField companies={companies} />);
       expect(window.requestAnimationFrame).not.toHaveBeenCalled();
-      report([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+      report(true);
       expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
-    } finally {
-      globalThis.IntersectionObserver = original;
-    }
+    });
+
+    it("never steps backwards when a frame's timestamp is older than the loop's start", () => {
+      render(<FirmField companies={companies} />);
+      report(true);
+      const tick = vi.mocked(window.requestAnimationFrame).mock.calls[0][0];
+      tick(performance.now() - 5000);
+      expect(cells().map((cell) => cell.style.transform)).toEqual(["translate3d(0px, 0px, 0)", "translate3d(0px, 0px, 0)"]);
+    });
   });
 
   it("is a static row under reduced motion: no pause button, no transforms, no dragging", () => {

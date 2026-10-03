@@ -100,8 +100,9 @@ export function FirmField({ companies }: FirmFieldProps) {
     let frame = 0;
     let last = 0;
     const tick = (now: number) => {
-      // Clamped so a tab coming back from the background doesn't fling everything.
-      const dt = Math.min((now - last) / 1000, 0.1);
+      // Clamped so a tab coming back from the background doesn't fling everything, and so a frame stamped before the
+      // loop started can't run time backwards.
+      const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
       last = now;
       if (m.live && !m.paused) {
         const pinned = new Set<number>();
