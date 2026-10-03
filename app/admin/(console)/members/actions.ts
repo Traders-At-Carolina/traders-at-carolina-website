@@ -6,7 +6,8 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 import type { TrackId } from "@/content/types";
-import { type ActionState, adminAction, FormError, parseForm } from "@/lib/admin/action";
+import { type ActionState, adminAction, FormError, parseForm, publish } from "@/lib/admin/action";
+import { TAGS } from "@/lib/data/public";
 import { recordAudit } from "@/lib/admin/audit";
 import { emailsWithAccounts } from "@/lib/admin/clerk-admins";
 import {
@@ -31,8 +32,10 @@ const optionalYear = z.preprocess(
 );
 const optionalText = (max: number) => z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim() : null), z.string().max(max).nullable());
 
+/** Roster changes refresh the admin and Home's automatic member count (spec 06 §5.2 memberCount "auto"). */
 function refresh() {
   revalidatePath("/admin", "layout");
+  publish(TAGS.members);
 }
 
 async function origin(): Promise<string> {

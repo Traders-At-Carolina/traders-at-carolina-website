@@ -1,21 +1,39 @@
-import { asc, eq, isNotNull } from "drizzle-orm";
+import { and, asc, count, eq, isNotNull } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { about } from "@/content/about";
+import { events as contentEvents } from "@/content/events";
 import { home } from "@/content/home";
 import { membership } from "@/content/membership";
 import { placementWall } from "@/content/placement-wall";
 import { placements as contentPlacements } from "@/content/placements";
+import { site } from "@/content/site";
 import { team } from "@/content/team";
-import type { CompanyMark, HomePhoto, MembershipContent, Partner, Person, Placement } from "@/content/types";
+import type { ClubEvent, CompanyMark, HomePhoto, MembershipContent, Partner, Person, Placement, Recruiting } from "@/content/types";
 import { db } from "@/lib/db/client";
-import { people, photos, placements, settings, sponsors, tracks } from "@/lib/db/schema";
+import { events, members, people, photos, placements, settings, sponsors, tracks } from "@/lib/db/schema";
 
 /**
  * Cached reads for the public pages (spec 06 §3 Read path). Each getter carries its collection's tag; admin saves call
  * updateTag(tag), so the next visitor gets fresh content while pages stay statically generated.
  * Public pages must read editable content only through this module, or saves won't reach them.
  */
-export const TAGS = { photos: "photos", sponsors: "sponsors", placements: "placements", people: "people", tracks: "tracks", season: "season" } as const;
+export const TAGS = {
+  photos: "photos",
+  sponsors: "sponsors",
+  placements: "placements",
+  people: "people",
+  tracks: "tracks",
+  season: "season",
+  recruiting: "recruiting",
+  events: "events",
+  members: "members",
+} as const;
+
+/**
+ * Backstop for time-driven content (spec 06 §3 Scheduled changes): pages that show recruiting or events regenerate at
+ * least this often, so a scheduled opening, a passed deadline or an ended event takes effect without a save.
+ */
+export const SCHEDULED_REVALIDATE = 300;
 
 /** Bump when a getter's output shape changes: unstable_cache keeps entries across deployments. */
 const VERSION = "v1";
@@ -159,4 +177,86 @@ export const getTracks = unstable_cache(
   },
   ["tracks", VERSION],
   { tags: [TAGS.tracks, TAGS.people] },
+);
+
+// ── Phase 6: recruiting, member count, events ──
+
+async function settingValue(key: "recruiting" | "season"): Promise<unknown | undefined> {
+  try {
+    const [row] = await db().select().from(settings).where(eq(settings.key, key)).limit(1);
+    return row?.value;
+  } catch (error) {
+    if (!missingTable(error)) throw error;
+    return undefined;
+  }
+}
+
+/**
+ * Recruiting settings (spec 06 §5.2), the source for every Apply surface. Until an admin first saves the Recruiting
+ * screen, the site's existing recruiting content applies (the seed copies it in), so a deploy never flips the state.
+ */
+export const getRecruiting = unstable_cache(
+  async (): Promise<Recruiting> => {
+    if (offline()) return site.recruiting;
+    const value = await settingValue("recruiting");
+    if (!value) {
+      console.warn("recruiting setting not saved yet; using content/site.ts");
+      return site.recruiting;
+    }
+    return value as Recruiting;
+  },
+  ["recruiting", VERSION],
+  { tags: [TAGS.recruiting], revalidate: SCHEDULED_REVALIDATE },
+);
+
+export type MemberCountSetting = { mode: "auto" } | { mode: "manual"; value: number } | { mode: "hidden" };
+
+/** Home's "active members" stat (spec 06 §5.2 season.memberCount): the Active roster count, a number, or hidden. */
+export const getMemberCount = unstable_cache(
+  async (): Promise<number | undefined> => {
+    if (offline()) return home.stats.members;
+    const season = (await settingValue("season")) as { memberCount?: MemberCountSetting } | undefined;
+    const setting = season?.memberCount;
+    if (!setting) return home.stats.members;
+    if (setting.mode === "hidden") return undefined;
+    if (setting.mode === "manual") return setting.value;
+    try {
+      const [row] = await db().select({ n: count() }).from(members).where(and(eq(members.status, "active")));
+      return row?.n || undefined;
+    } catch (error) {
+      if (!missingTable(error)) throw error;
+      return undefined;
+    }
+  },
+  ["member-count", VERSION],
+  { tags: [TAGS.season, TAGS.members] },
+);
+
+/** Every event, soonest first (spec 06 §6.10). Callers filter by audience and time (lib/events). */
+export const getEvents = unstable_cache(
+  async (): Promise<ClubEvent[]> => {
+    if (offline()) return contentEvents;
+    try {
+      const rows = await db().select().from(events).orderBy(asc(events.startsAt));
+      return rows.map((r) => ({
+        id: r.id,
+        title: r.title,
+        type: r.type,
+        startsAt: r.startsAt,
+        ...(r.endsAt ? { endsAt: r.endsAt } : {}),
+        ...(r.location ? { location: r.location } : {}),
+        ...(r.description ? { description: r.description } : {}),
+        ...(r.url ? { url: r.url } : {}),
+        audience: r.audience,
+        featured: r.featured,
+      }));
+    } catch (error) {
+      // Preview builds share the production database, which migrates only on production deploys.
+      if (!missingTable(error)) throw error;
+      console.warn("events table not migrated yet; showing no events");
+      return [];
+    }
+  },
+  ["events", VERSION],
+  { tags: [TAGS.events], revalidate: SCHEDULED_REVALIDATE },
 );

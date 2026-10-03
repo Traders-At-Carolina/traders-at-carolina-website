@@ -10,6 +10,8 @@ const sample: ClubEvent[] = [
   { title: "Last term's kickoff", type: "general-meeting", startsAt: "2026-09-01T19:00", audience: "public", featured: false },
 ];
 vi.mock("@/content/events", () => ({ events: sample }));
+// Outside Next there is no data cache; the getters fall back to content files when no database is configured.
+vi.mock("next/cache", () => ({ unstable_cache: (fn: unknown) => fn }));
 const fake = fakeDb();
 vi.mock("@/lib/db/client", () => ({ db: () => fake.db() }));
 

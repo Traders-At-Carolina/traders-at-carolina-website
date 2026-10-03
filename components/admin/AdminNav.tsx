@@ -19,12 +19,14 @@ const GROUPS = [
   {
     label: "Website",
     links: [
+      { href: "/admin/recruiting", label: "Recruiting" },
       { href: "/admin/photos", label: "Photos" },
       { href: "/admin/sponsors", label: "Sponsors" },
       { href: "/admin/placements", label: "Placements" },
       { href: "/admin/tracks", label: "Tracks" },
     ],
   },
+  { label: "Events & portal", links: [{ href: "/admin/events", label: "Events" }] },
   {
     label: "Insights",
     links: [

@@ -7,6 +7,11 @@ export type ImageAsset = { src: string; width: number; height: number; blurDataU
 /** Recruiting configuration. Full field definitions: docs/specs/05-apply.md §5. */
 export type Recruiting = {
   applicationsOpen: boolean;
+  /**
+   * Set by the admin Recruiting screen (spec 06 §5.2); overrides `applicationsOpen` when present. "scheduled" opens
+   * applications automatically at `nextApplicationOpenDate`.
+   */
+  mode?: "open" | "closed" | "scheduled";
   /** Google Form URL. Required (https, Google Forms) when applications are open. */
   applyUrl: string;
   /** Google Form for "Keep me posted" when applications are closed. */
@@ -84,6 +89,8 @@ export type EventType = "general-meeting" | "workshop" | "speaker" | "competitio
  * in. Home's Upcoming card shows the next featured public event (spec 01 §3.4).
  */
 export type ClubEvent = {
+  /** Database id once events move to the admin (spec 06 phase 6); absent for content-file events. */
+  id?: string;
   title: string;
   type: EventType;
   /** ISO "YYYY-MM-DDTHH:mm", America/New_York. */

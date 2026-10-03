@@ -11,6 +11,7 @@ import {
   insertPerson,
   nextSortOrder,
   setOrders,
+  getSeasonSetting,
   setSeasonSetting,
   tierOrder,
   tracksLedBy,
@@ -116,7 +117,10 @@ export async function saveAcademicYear(_p: ActionState, f: FormData): Promise<Ac
       z.object({ academicYear: optionalText(20).refine((v) => v === null || /^\d{4}[–-]\d{2}$/.test(v), "Use the form 2026–27.") }),
       { academicYear: f.get("academicYear") },
     );
-    const next = academicYear ? { academicYear: academicYear.replace("-", "–") } : {};
+    // Merge: the season also holds the Home member-count mode (Recruiting screen).
+    const { academicYear: _old, ...rest } = await getSeasonSetting();
+    void _old;
+    const next = academicYear ? { ...rest, academicYear: academicYear.replace("-", "–") } : rest;
     const { before, after } = await setSeasonSetting(next);
     const undoId = await recordAudit({ ...who, action: "update", entity: "season", entityId: "season", entityLabel: "Academic year", before, after });
     publish(TAGS.season);

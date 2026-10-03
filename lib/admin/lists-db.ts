@@ -216,7 +216,7 @@ export async function tracksLedBy(slug: string): Promise<TrackRow[]> {
 
 // ── Season (settings) ──
 
-export type Season = { academicYear?: string };
+export type Season = { academicYear?: string; memberCount?: { mode: "auto" } | { mode: "manual"; value: number } | { mode: "hidden" } };
 export async function getSeasonSetting(): Promise<Season> {
   const [r] = await db().select().from(settings).where(eq(settings.key, "season")).limit(1);
   return (r?.value as Season) ?? {};

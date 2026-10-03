@@ -29,6 +29,7 @@ import {
   type SponsorSnapshot,
   type TrackSnapshot,
 } from "@/lib/admin/lists-db";
+import { deleteEvent, eventSnapshot, getEvent, getSetting, insertEvent, setSetting, updateEvent, type EventSnapshot } from "@/lib/admin/settings-db";
 import type { Handler } from "@/lib/admin/undo";
 import { TAGS } from "@/lib/data/public";
 
@@ -39,7 +40,7 @@ const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
  * One Undo handler per website list (spec 06 §3). Each refuses unless the item still looks exactly as the change left
  * it, so Undo never overwrites a later edit, then restores the recorded state through the same data functions.
  */
-function rowHandler<S extends { id: string }>(cfg: {
+export function rowHandler<S extends { id: string }>(cfg: {
   label: string;
   tags: string[];
   viewHref: string;
@@ -166,7 +167,40 @@ const wall: Handler = {
   },
 };
 
-export const LIST_UNDO_HANDLERS: Record<string, Handler> = { sponsor, placement, person, track, season, "people-order": peopleOrder, "wall-order": wall };
+const event = rowHandler<EventSnapshot>({
+  label: "Event",
+  tags: [TAGS.events],
+  viewHref: "/",
+  current: async (id) => {
+    const r = await getEvent(id);
+    return r && eventSnapshot(r);
+  },
+  insert: (s) => insertEvent(s),
+  update: (id, s) => updateEvent(id, omitId(s)),
+  remove: deleteEvent,
+});
+
+const recruiting: Handler = {
+  label: "Recruiting",
+  tags: [TAGS.recruiting],
+  viewHref: () => "/apply",
+  restore: async (_id, state, entry) => {
+    if (!same((await getSetting("recruiting")) ?? null, entry.after)) throw new FormError(CHANGED);
+    return setSetting("recruiting", state);
+  },
+};
+
+export const LIST_UNDO_HANDLERS: Record<string, Handler> = {
+  sponsor,
+  placement,
+  person,
+  track,
+  season,
+  "people-order": peopleOrder,
+  "wall-order": wall,
+  event,
+  recruiting,
+};
 
 export const LIST_AREAS: Record<string, string> = {
   sponsor: "Sponsors",
@@ -176,4 +210,6 @@ export const LIST_AREAS: Record<string, string> = {
   season: "Academic year",
   "people-order": "Officer order",
   "wall-order": "Wall order",
+  event: "Events",
+  recruiting: "Recruiting",
 };
