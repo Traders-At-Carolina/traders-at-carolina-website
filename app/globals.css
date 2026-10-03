@@ -323,6 +323,25 @@ main:has(+ footer [data-cta-band]) > section:last-child {
     transform: none;
   }
 
+  html.js .section-rule {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html.js .section-marker .eyebrow {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 700ms steps(14, end) 250ms;
+  }
+
+  html.js .section-marker.is-drawn .section-rule {
+    transform: none;
+  }
+
+  html.js .section-marker.is-drawn .eyebrow {
+    clip-path: inset(0);
+  }
+
   .draw-in path {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;

@@ -395,7 +395,7 @@ function IdleSpin({ controls, animate }: { controls: RefObject<Controls | null>;
     }
     const dt = Math.min(delta, 0.05);
     s.t += dt;
-    s.va += (CAMERA.spin - s.va) * (1 - Math.exp(-dt * 0.8));
+    s.va += (CAMERA.spin - s.va) * (1 - Math.exp(-dt * 1.6));
     const goalPolar = CAMERA.polar + 0.04 * Math.sin((s.t / 31) * 2 * Math.PI);
     const k = 0.9;
     s.vp = Math.max(-0.2, Math.min(0.2, s.vp + (k * k * (goalPolar - c.getPolarAngle()) - 2 * k * s.vp) * dt));
@@ -426,7 +426,7 @@ export default function VolSurfaceCanvas({ params, animate, label, onInteractSta
   const [hover, setHover] = useState<{ k: number; T: number; x: number; y: number; flip: boolean } | null>(null);
   const hovering = useRef(false);
 
-  // Hovering pauses the spin (like a drag) so the details hold still; it resumes 4s after the pointer leaves.
+  // Hovering pauses the spin (like a drag) so the details hold still; it resumes 1.5s after the pointer leaves.
   const onHover = useCallback(
     (point: SurfacePoint | null) => {
       if (!point) {
