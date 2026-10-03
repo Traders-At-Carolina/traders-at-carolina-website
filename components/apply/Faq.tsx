@@ -30,7 +30,7 @@ export function Faq({ faq, contactEmail }: { faq: ApplyContent["faq"]; contactEm
             </h2>
             {contactEmail ? (
               <p className="mt-6 text-caption text-ink-3">
-                Still have questions? Email <TextLink href={`mailto:${contactEmail}`}>{contactEmail}</TextLink>
+                Questions? Email <TextLink href={`mailto:${contactEmail}`}>{contactEmail}</TextLink>
               </p>
             ) : null}
           </div>

@@ -66,7 +66,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 **Restraint rules**
 
 - At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. The `/team` firm field (spec 04 §4.6) is a motif in its own section, well below the header strip, so the two never share a viewport. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
-- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** the footer's `BitWordmark` (a decorative field of 0s and 1s, drawn in the site's own sans, [spec 08](08-footer-bit-wordmark.md)) is allowed. It counts as a motif and appears nowhere else.
+- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** decorative bits (0s and 1s drawn in the site's own sans) are allowed in exactly two places: the footer's `BitWordmark` ([spec 08](08-footer-bit-wordmark.md)) and the 404 page's navy 3D `Bit404` ([spec 10](10-not-found.md)). Each counts as a motif. Bits appear nowhere else.
 
 ---
 
@@ -202,11 +202,11 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 - **One exception (2026-10-03):** on `/team`, the header strip (spec 04 §4.1) and the firm field (spec 04 §4.6) show each firm's mark in its own colours, using the version made for light backgrounds. The footer strip, on black, stays monochrome (bone).
 
 ### 7.6 Order-book depth chart (`DepthChart`)
-- **Shape:** stepped cumulative bid and ask depth curves stepping outward from a narrow, centred spread, over a hairline baseline. No labels, axes or prices.
-- **Strokes and fills:** bids take the random walk's lead stroke (solid `navy`, 1.5px), asks its muted stroke (black at 25%, 1px). Each side has a faint fill to the baseline (navy at 6%, black at 3%). Never red/green (§3).
-- **Deterministic:** level sizes come from a fixed seed at build time (`lib/order-book.ts`). Bids and asks use separate streams, so the book is not a mirror image; the deeper side reaches the top.
+- **Shape:** stepped cumulative bid and ask depth curves stepping outward from a narrow, centred spread, over a hairline baseline with a short tick at each price level. Under the curves, a ladder of bars shows each level's own resting size at the curve's scale, so a bar never rises above its curve. A faint navy band marks the spread, and a dashed `rule-strong` mid line rises from it to a small navy dot at the top margin. No labels, axes or prices.
+- **Strokes and fills:** bids take the random walk's lead stroke (solid `navy`, 1.5px), asks its muted stroke (black at 25%, 1px). Each side's fill is a vertical gradient that fades toward the baseline (navy from 10%, black from 5%). Ladder bars are navy at 14% and black at 8%. Never red/green (§3).
+- **Deterministic:** level sizes come from a fixed seed (`lib/order-book.ts`). Bids and asks use separate streams, so the book is not a mirror image. The chart's scale leaves 20% headroom above the deeper side, so the live book can deepen without rescaling or clipping.
 - **Placement:** the `/membership` `PageHeader` only (spec 03 §3.1), in place of the random walk.
-- **Motion:** the same 1.2s stroke draw-in as the random walk, growing from the spread outward; fills fade in. Both are disabled under `prefers-reduced-motion`.
+- **Motion:** on first sight the chart is drawn, not raised: a pen sweeps out from the spread to each edge over 1.2s, drawing the curve and the ladder beneath it as it passes, with nothing on screen before it moves. The fills wash in once the line is down, and the mid line rises to its dot. (The pen is a clip that widens, not a stroke dash: dashes on a non-scaling stroke are measured on screen, so in the stretched chart they showed the ends of the curves before the draw began.) Then it trades quietly. Every 0.9–1.6s one or two levels resize over 550ms, mostly near the touch. Some ticks are a fill that takes 30–70% off one side's best level and prints a small ring at the spread, and a few put up or pull a large order deeper in the book. Sizes stay within 0.3–2.5× where they began. The motion pauses offscreen and in background tabs and resumes where it stopped. Under `prefers-reduced-motion` the full static book shows with no motion; without JavaScript it shows as rendered on the server.
 - **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 
 ---
@@ -289,6 +289,9 @@ Page specs reference these by name. Each one is built once and reused.
 - Contact, social and the UNC student-organization disclaimer still depend on §14.
 - The very bottom of the footer carries the `BitWordmark` band: a decorative, scroll-triggered field of 0s and 1s that resolves into "Traders at Carolina" and lights up around the cursor ([spec 08](08-footer-bit-wordmark.md)).
 
+### `Bit404`
+- 404 page only ([spec 10](10-not-found.md)): a solid 3D "404" built from navy 0s and 1s that decodes on load, keeps glitching and turns to face the cursor. It shares its bit primitives with `BitWordmark` (`components/bits/bitCore.ts`).
+
 ### `Button`
 All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (32px tall, 6px × 20px padding).
 
@@ -323,7 +326,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 
 ### `CTABand`
 - A full-bleed `navy` section: an H2 in `white`, an optional lead in `bone`, and an `inverse` Apply `Button`.
-- Rendered by `SiteFooter` (spec 07) as its CTA zone, which is the one navy band on every page except `/apply`; `/apply` keeps its own band inside the page (spec 05 §4.4) and the footer zone is left out there (§4.3).
+- Rendered by `SiteFooter` (spec 07) as its CTA zone, which is the one navy band on every page, `/apply` included.
 - The section directly above a band (the last section of `<main>` when the footer zone renders) gets one extra step of bottom padding (96 / 128 / 160px instead of 64 / 96 / 128px), so the band has more room. The padding sits on that section, so its bone or white tone runs right up to the navy.
 
 ### `RandomWalk`
@@ -397,6 +400,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 06 | `06-admin.md` | Admin dashboard: member roster and access requests, website lists and seasonal settings (photos, officers, tracks, sponsors, placements, recruiting, events), portal content, undo and history, admin access, usage analytics |
 | 08 | `08-footer-bit-wordmark.md` | Footer 0s-and-1s wordmark: scroll-in scramble and load, glitching letters, cursor-lit hover, cropped at the page end |
 | 09 | `09-portal.md` | Signed-in portal: recruiting, interview prep, events, tracks and the club for everyone; learning, internship tracker and competitions for members |
+| 10 | `10-not-found.md` | 404 page: a 3D "404" of navy bits that decodes on load, glitches and turns to face the cursor |
 
 **Every page spec contains:**
 1. The page's goal, and the visitor questions it answers.

@@ -56,7 +56,6 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
     const { band } = homeApplyCopy(s, recruiting, now);
     return (
       <CTABand
-        // Its own id: /apply also renders a CTABand, so the default would repeat on that page.
         id="footer-cta"
         title={band.title}
         lead={band.lead}

@@ -11,7 +11,8 @@ type PersonCardProps = {
 };
 
 /**
- * The placement company's mark, bare on the headshot's bottom-left corner. Mouse users see it on hover; touch screens
+ * The placement company's mark on a fixed white square tile in the headshot's bottom-left corner, so every logo,
+ * wide or square, shows at the same size. Mouse users see it on hover; touch screens
  * (no hover) always show it.
  * Decorative: the placement line under the name already names the company.
  */
@@ -19,9 +20,9 @@ function CompanyBadge({ company }: { company: CompanyMark }) {
   return (
     <span
       aria-hidden="true"
-      className="absolute bottom-2 left-2 flex size-11 translate-y-1 items-end justify-start opacity-0 transition duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
+      className="absolute bottom-2 left-2 flex size-10 translate-y-1 items-center justify-center rounded-md bg-white p-1.5 shadow-sm opacity-0 transition duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
     >
-      <Image src={company.logo} alt="" sizes="44px" className="max-h-full w-auto max-w-full object-contain" />
+      <Image src={company.logo} alt="" sizes="28px" className="size-full object-contain" />
     </span>
   );
 }
@@ -45,7 +46,7 @@ export function PersonCard({ person, sizes = "(min-width: 640px) 192px, 50vw" }:
             className="object-cover object-[50%_25%]"
           />
         ) : (
-          <div aria-hidden="true" className="flex h-full items-center justify-center border border-rule bg-white">
+          <div aria-hidden="true" className="flex h-full items-center justify-center on-dark surface-graphite border border-rule">
             <span className="font-display text-h1 text-navy">{initials(person.name)}</span>
           </div>
         )}

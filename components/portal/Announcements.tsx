@@ -9,7 +9,7 @@ import type { PortalAnnouncement } from "@/lib/data/portal";
 export function Announcements({ announcements }: { announcements: PortalAnnouncement[] }) {
   if (announcements.length === 0) return null;
   return (
-    <aside aria-label="Announcements" className="border-y border-rule bg-white">
+    <aside aria-label="Announcements" className="on-dark surface-graphite border-y border-rule">
       <Container className="py-8 md:py-10">
         <ul className="flex flex-col divide-y divide-rule">
           {announcements.map((announcement) => (

@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef } from "react";
+import { maskFromPixels } from "@/components/bits/bitCore";
 import {
   HOVER_RADIUS,
   LOAD_TOTAL_MS,
   TOUCH_HOVER_RADIUS,
   buildGrid,
-  buildLetterMask,
   cellSettle,
   cellState,
   decayHeat,
@@ -16,19 +16,7 @@ import {
   settleThreshold,
   wordmarkLayout,
 } from "@/components/footer/bitWordmarkScene";
-
-const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
-function useReducedMotion() {
-  return useSyncExternalStore(
-    (onChange) => {
-      const mq = window.matchMedia(reducedMotionQuery);
-      mq.addEventListener("change", onChange);
-      return () => mq.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(reducedMotionQuery).matches,
-    () => false,
-  );
-}
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /** Band visibility: the loop runs above VISIBLE, and the scroll-in load starts at START (spec 08 §5). */
 const VISIBLE = 0.1;
@@ -104,14 +92,7 @@ export function BitWordmark({ className = "" }: { className?: string }) {
       octx.textBaseline = "alphabetic";
       lines.forEach((line, i) => octx.fillText(line, w / 2, baselines[i]));
 
-      const px = octx.getImageData(0, 0, w, h).data;
-      const coverage = new Float32Array(cols * rows);
-      for (let y = 0; y < h; y++) {
-        const rowBase = Math.floor(y / MASK_SCALE) * cols;
-        for (let x = 0; x < w; x++) coverage[rowBase + Math.floor(x / MASK_SCALE)] += px[(y * w + x) * 4 + 3];
-      }
-      for (let i = 0; i < coverage.length; i++) coverage[i] /= MASK_SCALE * MASK_SCALE;
-      return buildLetterMask(coverage);
+      return maskFromPixels(octx.getImageData(0, 0, w, h).data, cols, rows, MASK_SCALE);
     }
 
     function makeSprite(glyph: string) {

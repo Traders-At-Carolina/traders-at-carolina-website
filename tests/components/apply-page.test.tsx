@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen, within } from "@testing-library/react";
 import { ApplyPage } from "@/components/apply/ApplyPage";
 import { apply } from "@/content/apply";
-import type { Recruiting } from "@/content/types";
+import type { ClubEvent, Recruiting } from "@/content/types";
 
 const open: Recruiting = {
   applicationsOpen: true,
@@ -18,39 +18,39 @@ afterEach(() => {
 });
 
 describe("ApplyPage", () => {
-  it("renders the open state with one h1 and the form link in the header and band", () => {
+  it("renders the open state with one h1 and the form link in the header and What you get", () => {
     const { container } = render(<ApplyPage apply={apply} recruiting={open} now={before} />);
     expect(screen.getAllByRole("heading", { level: 1 }).map((h) => h.textContent)).toEqual(["Applications are open."]);
     expect(screen.getByText("Due Sat, Feb 6 at 11:59 PM ET")).toBeInTheDocument();
-    // Header, What you get and the band.
+    // Header and What you get; the closing band is the footer's.
     const applyLinks = screen.getAllByRole("link", { name: /^Apply/ });
-    expect(applyLinks).toHaveLength(3);
+    expect(applyLinks).toHaveLength(2);
     applyLinks.forEach((link) => {
       expect(link).toHaveAttribute("href", "https://forms.gle/apply");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
     });
-    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
+    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
   });
 
-  it("leads the closed state with one action and no repeated 'closed' in the band", () => {
+  it("leads the closed state with one action and no band of its own", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Be first to know when applications open.");
     expect(screen.getByText(/^Applications are closed · /)).toBeInTheDocument();
     const notify = screen.getAllByRole("link", { name: /^Keep me posted/ });
-    expect(notify).toHaveLength(3);
+    expect(notify).toHaveLength(2);
     notify.forEach((link) => expect(link).toHaveAttribute("href", "https://forms.gle/notify"));
     const header = screen.getByRole("heading", { level: 1 }).closest("header")!;
     expect(within(header).getAllByRole("link")).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 2, name: "Don't miss the next cycle." })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Don't miss the next cycle." })).not.toBeInTheDocument();
   });
 
-  it("orders the sections header, what you get, process, FAQ, band", () => {
+  it("orders the sections header, until then, what you get, process, FAQ", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
     expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)).toEqual([
+      "Make the most of the wait.",
       "Everything you need to break into quant.",
       "What happens after you apply.",
       "Common questions.",
-      "Don't miss the next cycle.",
     ]);
   });
 
@@ -74,7 +74,6 @@ describe("ApplyPage", () => {
       vi.advanceTimersByTime(2 * 60_000);
     });
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Applications are closed.");
-    expect(screen.getByRole("heading", { name: "Applications are closed for now." })).toBeInTheDocument();
   });
 
   it("renders FAQ items as details with links and FAQPage JSON-LD", () => {
@@ -109,7 +108,34 @@ describe("ApplyPage", () => {
     expect(placements).toEqual([
       ["keep-me-posted", "apply-header"],
       ["keep-me-posted", "apply-benefits"],
-      ["keep-me-posted", "band"],
     ]);
+  });
+
+  it("adds a closed-only 'until then' section with an event when one is coming", () => {
+    const event: ClubEvent = {
+      title: "Mock trading night",
+      type: "workshop",
+      startsAt: "2027-02-10T19:00",
+      audience: "public",
+      featured: false,
+      url: "https://example.com/mock",
+    };
+    render(<ApplyPage apply={apply} recruiting={closed} events={[event]} social={{ instagram: "https://instagram.com/tac" }} now={before} />);
+    const wait = screen.getByRole("region", { name: "Make the most of the wait." });
+    expect(within(wait).getByText(/Mock trading night/)).toBeInTheDocument();
+    expect(within(wait).getByRole("link", { name: /^Details/ })).toHaveAttribute("href", "https://example.com/mock");
+    expect(within(wait).getByRole("link", { name: /^Instagram/ })).toHaveAttribute("href", "https://instagram.com/tac");
+    expect(within(wait).getByRole("link", { name: /^Meet the team/ })).toHaveAttribute("href", "/team");
+  });
+
+  it("leaves the 'until then' section out while applications are open", () => {
+    render(<ApplyPage apply={apply} recruiting={open} now={before} />);
+    expect(screen.queryByRole("region", { name: "Make the most of the wait." })).not.toBeInTheDocument();
+  });
+
+  it("shows the contact email under the FAQ heading", () => {
+    render(<ApplyPage apply={apply} recruiting={closed} contactEmail="hi@club.org" now={before} />);
+    expect(screen.getByText(/^Questions\? Email/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "hi@club.org" })).toHaveAttribute("href", "mailto:hi@club.org");
   });
 });
