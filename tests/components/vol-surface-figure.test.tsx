@@ -2,20 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { VolSurfaceFigure } from "@/components/home/VolSurfaceFigure";
 
-// The WebGL canvas is replaced by a stand-in that exposes its accessible label.
-vi.mock("@/components/home/VolSurfaceCanvas", () => ({
-  default: ({ label }: { label: string }) => <div role="img" aria-label={label} />,
+// The bit canvas is replaced by a stand-in that exposes its accessible label.
+vi.mock("@/components/home/BitSurface", () => ({
+  BitSurface: ({ label }: { label: string }) => <div role="img" aria-label={label} />,
 }));
-
-const caption = "Fig. 1 — Implied volatility across strike and maturity.";
-
-/** Renders the figure and waits for the lazily imported canvas to mount. */
-async function renderLoaded() {
-  render(<VolSurfaceFigure caption={caption} />);
-  await act(async () => {
-    await vi.dynamicImportSettled();
-  });
-}
 
 /** An IntersectionObserver that reports the figure as visible immediately. */
 function figureInView() {
@@ -38,11 +28,11 @@ describe("VolSurfaceFigure", () => {
     vi.restoreAllMocks();
   });
 
-  it("shows the surface, its live numbers and a caption, with no controls", () => {
-    const { container } = render(<VolSurfaceFigure caption={caption} />);
-    expect(container.querySelector("svg[aria-hidden='true']")).not.toBeNull();
-    expect(screen.getByRole("figure")).toHaveTextContent(caption);
-    expect(container.querySelector("figcaption")?.textContent).toBe(caption);
+  it("shows the surface and its live numbers, with no caption and no controls", () => {
+    const { container } = render(<VolSurfaceFigure />);
+    expect(screen.getByRole("img")).toHaveAccessibleName(/^Calm market\. Implied volatility surface/);
+    expect(container.querySelector("figcaption")).toBeNull();
+    expect(screen.getByRole("figure")).not.toHaveTextContent(/Fig\. 1/);
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByRole("slider")).toBeNull();
     expect(screen.queryByRole("list")).toBeNull();
@@ -51,20 +41,21 @@ describe("VolSurfaceFigure", () => {
     expect(screen.getByText(/pts$/)).toBeInTheDocument();
   });
 
-  it("keeps the live numbers under the plot, between the surface and its caption", () => {
-    render(<VolSurfaceFigure caption={caption} />);
-    const [plot, numbers, figcaption] = Array.from(screen.getByRole("figure").children);
-    expect(plot.querySelector("svg")).not.toBeNull();
+  it("ends with the live numbers, directly under the plot", () => {
+    render(<VolSurfaceFigure />);
+    const children = Array.from(screen.getByRole("figure").children);
+    expect(children).toHaveLength(2);
+    const [plot, numbers] = children;
+    expect(plot.querySelector("[role='img']")).not.toBeNull();
     expect(numbers).toHaveTextContent("Calm market");
     expect(numbers).toHaveTextContent("13.6 / 16.0 / 19.2%");
     expect(numbers).toHaveClass("border-t");
-    expect(figcaption.tagName).toBe("FIGCAPTION");
   });
 
-  it("moves on to the next market by itself while visible", async () => {
+  it("moves on to the next market by itself while visible", () => {
     vi.useFakeTimers();
     figureInView();
-    await renderLoaded();
+    render(<VolSurfaceFigure />);
     expect(screen.getByRole("img")).toHaveAccessibleName(/^Calm market\./);
 
     act(() => vi.advanceTimersByTime(5000 + 2600 + 100));
@@ -72,13 +63,13 @@ describe("VolSurfaceFigure", () => {
     expect(screen.getByRole("img")).toHaveAccessibleName(/^Sell-off\./);
   });
 
-  it("stays on one market under reduced motion", async () => {
+  it("stays on one market under reduced motion", () => {
     vi.useFakeTimers();
     figureInView();
     vi.spyOn(window, "matchMedia").mockImplementation(
       (query) => ({ matches: query.includes("reduce"), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
     );
-    await renderLoaded();
+    render(<VolSurfaceFigure />);
 
     act(() => vi.advanceTimersByTime(20000));
 

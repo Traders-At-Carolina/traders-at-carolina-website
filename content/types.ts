@@ -58,8 +58,6 @@ export type HomeContent = {
     /** Substring of `headline` rendered in italic. */
     headlineEmphasis?: string;
     subhead: string;
-    /** Caption under the hero's random-walk figure ("Fig. 1 — …"). */
-    figureCaption: string;
   };
   /** H2 copy for each section. */
   headings: { pillars: string; numbers: string; inside: string };

@@ -7,7 +7,7 @@ const image = { src: "/images/events/x.jpg", width: 1800, height: 1200 } as Stat
 const photo = (n: number): HomePhoto => ({ src: image, alt: `Members at event ${n}`, caption: `Event ${n}`, ratio: "3:2" });
 
 const valid: HomeContent = {
-  hero: { eyebrow: "Eyebrow", headline: "Rigor, practiced together.", headlineEmphasis: "practiced", subhead: "Subhead.", figureCaption: "Fig. 1 — Walks." },
+  hero: { eyebrow: "Eyebrow", headline: "Rigor, practiced together.", headlineEmphasis: "practiced", subhead: "Subhead." },
   headings: { pillars: "Pillars", numbers: "Numbers", inside: "Inside" },
   pillars: [
     { title: "Preparation", body: "Body.", link: { label: "See the curriculum", href: "/membership" } },

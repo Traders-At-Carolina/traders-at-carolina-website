@@ -18,9 +18,9 @@ The reference is the dot-matrix "Orbit" wordmark at the foot of myorbitnetwork.c
 
 Spec 00 §3 says "Never use … terminal or monospace typography". A field of bits is the one deliberate exception.
 
-- **Scope:** `BitWordmark` only, inside `SiteFooter` only.
+- **Scope:** `BitWordmark`, inside `SiteFooter`. Since 2026-10-03 the Home hero's volatility surface is also drawn in bits (spec 01 §3.1, navy on bone); the two share the DOM-free bit logic in `lib/bit-field.ts` (seeded bits, flicker, glitch, load, hover falloff). No other component uses the glyphs.
 - **Limits:** the glyphs `0` and `1` are drawn in the site's own sans (`--font-sans`, Public Sans), not a monospace face. No monospace or terminal typography appears anywhere else on the site.
-- **Motif count:** the field counts as a motif (00 §3). It appears only at the very bottom of the page, where no other motif sits alongside it.
+- **Motif count:** the field counts as a motif (00 §3). It appears only at the very bottom of the page, where no other motif sits alongside it (the hero's bit surface is a full page away).
 - The same edit adds the exception to spec 00 §3 and §10 `SiteFooter`.
 
 ---
@@ -96,7 +96,7 @@ The loop runs **only while the band is at least 10% visible** and the tab is vis
 
 ## 8. Implementation notes
 
-- **Pure module** `components/footer/bitWordmarkScene.ts`, unit-tested with vitest (the `volSurfaceScene.ts` pattern):
+- **Pure module** `components/footer/bitWordmarkScene.ts`, unit-tested with vitest (the `volSurfaceScene.ts` pattern). The generic bit helpers live in `lib/bit-field.ts`, shared with the Home hero, and are re-exported from here:
   - `buildGrid(width, height, cell)` → columns and rows
   - `buildLetterMask(coverage, cols, rows)` → boolean per cell
   - `cellState({ col, row, isLetter, time, settle, heat, shimmer })` → glyph and alpha

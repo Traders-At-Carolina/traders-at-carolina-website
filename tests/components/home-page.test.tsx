@@ -14,7 +14,7 @@ const photo = (n: number, ratio: HomePhoto["ratio"] = "3:2"): HomePhoto => ({
 });
 
 const base: HomeContent = {
-  hero: { eyebrow: "UNC's Premier Quantitative Finance Club", headline: "Traders at Carolina", headlineEmphasis: "at", subhead: "Prepares UNC students.", figureCaption: "Fig. 1 — Walks." },
+  hero: { eyebrow: "UNC's Premier Quantitative Finance Club", headline: "Traders at Carolina", headlineEmphasis: "at", subhead: "Prepares UNC students." },
   headings: { pillars: "Three ways we build quants.", numbers: "By the numbers title", inside: "Inside title" },
   pillars: [
     { title: "Preparation", body: "P.", link: { label: "See weekly activities", href: "/membership#activities" } },

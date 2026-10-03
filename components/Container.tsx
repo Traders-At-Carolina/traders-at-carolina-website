@@ -1,6 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef } from "react";
 
-/** HTML tags only. createElement avoids JSX over every intrinsic tag, which includes three.js elements (@react-three/fiber). */
+/** HTML tags only. createElement avoids a JSX element typed over every intrinsic tag (SVG included). */
 type Tag = keyof HTMLElementTagNameMap;
 type ContainerProps<T extends Tag> = { as?: T } & ComponentPropsWithoutRef<T>;
 

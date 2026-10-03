@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
 type RevealProps = {
-  /** HTML tags only (JSX.IntrinsicElements also holds three.js elements via @react-three/fiber). */
+  /** HTML tags only (JSX.IntrinsicElements also holds SVG elements). */
   as?: keyof HTMLElementTagNameMap;
   children: ReactNode;
   className?: string;

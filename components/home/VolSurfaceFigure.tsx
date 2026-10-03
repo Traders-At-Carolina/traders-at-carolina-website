@@ -1,16 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
+import { BitSurface } from "@/components/home/BitSurface";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { MARKET_REGIMES, describeSurface, easeInOut, impliedVol, lerpParams, type VolParams } from "@/lib/vol-surface";
-
-// three.js stays out of the initial bundle: the canvas loads after hydration, once the figure is near the viewport.
-const VolSurfaceCanvas = dynamic(() => import("@/components/home/VolSurfaceCanvas"), {
-  ssr: false,
-  loading: () => <VolSurfacePoster />,
-});
 
 /** How long each market is held, and how long the surface takes to morph into the next. */
 const HOLD_MS = 5000;
@@ -33,7 +26,7 @@ const pct = (v: number) => (v * 100).toFixed(1);
 /**
  * Live numbers for the surface on screen, recomputed every frame of a morph: ATM vol at 3M, 1Y and 2Y (the term
  * structure) and 1Y skew as the vol spread between the 90% and 110% strikes. Sits under the plot on a hairline, like
- * the data line of a printed figure. Decorative duplicate of the canvas label, so hidden from assistive tech.
+ * the data line of a printed figure. Decorative duplicate of the figure's label, so hidden from assistive tech.
  */
 function Readout({ name, params }: { name: string; params: VolParams }) {
   const atm = [0.25, 1, 2].map((T) => pct(impliedVol(0, T, params)));
@@ -60,20 +53,14 @@ function Readout({ name, params }: { name: string; params: VolParams }) {
   );
 }
 
-type VolSurfaceFigureProps = {
-  caption: string;
-  className?: string;
-};
-
 /**
- * Fig. 1 on Home: a rotatable 3D implied-volatility surface that eases on its own between market
- * regimes (spec 01 §3.1). Deliberately bare: the surface, three axes and a one-line caption.
+ * Fig. 1 on Home: a rotatable 3D implied-volatility surface drawn in 1s and 0s that eases on its own between market
+ * regimes (spec 01 §3.1). Deliberately bare: the surface, its axes and the live readout under it; no caption.
  */
-export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigureProps) {
+export function VolSurfaceFigure({ className = "" }: { className?: string }) {
   const [index, setIndex] = useState(0);
   const [params, setParams] = useState<VolParams>(MARKET_REGIMES[0].params);
   const [idle, setIdle] = useState(true);
-  const [nearViewport, setNearViewport] = useState(false);
   const [inView, setInView] = useState(false);
   const reducedMotion = useReducedMotion();
   const pageVisible = usePageVisible();
@@ -85,14 +72,9 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const near = new IntersectionObserver(([e]) => e.isIntersecting && setNearViewport(true), { rootMargin: "200px" });
     const visible = new IntersectionObserver(([e]) => setInView(e.isIntersecting));
-    near.observe(el);
     visible.observe(el);
-    return () => {
-      near.disconnect();
-      visible.disconnect();
-    };
+    return () => visible.disconnect();
   }, []);
 
   // Hold the current market, then morph to the next one. Pauses offscreen, in hidden tabs and under reduced motion;
@@ -142,21 +124,16 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
   return (
     <figure className={className}>
       <div ref={box} className="relative h-[300px] md:h-[420px] lg:h-[clamp(380px,58vh,600px)]">
-        {nearViewport ? (
-          <VolSurfaceCanvas
-            params={params}
-            animate={animateCamera}
-            label={`${regime.name}. ${describeSurface(regime.params)}`}
-            onInteractStart={onInteractStart}
-            onInteractEnd={onInteractEnd}
-          />
-        ) : (
-          <VolSurfacePoster />
-        )}
+        <BitSurface
+          params={params}
+          animate={animateCamera}
+          label={`${regime.name}. ${describeSurface(regime.params)}`}
+          onInteractStart={onInteractStart}
+          onInteractEnd={onInteractEnd}
+        />
       </div>
 
       <Readout name={regime.name} params={params} />
-      <figcaption className="mt-3 text-caption text-ink-3">{caption}</figcaption>
     </figure>
   );
 }

@@ -2,6 +2,8 @@
 
 **Status:** Approved · **Date:** 2026-09-30 · **Route:** `/` · **Depends on:** [Spec 00](00-vision-and-style.md)
 
+> **Revision (2026-10-03, hero):** Fig. 1 is now drawn entirely in 1s and 0s. The same rotating, morphing implied-volatility surface is rasterized every frame onto a grid of `0`/`1` glyphs on one 2D canvas (the footer `BitWordmark` technique, spec 08), with its axes drawn as lines of bits and small text axis labels. It decodes out of scrambled bits on load, keeps a light glitch, and lights up around the cursor (replacing the hover tooltip and slice curves). The "Fig. 1 —" figcaption and the `figureCaption` content field are gone; the live readout stays under the plot. three.js, `@react-three/fiber` and `@react-three/drei` are removed. §3.1 below is updated to match.
+
 > **Revision (2026-10-02, hero):** the live readout moved from above the plot to below it. With the surface drawn low in its canvas, a readout at the top of the figure column floated away from what it describes; under the plot it reads as the figure's data line, and on mobile it brings the top of the surface into the first screen. The gap between the hero text and the figure is also tighter below 1024px (32px, was 48px).
 
 > **Revision (2026-10-02):** two Home sections changed. **By the numbers** no longer shows a one-item stat row: a lone stat becomes the section heading (§3.3). **Inside the club** with three photos now uses one large lead photo with the other two stacked beside it, instead of a 3-up row of equal thumbnails (§3.4). Where this note conflicts with §3 below, this note wins.
@@ -35,7 +37,7 @@ A recruiter or firm visitor should also leave with a sense of an active, serious
 | # | Section | Background | Motif used (00 §3) |
 |---|---|---|---|
 | — | `SiteHeader` | bone | — |
-| 01 | Hero | bone + grid | 3D volatility surface + grid (one composition) |
+| 01 | Hero | bone + grid | 3D volatility surface in 1s and 0s + grid (one composition) |
 | 02 | What we do | bone | — |
 | 03 | By the numbers | white | Stat row |
 | 04 | Inside the club | bone | — (photos) |
@@ -55,13 +57,15 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Subhead:** Lead role, max about 25 words. Working copy: "Rigor, practiced together. We teach the probability, markets and interview craft behind trading and research careers — no finance background required."
 - **Primary action:** the Apply `Button` (`primary`), with behavior per §5.
 - **Secondary action:** `TextLink` "How membership works →" to `/membership`.
-- **Art — "Fig. 1":** `VolSurfaceFigure`, a deliberately bare, rotatable 3D implied-volatility surface drawn like a printed figure, easing on its own between market regimes:
+- **Art — "Fig. 1":** `VolSurfaceFigure`, a rotatable 3D implied-volatility surface drawn **entirely in 1s and 0s**, easing on its own between market regimes:
   - Strike (log-moneyness −0.5…0.5) × maturity (0.1–2y) × implied vol (height, from 10%), from an SSVI-style model in `lib/vol-surface.ts`.
-  - A matte 61 × 41 mesh washed in navy (mixed into white), deeper where implied vol is higher — tinted by absolute vol, so a sell-off reads darker than a calm market. Design-token colors, no tone mapping, mostly ambient light.
-  - Navy-ink lines (anti-aliased `LineSegments2`): a faint wire grid every 5th row/column, a thin outline, and a bold **at-the-money line** (K/S = 1) tracing the ATM term structure.
-  - Hairline axes meeting at the front-right corner, with tick marks and values: strike K/S 0.8 / "1.0 ATM" / 1.25, maturity 6M / 1Y / 18M / 2Y, implied vol 20% / 40% / 60%; titled "Strike K/S", "Maturity" and "Implied vol". Each label fades out as its axis turns away from the camera, so far-side numbers never sit over the surface. No floor grid.
-  - **Live readout** directly under the plot, on a `rule` hairline and above the caption, like the data line of a printed figure (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the canvas label carries the same information).
-  - `<figcaption>`: `hero.figureCaption` ("Fig. 1 — Implied volatility (height) across strike and maturity. The bold line is at the money.")
+  - **Bit rendering** (`BitSurface`, one 2D `<canvas>`, no 3D library): each frame the 61 × 41 surface is projected orthographically onto a grid of square cells (9px from `md` up, 7px below) and filled into a cell-resolution depth buffer. Every covered cell shows one glyph, `0` or `1`, in navy Public Sans 700 (the spec 08 glyphs, recolored for bone). Nothing else is drawn: empty cells stay blank, so the hero's graph paper shows through.
+  - **Density is the shading.** Fill cells sit at 30–62% opacity by absolute implied vol (so a sell-off reads denser than a calm market), dimmer on the underside. The wire grid (every 10th row/column of the 61 × 41 grid: 7 strikes × 5 maturities, including the outline) is stronger bits (95%), the axes sit at 70%, and the **at-the-money line** (K/S = 1) is full-strength bits tracing the ATM term structure.
+  - **Axes** meet at the front-right corner as lines of bits, with single-bit tick marks at strike K/S 0.8 / 1.0 / 1.25, maturity 6M / 1Y / 18M / 2Y and implied vol 20% / 40% / 60%. The surface hides any axis behind it.
+  - **Axis labels:** small Public Sans text beside the bit axes — tick values (10px, `ink-3`, tabular) and the titles "Strike K/S", "Maturity" and "Implied vol" (11px, medium, `ink-2`), with a soft `bone` text-shadow halo so they stay legible where they cross the bits. Axis titles sit centred beyond their tick values. Each label follows its anchor as the surface turns, fades out as its axis turns away from the viewer (so far-side numbers never sit over the surface), and fades in with the decode. `aria-hidden`.
+  - Each cell's glyph is a fixed seeded bit per screen cell, like an LED matrix: as the surface turns, cells switch on and off beneath it.
+  - **Live readout** directly under the plot, on a `rule` hairline, like the data line of a printed figure (Public Sans caption, tabular): the current regime's name, ATM vol at 3M / 1Y / 2Y, and 1Y skew as the 90%–110% strike vol spread in points — recomputed every frame of a morph. `aria-hidden` (the figure's label carries the same information).
+  - No figcaption.
 
 **Layout**
 - **Desktop (≥ 1024px):**
@@ -71,19 +75,21 @@ Only these sections appear on Home. No placement section (data isn't available y
 - **Tablet (768–1023px):** single column. The text comes first, then the figure at 280px.
 - **Mobile (< 768px):**
   - Single column: eyebrow, headline, subhead, then the actions stacked (Apply full width, link below).
-  - The figure is full width at 260px, followed by its caption.
+  - The figure is full width at 260px, followed by its readout.
   - No min-height. Content defines the height.
 
 **Behavior**
-- **Framing:** rotation is free in every direction (all the way round, over the top and underneath). Each frame the camera distance eases toward the tightest fit for the current angle and canvas aspect (`fitDistance`), so the surface, axes and titles fill the figure without ever clipping.
-- **Rotate:** drag (OrbitControls; zoom and pan off) or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`).
-- **Hover (pointer over the surface):** a navy marker at the hovered point, its two slices drawn as bold navy curves — the smile across strikes at that maturity and the term structure across maturities at that strike — and a tooltip with implied vol, K/S, maturity and the spread to at-the-money vol in points. Slices and tooltip follow the surface as it morphs; hovering pauses the spin, which resumes 1.5s after the pointer leaves. All `aria-hidden` (decorative detail).
-- **Idle spin:** while idle the surface turns continuously clockwise (seen from above), one turn every 60s, easing up to speed after a drag, with a gentle tilt sway. It stops on interaction and resumes 1.5s after it ends.
+- **Framing:** rotation is free in every direction (all the way round, over the top and underneath). Each frame the projection scale eases toward the largest that keeps the whole box (surface and axes) inside the grid at the current angle (`fitScale`), so the surface fills the figure without ever clipping.
+- **Rotate:** drag, or, when the figure is focused, the left/right arrow keys. On touch, horizontal drags rotate and vertical swipes still scroll the page (`touch-action: pan-y`). Dragging pauses the spin, which resumes 1.5s after it ends.
+- **Decode on load:** the first time the figure is at least 40% in view after the Home intro has finished (`html.intro` gone), every cell in the box flickers as scrambled bits for 0.5s, then the bits lock in at random moments over 1.6s: surface cells settle to their resting look and empty cells fade out, so the surface resolves out of the noise. Plays once per page load. Uses the spec 08 load logic (`lib/bit-field.ts`).
+- **Glitch:** once formed, about 1.5% of the surface's bits flip and dip to half opacity in each 110ms window (a different set each window). Empty cells never show.
+- **Spotlight (pointer over the surface):** surface bits within about 16px of the pointer (14px on touch) turn to `1` at full strength with a soft navy glow, fully on to 70% of the radius, and ease back over 0.6s after the pointer moves on. Hover does not pause the spin. Replaces the earlier hover marker, slice curves and tooltip.
+- **Idle spin:** while idle the surface turns continuously clockwise (seen from above), one turn every 60s, easing up to speed after a drag, with a gentle tilt sway.
 - **Market cycle:** each regime is held for 5s (time for the camera to settle), then the surface morphs into the next over 2.6s (parameters interpolated with a cubic ease-in-out), looping through all six.
-- The cycle and the spin pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime with a short note, and the camera stays still.
-- The canvas wrapper is `role="img"` with an `aria-label` naming and summarising the current regime; the axis titles are `aria-hidden`.
+- The cycle, the spin and the canvas loop pause when the figure is offscreen or the tab is hidden; a paused morph resumes from where it stopped. Under reduced motion the surface stays on the first regime, drawn once, fully formed, with no spin, flicker, glitch or spotlight; drag and the arrow keys still rotate it.
+- The figure wrapper is `role="img"` with an `aria-label` naming and summarising the current regime; the canvas itself is `aria-hidden`.
 - The headline is the page's only `<h1>`.
-- **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island that first renders a static SVG poster of the surface (same math, no layout shift, also the no-WebGL fallback). three.js (`three`, `@react-three/fiber`, `@react-three/drei`, ~245 kB gzipped) loads lazily via `next/dynamic` only once the figure is within 200px of the viewport, so it is never on the LCP path. Budget: LCP stays text, CLS 0.
+- **Performance:** the hero is the LCP element (text) and `Hero` stays a server component. `VolSurfaceFigure` is a client island; its box height is reserved by CSS, so the canvas never shifts layout, and before JavaScript runs the box is simply empty. The bit renderer is a few kB of plain canvas code with no 3D library. Each frame rasterizes about 4.8k triangles into about 5k cells and stamps one of a few pre-rendered glyph sprites per cell, the same order of work as the footer band. Budget: LCP stays text, CLS 0.
 
 ### 3.2 What we do (§ 02)
 
@@ -213,7 +219,7 @@ nextApplicationOpenDate?: string;    // ISO "YYYY-MM-DD"; shown when closed
 
 ```ts
 export const home = {
-  hero: { eyebrow: string; headline: string; headlineEmphasis?: string; subhead: string; figureCaption: string },
+  hero: { eyebrow: string; headline: string; headlineEmphasis?: string; subhead: string },
   pillars: [ { title, body, link: { label, href } } ×3 ],
   stats: {
     members?: number;          // rendered as "{n}+"
@@ -266,7 +272,7 @@ export const home = {
 3. Toggling `applicationsOpen` (or setting `applyDeadline` in the past) in `content/site.ts` switches the hero button and the footer's CTA zone per §5, with no other code changes.
 4. Removing any stat from `content/home.ts` drops it from the row with no gap or leftover hairline.
 5. Removing `upcoming`, or setting it to a past date, renders the photo-only layout in §3.4 with no empty card.
-6. The hero figure first renders the default regime (poster, then the same surface in WebGL), never shifts layout, and under `prefers-reduced-motion` neither moves the camera nor animates.
+6. The hero figure renders the default regime in 1s and 0s with no caption below its readout, never shifts layout, and under `prefers-reduced-motion` neither moves the camera nor animates.
 7. All images have non-empty alt text. TypeScript fails the build if `alt` is missing.
 8. Lighthouse (mobile) ≥ 95 in Performance, Accessibility, Best Practices and SEO. LCP < 2.0s and CLS < 0.05.
 9. Keyboard-only: every link and button is reachable in visual order with a visible focus ring (00 §4.3).
