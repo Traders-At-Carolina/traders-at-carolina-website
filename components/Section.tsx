@@ -44,13 +44,15 @@ type SectionHeaderProps = {
   id?: string;
   /** Inverse for dark sections. */
   tone?: "default" | "inverse";
+  /** Fill the parent's width instead of the 7-column text span, for a header set beside its content. */
+  fullWidth?: boolean;
 };
 
 /** Drawn hairline, eyebrow, H2 and optional lead within the 7-column text span (00 §10). */
-export function SectionHeader({ index, eyebrow, title, lead, id, tone = "default" }: SectionHeaderProps) {
+export function SectionHeader({ index, eyebrow, title, lead, id, tone = "default", fullWidth }: SectionHeaderProps) {
   return (
     <SectionRule inverse={tone === "inverse"}>
-      <div className="col-span-12 lg:col-span-7">
+      <div className={fullWidth ? "col-span-12" : "col-span-12 lg:col-span-7"}>
         <Eyebrow index={index} tone={tone}>
           {eyebrow}
         </Eyebrow>

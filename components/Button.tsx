@@ -2,7 +2,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { type Track, trackAttrs } from "@/lib/analytics/attributes";
 
-export type ButtonVariant = "primary" | "secondary" | "inverse";
+/**
+ * `light` and `light-outline` are for graphite surfaces, where `surface-graphite` remaps navy to bone and the
+ * other variants lose their contrast (the Membership games, 03 §3.7).
+ */
+export type ButtonVariant = "primary" | "secondary" | "inverse" | "light" | "light-outline";
 
 type ButtonProps = {
   href: string;
@@ -13,7 +17,7 @@ type ButtonProps = {
   /** Trailing → on internal links (external links always show ↗). */
   arrow?: boolean;
   fullWidth?: boolean;
-  /** `rounded` (10px corners) is reserved for the header's Apply button (00 §10 SiteHeader). */
+  /** `rounded` (10px corners) is reserved for the header's Apply button (00 §10 SiteHeader) and the Membership games (03 §3.7). */
   shape?: "square" | "rounded";
   /**
    * `compact` trims side padding for tight spots like the mobile header; height stays 44px.
@@ -29,6 +33,8 @@ const variants: Record<ButtonVariant, string> = {
   primary: "bg-navy text-white hover:bg-navy-press",
   secondary: "border border-black text-black hover:bg-black hover:text-bone",
   inverse: "bg-bone text-navy hover:bg-white",
+  light: "bg-bone text-graphite hover:bg-white",
+  "light-outline": "border border-rule-strong text-bone hover:bg-bone hover:text-graphite",
 };
 
 const sizes = {

@@ -74,6 +74,8 @@
   --font-display: "Georgia Pro", Georgia, var(--font-gelasio), "Times New Roman", serif;
   --font-sans: var(--font-public-sans), system-ui, sans-serif;
   --font-title: var(--font-chivo), "Arial Black", system-ui, sans-serif;
+  /* Zetamac's own stack (arithmetic.zetamac.com), for the mental math sprint only (03 §3.7). */
+  --font-zetamac: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
 @layer base {
@@ -436,6 +438,66 @@ main:has(+ footer [data-cta-band]) > section:last-child {
 @keyframes fade-in {
   to {
     opacity: 1;
+  }
+}
+
+/*
+ * Membership games (03 §3.7), on graphite, where navy reads as bone. The Fermi number line positions everything in
+ * percentages; when its scale changes (each keystroke, and the reveal), ticks and the spread band glide to their new
+ * places, then the answer's marker drops in once the line has settled.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .game-enter {
+    animation: game-enter 400ms ease-out both;
+  }
+
+  /* The pill and the tab labels move together, so the label turns dark as the pill arrives under it. */
+  .game-tab-indicator {
+    transition: transform 400ms ease-out;
+  }
+
+  .game-tab {
+    transition: color 400ms ease-out;
+  }
+
+  /* Matches the 100ms tick, so the bar drains continuously rather than in steps. */
+  .game-timer {
+    transition: transform 100ms linear;
+  }
+
+  .fermi-move {
+    transition:
+      left 400ms ease-out,
+      width 400ms ease-out;
+  }
+
+  .fermi-tick {
+    animation: game-fade 300ms ease-out both;
+  }
+
+  .fermi-truth {
+    animation: game-drop 400ms ease-out 400ms both;
+  }
+}
+
+@keyframes game-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes game-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* transform only: the marker's centring uses the separate translate property (Tailwind v4), which this leaves alone. */
+@keyframes game-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
   }
 }
 
