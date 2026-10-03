@@ -198,7 +198,7 @@ export function FirmField({ companies }: FirmFieldProps) {
             return (
               <li
                 key={company.name}
-                className="firm-field-cell group flex h-20 w-32 flex-col items-center justify-center gap-2 px-2"
+                className="firm-field-cell flex h-20 w-32 flex-col items-center justify-center gap-2 px-2"
                 style={{ left: pct(anchor.x / start.size.width), top: pct(anchor.y / start.size.height) }}
                 onPointerDown={grab(i)}
                 onPointerMove={drag}
@@ -209,13 +209,9 @@ export function FirmField({ companies }: FirmFieldProps) {
                   if (motion.current.hovered === i) motion.current.hovered = null;
                 }}
               >
-                {/* Flattened to ink and decorative; the caption names the firm (Infragrid's mark is a bare square). */}
-                <Image
-                  src={company.logo}
-                  alt=""
-                  draggable={false}
-                  className="h-auto max-h-8 w-auto max-w-full object-contain opacity-70 brightness-0 transition-opacity group-hover:opacity-100"
-                />
+                {/* In the firm's own colours (the one exception to 00 §7.5's ink marks) and decorative; the caption
+                    names the firm (Infragrid's mark is a bare square). */}
+                <Image src={company.logo} alt="" draggable={false} className="h-auto max-h-8 w-auto max-w-full object-contain" />
                 <span className="whitespace-nowrap text-caption text-ink-2">{company.name}</span>
               </li>
             );

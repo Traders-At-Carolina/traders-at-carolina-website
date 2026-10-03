@@ -72,7 +72,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 ## 4. Color system
 
-The four brand colors are the only hues on the site. Every other color is a tint, alpha or mix of those four.
+The four brand colors are the only hues on the site. Every other color is a tint, alpha or mix of those four. (Firm logos in the `/team` firm field are the one exception, §7.5.)
 
 ### 4.1 Tokens
 
@@ -199,6 +199,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 ### 7.5 Firm names
 - Placement firms are set in type by default.
 - If firm logos are used, they are monochrome (black at 60%) and uniform in height, never in full color.
+- **One exception (2026-10-03):** the `/team` firm field (spec 04 §4.6) shows each firm's mark in its own colours, using the version made for light backgrounds. The header strip and the footer strip stay monochrome.
 
 ### 7.6 Order-book depth chart (`DepthChart`)
 - **Shape:** stepped cumulative bid and ask depth curves stepping outward from a narrow, centred spread, over a hairline baseline. No labels, axes or prices.

@@ -38,6 +38,13 @@ describe("FirmField", () => {
     expect(cells()[0].style.top).toBe(`${((first.y / REFERENCE.height) * 100).toFixed(2)}%`);
   });
 
+  it("shows each mark in its own colours rather than flattened to ink", () => {
+    const { container } = render(<FirmField companies={companies} />);
+    for (const img of container.querySelectorAll("img")) {
+      expect(img.className).not.toMatch(/brightness-0|invert|grayscale|opacity-/);
+    }
+  });
+
   it("moves a firm with the pointer while it is held, and stops following once let go", () => {
     render(<FirmField companies={companies} />);
     const [b] = seedLayout(2, REFERENCE);

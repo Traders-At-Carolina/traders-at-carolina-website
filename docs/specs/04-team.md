@@ -150,7 +150,8 @@ The firms from the header strip, floating loose in a field below the leadership 
 **Layout and look**
 - Bone section, not graphite, so it doesn't run into the graphite § Placements band below it.
 - The field spans the container width: 420px tall from 768px up, 320px below, with `rule` hairlines top and bottom. No graph-paper grid (00 §7.3).
-- Each firm is a bare mark with its name as a caption beneath, the same cell as the header strip: the mark flattened to ink (00 §7.5) at about 32px tall, the caption in `ink-2`. No circle, tile or border. Collisions use an invisible circle sized to the cell.
+- Each firm is a bare mark with its name as a caption beneath: the mark in the firm's own colours at about 32px tall (the one exception to 00 §7.5's monochrome marks), the caption in `ink-2`. No circle, tile or border. Collisions use an invisible circle sized to the cell.
+- Marks must be the full-colour versions made for light backgrounds, since they sit on bone. AWS uses `aws-on-light.png` (dark text); the white-text `aws.png` stays for the dark headshot badge.
 - **Growth:** the field keeps its base height until the cells' circles would cover more than 30% of its area, then grows taller to stay at 30%.
 - Unlike the header strip, the field also shows below 768px.
 
@@ -160,7 +161,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 - **Collisions:** firms bounce softly off each other (equal mass, restitution 0.9, overlap resolved in the same frame) and off the field's edges. After a bump or a flick, each firm's speed eases back to its cruise speed, so the field never stalls or speeds up over time.
 - **Drag and flick:** a firm can be grabbed with a mouse, pen or finger. It follows the pointer and pushes the others aside while held. On release it keeps the smoothed pointer velocity, capped at 1500px/s, which decays back to cruise. The cursor is `grab` / `grabbing` on the firms only.
 - **Touch:** a drag that starts on a firm moves the firm (`touch-action: none` on the cells). A drag that starts on empty field scrolls the page (`touch-action: pan-y` on the field).
-- **Hover:** the hovered firm holds still and its mark goes to full ink. The others keep drifting.
+- **Hover:** the hovered firm holds still while the others keep drifting.
 - **When it runs:** only while the field is on screen (IntersectionObserver). The frame step is clamped to 0.1s, so returning to a background tab doesn't make firms jump. A ResizeObserver keeps every firm inside the field when it resizes.
 - **Pause (WCAG 2.2.2):** a caption-size text button just below the field's bottom hairline, right-aligned, with a 44px tap target. Its label names the action, "Pause motion" or "Play motion"; it has no `aria-pressed`, because the label already carries the state. While paused, the firms stop where they are and can't be dragged.
 - Built with `requestAnimationFrame` and pointer events, following `PlacementWall`'s pattern. No animation or physics library (00 §9.2).
