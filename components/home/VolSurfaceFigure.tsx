@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { MARKET_REGIMES, describeSurface, easeInOut, impliedVol, lerpParams, type VolParams } from "@/lib/vol-surface";
 
 // three.js stays out of the initial bundle: the canvas loads after hydration, once the figure is near the viewport.
@@ -15,19 +16,6 @@ const VolSurfaceCanvas = dynamic(() => import("@/components/home/VolSurfaceCanva
 const HOLD_MS = 5000;
 const MORPH_MS = 2600;
 const IDLE_MS = 4000;
-
-const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
-function useReducedMotion() {
-  return useSyncExternalStore(
-    (onChange) => {
-      const mq = window.matchMedia(reducedMotionQuery);
-      mq.addEventListener("change", onChange);
-      return () => mq.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(reducedMotionQuery).matches,
-    () => false,
-  );
-}
 
 function usePageVisible() {
   return useSyncExternalStore(

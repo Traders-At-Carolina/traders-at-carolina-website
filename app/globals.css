@@ -239,6 +239,48 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
   }
 }
 
+/* Team firm field (spec 04 §4.6). Static by default: a centered, wrapped row. Without a reduced-motion preference it
+   becomes a bounded field: each cell is centered on its server-seeded position (inline left/top), and
+   components/team/FirmField.tsx moves it from there with transforms. JS raises the height only when many firms need room. */
+.firm-field-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .firm-field {
+    position: relative;
+    min-height: 20rem;
+    overflow: hidden;
+    user-select: none;
+    /* Drags that start on empty field scroll the page; drags on a firm move it. */
+    touch-action: pan-y;
+
+    @media (min-width: 48rem) {
+      min-height: 26.25rem;
+    }
+  }
+
+  .firm-field-list {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  .firm-field-cell {
+    position: absolute;
+    translate: -50% -50%;
+    cursor: grab;
+    touch-action: none;
+    will-change: transform;
+  }
+
+  .firm-field-cell[data-dragging] {
+    cursor: grabbing;
+  }
+}
+
 /* Resting hairline underline that fills in from the left on hover (00 §9.2). */
 @utility link-underline {
   background-image:
