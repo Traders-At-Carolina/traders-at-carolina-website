@@ -142,8 +142,8 @@ Membership lives in the `members` table, not in Clerk metadata. There is one sou
 
 ### 4.4 Isolation from the public site
 
-- Clerk's provider and scripts load only under `app/admin/`, `app/account/` and the portal. Public pages ship no Clerk JavaScript.
-- `proxy.ts` also runs on `/account/*` and `/api/games/*` so those routes can read the session; it protects only `/admin` and `/api/admin`.
+- Clerk's provider and scripts load only under `app/admin/`, `app/account/` and the portal layout (`/portal`, spec 09). Public pages ship no Clerk JavaScript; the public corner button is a plain link to `/portal`.
+- `proxy.ts` also runs on `/account/*`, `/portal/*` and `/api/games/*` so those routes can read the session. It protects only `/admin` and `/api/admin`. The portal redirects signed-out visitors to `/account/sign-in` itself.
 - `/api/games/*` is a public write path: zod-validated, rate-limited per browser id and hashed IP, Fermi rescored server-side. `/admin/games` lists scores and volunteered contacts.
 - Analytics exclusion: `MarkInternalBrowser` is mounted in the signed-in console layout, not on `/admin/sign-in`, so only admins are excluded from analytics.
 
@@ -434,6 +434,22 @@ Exists. Volunteered contacts, the top 10 per game and recent plays (03 §3.7).
 
 Spec 09 builds the portal pages on these pieces. They are fixed here so the two specs can be built in parallel.
 
+**Ownership.** Spec 09 creates every file in this section with exactly these signatures and exported types, using interim bodies. The admin phases later replace only the bodies, so the portal needs no changes:
+
+| File | Interim body (spec 09) | Real body |
+|---|---|---|
+| `lib/members/resolve.ts` | `getMembership` returns `null`, so only admins see the member view | Phase 4 |
+| `lib/members/audience.ts` | Complete: `canSee` is pure logic | — |
+| `lib/members/requests.ts` | Validates and refuses; no insert | Phase 4 |
+| `lib/data/portal.ts` | Reads `content/events.ts` and `site.recruiting`; other getters return empty | Phases 6 and 7 |
+
+The portal never reads membership from Clerk metadata, not even as a stand-in.
+
+**Viewer.** `requireViewer()` (`lib/auth/viewer.ts`) returns `{ userId, firstName, isMember, isAdmin }`.
+- `isAdmin` comes from `isAdminClaims` (`lib/auth/roles.ts`).
+- The verified emails are the Clerk user's addresses whose verification status is `verified`.
+- `isMember = isAdmin || membership !== null`.
+
 **Resolver.** `lib/members/resolve.ts`
 
 ```ts
@@ -445,27 +461,42 @@ async function getMembership(user: { id: string; verifiedEmails: string[] }): Pr
 2. If none, find it by any verified email (case-insensitive) and set its `user_id`.
 3. Return `null` for no row, an `inactive` row, or an `alumni` row while `alumniAccess` is off.
 
-`getMembership` reads only the roster. The caller treats admins as members: `isMember = isAdmin || membership !== null`, where `isAdmin` comes from `isAdminClaims` (`lib/auth/roles.ts`). The resolver runs per request on portal pages, which are per-user and dynamic. Public pages never call it.
+`getMembership` reads only the roster; the caller adds admins. It runs per request on portal pages, which are per-user and dynamic. Public pages never call it.
 
-**Ownership.** Spec 09 creates `lib/members/resolve.ts` and `lib/members/audience.ts` with exactly these signatures. Until phase 4, `getMembership` is a stub that returns `null`, so only admins see the member view. Phase 4 replaces the body without changing the signature, and the portal needs no changes. The portal never reads membership from Clerk metadata, not even as a stand-in.
+**Visibility.** `lib/members/audience.ts`
+- Exports `canSee(audience, viewer)`, where `viewer` is `"signed_in" | "member"`.
+- It returns `audience !== "members" || viewer === "member"`.
+- It also exports `audienceViewer(isMember)`.
+- `Audience` (`"public" | "signed_in" | "members"`) lives in `content/types.ts`.
+- Every portal query filters on the server, so nothing members-only reaches a non-member's browser.
 
-**Visibility.** `lib/members/audience.ts` exports `canSee(audience, viewer)`, where the viewer is `"signed_in" | "member"`. Every portal query filters with it on the server; nothing members-only is sent to a non-member's browser.
-
-**Portal getters.** `lib/data/portal.ts`, uncached, each taking the viewer:
+**Portal getters.** `lib/data/portal.ts`. These are uncached. Getters that depend on time take an optional `now` for tests; callers pass only the viewer.
 
 | Getter | Returns |
 |---|---|
-| `portalEvents(viewer)` | Upcoming events the viewer may see, soonest first. Competitions are `type === "competition"`. |
-| `portalResources(viewer)` | Visible resources, grouped by section, pinned first. |
-| `portalAnnouncements(viewer)` | Announcements within their dates, pinned first, newest first. |
-| `portalLinks(viewer)` | Links in order. |
-| `portalSettings()` | Welcome lines and the request toggle. |
-| `recruitingTimeline()` | The recruiting settings and `type === "recruiting"` events, for the non-member recruiting timeline. |
-| `myRequest(userId)` | The viewer's latest access request, if any. |
+| `portalEvents(viewer, now?)` | `ClubEvent[]`: upcoming events the viewer may see, soonest first. Competitions are `type === "competition"`. |
+| `portalResources(viewer)` | `Record<ResourceSection, PortalResource[]>`, pinned first, then by order. `NO_RESOURCES` is the empty value. |
+| `portalAnnouncements(viewer, now?)` | `PortalAnnouncement[]`: those within their dates, pinned first, then newest first. |
+| `portalLinks(viewer)` | `PortalLink[]` in admin order. |
+| `portalSettings()` | `PortalSettings`: `{ welcomeMember?, welcomeVisitor?, acceptRequests }`. The interim value has `acceptRequests: false` because there is nowhere to store a request yet. |
+| `recruitingTimeline(now?)` | `{ recruiting, events }`: the recruiting settings plus upcoming `type === "recruiting"` events whose audience is `public` or `signed_in`. |
+| `myRequest(userId)` | `{ status: "pending" \| "approved" \| "declined" } \| null`: the user's latest request. |
 
-**Actions for spec 09.** `requestMembership({ note })` creates a pending request (one per user; refused when requests are off or the user is already a member).
+**Return shapes**
 
-**Files.** `/portal/files/[id]` checks the viewer with `getMembership` and `canSee`, then streams the private Blob object. It returns 404 when the viewer may not see the resource, so the file's existence is not revealed.
+- `PortalResource`: `{ id, title, kind, tracks, description?, href, pinned }`. The getter resolves `href`: an external resource's URL, or `/portal/files/{id}` for an uploaded file. The private Blob pathname never reaches the page.
+- `PortalAnnouncement`: `{ id, title, body, pinned }`. `body` is inline markdown.
+- `PortalLink`: `{ id, label, url, description? }`.
+
+**Action.** `requestMembership({ note })` (`lib/members/requests.ts`, `"use server"`)
+- It calls `requireViewer()` itself. The note is trimmed to 500 characters.
+- It returns `{ ok: true }` or `{ ok: false, reason }`, where `reason` is one of:
+  - `"already-member"`;
+  - `"requests-closed"`;
+  - `"already-pending"`.
+- Phase 4 adds the insert. A unique index allows at most one pending request per user.
+
+**Files.** `/portal/files/[id]` (phase 7) checks the viewer with `getMembership` and `canSee`, then streams the private Blob object. It returns 404 when the viewer may not see the resource, so the file's existence is not revealed.
 
 ---
 
@@ -512,8 +543,8 @@ Each phase is its own implementation plan and PR. A phase is implemented only wh
 | 3 | **Editor framework + Photos.** `lib/data/public.ts`, `lib/admin/action.ts`, `ImageUpload`, save toast with Undo, History, the console sidebar groups. Photos end to end with Home and Membership slots. The template for every other editor. | |
 | 4 | **Members.** Roster, bulk add with optional invitations, requests, all accounts, CSV export. Fills in the `lib/members/resolve.ts` stub that spec 09 creates. | |
 | 5 | **Website lists.** Sponsors → Placements → Officers (visible flag, academic year) → Tracks, each with its public page cut over. | |
-| 6 | **Recruiting, season and events.** The `settings` and `events` tables, the recruiting cut-over, Home "Upcoming" from events, member-count modes, the 5-minute backstop, the games `DeadlineSwitch` fix. | |
-| 7 | **Portal content.** Resources (private Blob store and the file route), Announcements, Portal settings and links, `lib/data/portal.ts`. Can run alongside spec 09. | |
+| 6 | **Recruiting, season and events.** The `settings` and `events` tables, the recruiting cut-over, Home "Upcoming" from events, member-count modes, the 5-minute backstop, the games `DeadlineSwitch` fix. Replaces the interim `portalEvents` and `recruitingTimeline` bodies. | |
+| 7 | **Portal content.** Resources (private Blob store and the file route), Announcements, Portal settings and links. Replaces the remaining interim bodies in `lib/data/portal.ts`. Can run alongside spec 09. | |
 | 8 | **Analytics dashboard** and the Overview visitor metrics. | |
 
 Members (phase 4) come right after the framework because the portal depends on them. Phase 5's placements work assumes the PlacementWall branch has merged (it has).
