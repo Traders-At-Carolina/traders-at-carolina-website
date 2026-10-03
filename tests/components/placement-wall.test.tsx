@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { StaticImageData } from "next/image";
 import { PlacementWall } from "@/components/team/PlacementWall";
 import type { CompanyMark } from "@/content/types";
@@ -68,5 +68,31 @@ describe("PlacementWall dragging", () => {
     } finally {
       window.matchMedia = original;
     }
+  });
+});
+
+describe("PlacementWall tone", () => {
+  beforeEach(() => {
+    vi.spyOn(window, "requestAnimationFrame").mockReturnValue(0);
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it("keeps ink marks and the default hairlines on the default tone", () => {
+    const { container } = render(<PlacementWall companies={companies} />);
+    const mark = container.querySelector("img") as HTMLElement;
+    expect(mark.className).toContain("brightness-0");
+    expect(mark.className).not.toContain("invert");
+    expect(container.querySelector(".logo-strip")).toHaveClass("border-rule");
+    expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-ink-2");
+  });
+
+  it("flattens the marks to bone and uses inverse hairlines and text on the inverse tone", () => {
+    const { container } = render(<PlacementWall companies={companies} tone="inverse" />);
+    const mark = container.querySelector("img") as HTMLElement;
+    expect(mark.className).toContain("brightness-0");
+    expect(mark.className).toContain("invert");
+    expect(container.querySelector(".logo-strip")).toHaveClass("border-rule-inverse");
+    expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-bone");
+    expect(screen.getByText("Where we've worked")).toHaveClass("text-bone");
   });
 });

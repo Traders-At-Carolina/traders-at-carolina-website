@@ -39,7 +39,7 @@ describe("applyStatusCopy", () => {
       statusLine: "Applications are closed · The next cycle opens Wed, Aug 25.",
       note: "Name and email only · No experience needed to apply",
     });
-    expect(copy.action).toEqual({ label: "Get notified", href: "https://forms.gle/notify", external: true });
+    expect(copy.action).toEqual({ label: "Keep me posted", href: "https://forms.gle/notify", external: true });
     expect(copy.secondary).toBeUndefined();
   });
 
@@ -66,7 +66,7 @@ describe("applyBandCopy", () => {
     expect(applyBandCopy(getApplicationState(now, notify), notify, undefined, now)).toMatchObject({
       title: "Don't miss the next cycle.",
       lead: "We'll email you when applications open.",
-      action: { label: "Get notified", href: "https://forms.gle/notify" },
+      action: { label: "Keep me posted", href: "https://forms.gle/notify" },
     });
     const dated = { ...notify, nextApplicationOpenDate: "2027-08-25" };
     expect(applyBandCopy(getApplicationState(now, dated), dated, undefined, now).lead).toBe(
@@ -80,7 +80,7 @@ describe("applyPrimaryAction", () => {
   it("points at the form for the current state", () => {
     expect(applyPrimaryAction(getApplicationState(now, open), open, undefined).href).toBe("https://forms.gle/apply");
     const notify = { ...closed, interestFormUrl: "https://forms.gle/notify" };
-    expect(applyPrimaryAction(getApplicationState(now, notify), notify, undefined).label).toBe("Get notified");
+    expect(applyPrimaryAction(getApplicationState(now, notify), notify, undefined).label).toBe("Keep me posted");
     expect(applyPrimaryAction(getApplicationState(now, closed), closed, "hi@club.org").href).toBe("mailto:hi@club.org");
   });
 });

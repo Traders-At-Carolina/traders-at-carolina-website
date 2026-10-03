@@ -66,7 +66,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 **Restraint rules**
 
 - At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
-- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
+- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** the footer's `BitWordmark` (a decorative field of 0s and 1s, drawn in the site's own sans, [spec 08](08-footer-bit-wordmark.md)) is allowed. It counts as a motif and appears nowhere else.
 
 ---
 
@@ -107,9 +107,9 @@ Text colors are always **solid** values (`ink-2` and `ink-3`), never `opacity` o
 ### 4.3 Usage rules
 
 - **Proportion:** about 70% bone or white, 20% black (type), 10% navy.
-- **Navy fills:** primary buttons, plus **at most one** full-bleed navy band per page (usually the Apply CTA).
+- **Navy fills:** primary buttons, plus **at most one** full-bleed navy band per page. That band is the footer's CTA zone (spec 07); pages don't place their own.
 - **Black fills:** the footer, plus the hover state of the `secondary` button. No black sections.
-- **Light theme only.** No dark mode. The navy band and black footer supply the dark moments.
+- **Light theme only.** No dark mode. The footer's navy CTA zone and black base supply the dark moments.
 - **No Carolina Blue.** It keeps the club's identity distinct and avoids UNC trademark questions.
 - **Focus ring:** `2px solid navy`, `outline-offset: 2px`. On navy or black surfaces the ring is `bone`.
 
@@ -165,7 +165,7 @@ Text colors are always **solid** values (`ink-2` and `ink-3`), never `opacity` o
 - **Spacing scale (4px base):** 4, 8, 12, 16, 24, 32, 48, 64, 96, 128. Use only these values.
 - **Section padding:** 96–128px vertical on desktop, 64px on mobile.
 - **Section anatomy:** hairline `rule` at the top, then eyebrow, then H2, then optional lead, then content.
-- **Background rhythm:** bone by default, with occasional white sections for contrast. At most one navy band per page. The footer is always black.
+- **Background rhythm:** bone by default, with occasional white sections for contrast. The only navy band is the footer's CTA zone (spec 07). The footer base is always black.
 - **Corners and depth:** `border-radius: 0` everywhere, no box shadows. Elevation is a `white` surface plus a 1px `rule` border. **Sole exception:** the `SiteHeader`'s floating bar, nav highlight, Apply button and mobile menu card (§10).
 - **Breakpoints:** Tailwind defaults (`sm` 640, `md` 768, `lg` 1024, `xl` 1280). Mobile-first.
 
@@ -281,16 +281,9 @@ Page specs reference these by name. Each one is built once and reused.
 - **Mobile (< 768px):** logo, a compact Apply button (44px tall, `size="compact"`) and a menu button; the compact Apply gives way to the menu's own Apply while the menu is open. The menu opens a dropdown card directly under the bar: `bone`, 1px `rule` border, 16px corners and the bar's shadow, with Georgia (H3-size) links, each at least 48px tall, and a full-width Apply button. It is a disclosure, not a modal: the page behind stays interactive and still scrolls (it is not made `inert`) and there is no focus trap. `Esc`, a press outside the header, tabbing out of the header or choosing a link closes it. The current page's link sits on the `wash` highlight.
 
 ### `SiteFooter`
-- Background `black`, text `bone`, hairlines `rule-inverse`.
-- **Contents:**
-  - one-color bone logo
-  - one-line mission statement
-  - nav links (mirroring the header)
-  - contact email
-  - Instagram and LinkedIn
-  - Apply link
-  - `© {year} Traders at Carolina`
-  - a UNC student-organization disclaimer, if UNC requires one (§14)
+- Defined in spec 07: a navy CTA zone, then a black base (`black` background, `bone` text, `rule-inverse` hairlines) with the Club / Join / Reach link grid, the placement strip and the legal row.
+- Contact, social and the UNC student-organization disclaimer still depend on §14.
+- The very bottom of the footer carries the `BitWordmark` band: a decorative, scroll-triggered field of 0s and 1s that resolves into "Traders at Carolina" and lights up around the cursor ([spec 08](08-footer-bit-wordmark.md)).
 
 ### `Button`
 All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (32px tall, 6px × 20px padding).
@@ -326,8 +319,8 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 
 ### `CTABand`
 - A full-bleed `navy` section: an H2 in `white`, an optional lead in `bone`, and an `inverse` Apply `Button`.
-- Counts as that page's one navy band (§4.3).
-- The section directly above it gets one extra step of bottom padding (96 / 128 / 160px instead of 64 / 96 / 128px), so the band has more room. The padding sits on that section, so its bone or white tone runs right up to the navy.
+- Rendered by `SiteFooter` (spec 07) as its CTA zone, which is the one navy band on every page except `/apply`; `/apply` keeps its own band inside the page (spec 05 §4.4) and the footer zone is left out there (§4.3).
+- The section directly above a band (the last section of `<main>` when the footer zone renders) gets one extra step of bottom padding (96 / 128 / 160px instead of 64 / 96 / 128px), so the band has more room. The padding sits on that section, so its bone or white tone runs right up to the navy.
 
 ### `RandomWalk`
 - The seeded SVG motif described in §7.2. Props: `seed`, `paths` (3–5), `size` (`hero` | `header`).
@@ -350,7 +343,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | `/apply` | Apply | 05 |
 
 - **Header nav:** About · Membership · Team · [Apply]. The logo links to Home.
-- **Footer nav:** mirrors the header.
+- **Footer nav:** mirrors the header (the Club group). The Join and Reach groups are defined in spec 07.
 - **Reserved for the future (not built, not linked):** `/resources`, `/events`. The header layout must still fit two more nav items at ≥ 1024px without crowding.
 - **Admin (not linked, not indexed):** `/admin`, defined in spec 06. It is invite-only and does not use the site header or footer.
 
@@ -397,6 +390,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 04 | `04-team.md` | Executive board, track leads, placements (firm names) |
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
 | 06 | `06-admin.md` | Admin dashboard: content editing (photos, officers, tracks, sponsors, placements), admin access, usage analytics |
+| 08 | `08-footer-bit-wordmark.md` | Footer 0s-and-1s wordmark: scroll-in scramble and load, glitching letters, cursor-lit hover, cropped at the page end |
 
 **Every page spec contains:**
 1. The page's goal, and the visitor questions it answers.

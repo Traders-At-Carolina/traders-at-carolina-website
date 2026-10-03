@@ -84,28 +84,28 @@ describe("HomePage", () => {
     expect(within(section).queryByText("§ 03 — At a glance")).not.toBeInTheDocument();
   });
 
-  it("links hero and band buttons to the form when applications are open", () => {
+  it("links the hero button to the form when applications are open", () => {
     render(<HomePage home={base} recruiting={open} now={now} />);
     const applyLinks = screen.getAllByRole("link", { name: /^Apply/ });
-    expect(applyLinks).toHaveLength(2);
-    applyLinks.forEach((link) => expect(link).toHaveAttribute("href", "https://forms.gle/apply"));
-    expect(screen.getByRole("heading", { name: "Ready to start?" })).toBeInTheDocument();
+    expect(applyLinks).toHaveLength(1);
+    expect(applyLinks[0]).toHaveAttribute("href", "https://forms.gle/apply");
+    expect(screen.queryByRole("heading", { name: "Ready to start?" })).not.toBeInTheDocument();
   });
 
-  it("says applications are closed in the hero and links Get notified to the interest form", () => {
+  it("says we're between cycles in the hero and links Keep me posted to the interest form", () => {
     const interest = "https://forms.gle/interest";
     render(<HomePage home={base} recruiting={{ ...closed, interestFormUrl: interest, nextApplicationOpenDate: "2027-01-12" }} now={now} />);
-    expect(screen.getByText("Applications are closed. The next cycle opens Tue, Jan 12.")).toBeInTheDocument();
-    const notify = screen.getAllByRole("link", { name: /^Get notified/ });
-    expect(notify).toHaveLength(2);
-    notify.forEach((link) => expect(link).toHaveAttribute("href", interest));
-    expect(screen.getByRole("heading", { name: "Applications are closed for now." })).toBeInTheDocument();
+    expect(screen.getByText("We're between cycles. Our next cycle opens Tue, Jan 12.")).toBeInTheDocument();
+    const notify = screen.getAllByRole("link", { name: /^Keep me posted/ });
+    expect(notify).toHaveLength(1);
+    expect(notify[0]).toHaveAttribute("href", interest);
+    expect(screen.queryByRole("heading", { name: "We're between cycles." })).not.toBeInTheDocument();
   });
 
-  it("never shows Get notified without an interest form", () => {
+  it("never shows Keep me posted without an interest form", () => {
     render(<HomePage home={base} recruiting={closed} now={now} />);
-    expect(screen.queryByRole("link", { name: /Get notified/ })).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /^How to apply/ })).toHaveLength(2);
+    expect(screen.queryByRole("link", { name: /Keep me posted/ })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /^See how it works/ })).toHaveLength(1);
   });
 
   it("flips open-state buttons to the closed state once the deadline passes in the browser", async () => {
@@ -114,12 +114,12 @@ describe("HomePage", () => {
     try {
       const withDeadline = { ...open, applyDeadline: "2027-01-05T13:00", interestFormUrl: "https://forms.gle/interest" };
       render(<HomePage home={base} recruiting={withDeadline} now={now} />);
-      expect(screen.getAllByRole("link", { name: /^Apply/ })).toHaveLength(2);
+      expect(screen.getAllByRole("link", { name: /^Apply/ })).toHaveLength(1);
       await act(async () => {
         vi.advanceTimersByTime(2 * 60 * 60 * 1000);
       });
       expect(screen.queryByRole("link", { name: /^Apply/ })).not.toBeInTheDocument();
-      expect(screen.getAllByRole("link", { name: /^Get notified/ })).toHaveLength(2);
+      expect(screen.getAllByRole("link", { name: /^Keep me posted/ })).toHaveLength(1);
     } finally {
       vi.useRealTimers();
     }
@@ -194,9 +194,9 @@ describe("HomePage", () => {
     expect(figures[0]).toHaveTextContent("Event 1");
   });
 
-  it("renders exactly one navy band", () => {
+  it("renders no navy band, because the footer's CTA zone is the page's single one", () => {
     const { container } = render(<HomePage home={base} recruiting={closed} now={now} />);
-    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
+    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
   });
 
   it("renders photos that have no blur placeholder", () => {

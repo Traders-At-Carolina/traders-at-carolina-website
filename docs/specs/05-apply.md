@@ -34,7 +34,7 @@ Turn a student who's interested into an applicant, or into someone notified abou
 | — | Apply band (`CTABand`) | navy | — |
 | — | `SiteFooter` | black | — |
 
-**Conversion rule (2026-10-02 revision):** every section ends at, or sits next to, the one action for the current state: "Apply" while open, "Get notified" while closed. The closed state leads with that action, not with the fact that applications are closed, and no two sections repeat the same "closed" message.
+**Conversion rule (2026-10-02 revision):** every section ends at, or sits next to, the one action for the current state: "Apply" while open, "Keep me posted" while closed. The closed state leads with that action, not with the fact that applications are closed, and no two sections repeat the same "closed" message.
 
 **Exception to spec 00:** `PageHeader` (00 §10) normally has no actions. On `/apply` only, it gets a **status block** with a button (§4.1). This is the one page where the primary action belongs in the header.
 
@@ -77,7 +77,7 @@ getApplicationState(now: Date): ApplicationState
 | H1 | "Applications are open." | "Be first to know when applications open." |
 | Status line (Public Sans 500, navy, tabular) | "Due {Fri, Feb 6} at {11:59 PM} ET". Omitted if there's no deadline | "Applications are closed · The next cycle opens {Mon, Jan 12}." If there's no date: "Applications are closed · We recruit each fall and spring." |
 | Lead (`ink-2`) | "The application takes about {n} minutes." Omitted without `applicationMinutes` | "Leave your email and we'll let you know as soon as the next cycle opens." |
-| Button | `primary` "Apply ↗", opens `applyUrl` in a new tab | `primary` "Get notified ↗", opens `interestFormUrl` in a new tab |
+| Button | `primary` "Apply ↗", opens `applyUrl` in a new tab | `primary` "Keep me posted ↗", opens `interestFormUrl` in a new tab |
 | Secondary (`TextLink`) | "Review the process →" (anchor to `#process`) | None, so nothing competes with the one action |
 | Note (caption, `ink-3`) | "No experience needed to apply" | "Name and email only · No experience needed to apply" |
 
@@ -89,13 +89,13 @@ getApplicationState(now: Date): ApplicationState
 
 - `SectionHeader`: eyebrow `§ 01 — WHAT YOU GET`, H2 (working copy: "Everything you need to break into quant."), no lead. `id="what-you-get"`.
 - Exactly three benefits from `apply.benefits`, as columns divided by hairlines on desktop (the Membership "How it works" pattern) and stacked on mobile. Each has an H3 title, 1–2 sentences of body, and an optional `TextLink` into Membership or About.
-- After the columns: the page's primary action for the current state as a `secondary` button ("Apply ↗" / "Get notified ↗"; the email/FAQ fallback when closed with no interest form). It switches live at the deadline like the header.
+- After the columns: the page's primary action for the current state as a `secondary` button ("Apply ↗" / "Keep me posted ↗"; the email/FAQ fallback when closed with no interest form). It switches live at the deadline like the header.
 - **Planned:** a static row of firm marks ("Where our leadership has worked") reusing the Team page's company marks, shown only when that list is non-empty.
 
 ### 4.3 Process and dates (§ 02)
 
 - `SectionHeader`: eyebrow `§ 02 — PROCESS AND DATES`, H2 (working copy: "What happens after you apply."), and a lead: "We recruit each fall and spring. Here's how the {cycle label} cycle works."
-  - When closed, the lead reads: "We recruit each fall and spring. Here's how a typical cycle works."
+  - When closed, the lead reads: "We open applications each fall and spring. Here's how a typical cycle works."
 - `id="process"` on the section.
 - Three stages as an `<ol>` stepped timeline. Each stage shows a caption line (numeral, then the date column value, then "OPEN NOW" on the current stage), the H3 title, an effort line (caption, `ink-3`) and the description.
 
@@ -143,13 +143,13 @@ getApplicationState(now: Date): ApplicationState
 
 - `CTABand`, using the same state as the status block (§3).
 - **Open:** H2 "Ready when you are.", lead "Applications close {Fri, Feb 6}." (omitted with no deadline), button `inverse` "Apply ↗".
-- **Closed with interest form:** H2 "Don't miss the next cycle.", lead "Applications open {Mon, Jan 12}. We'll email you when they do." or, with no future date, "We'll email you when applications open.", button `inverse` "Get notified ↗".
+- **Closed with interest form:** H2 "Don't miss the next cycle.", lead "Applications open {Mon, Jan 12}. We'll email you when they do." or, with no future date, "We'll email you when applications open.", button `inverse` "Keep me posted ↗".
 - **Closed with no interest form:** H2 "Applications are closed for now.", with the "Email us" / "Read the FAQ" fallback.
 - This is the page's single navy band.
 
 ### 4.6 Measurement
 
-Analytics are defined in [spec 06 §7](06-admin.md). Every Apply and "Get notified" action on this page carries the §7.1 tracking attributes, with placements `apply-header`, `apply-benefits` and `band`, so the dashboard can compare clicks by section.
+Analytics are defined in [spec 06 §7](06-admin.md). Every Apply and "Keep me posted" action on this page carries the §7.1 tracking attributes, with placements `apply-header`, `apply-benefits` and `band`, so the dashboard can compare clicks by section.
 
 ---
 
@@ -161,7 +161,7 @@ Analytics are defined in [spec 06 §7](06-admin.md). Every Apply and "Get notifi
 // Recruiting
 applicationsOpen: boolean;
 applyUrl: string;                       // Google Form
-interestFormUrl?: string;               // Google Form for "Get notified"
+interestFormUrl?: string;               // Google Form for "Keep me posted"
 cycleLabel?: string;                    // "Spring 2027"
 applyDeadline?: string;                 // ISO "YYYY-MM-DDTHH:mm", America/New_York
 interviewWindow?: { start: string; end: string };   // ISO "YYYY-MM-DD"
@@ -201,12 +201,12 @@ export const apply = {
 
 ## 6. Content the club must supply
 
-- [ ] Google Form URL for applications, plus a second short Google Form for "Get notified" (name and email).
+- [ ] Google Form URL for applications, plus a second short Google Form for "Keep me posted" (name and email).
 - [ ] The current or next cycle: label, deadline (date and time), interview window, decision date, and the next open date when closed.
 - [ ] Roughly how long the application takes, in minutes.
 - [ ] Stage descriptions (or approve the working copy), and generic timing for each stage.
 - [ ] FAQ answers (drafts are in `content/apply.ts`): real eligibility, the selectivity framing you're comfortable with, the qualities you look for, the interview format, and the weekly time commitment.
-- [ ] Confirm what the "Get notified" list receives, so the header and band promise is accurate.
+- [ ] Confirm what the "Keep me posted" list receives, so the header and band promise is accurate.
 - [ ] Contact email.
 
 ---
@@ -225,14 +225,14 @@ export const apply = {
 ## 8. Cross-spec sync (applied with this spec)
 
 - **00 §10:** Apply config now lives in this spec's §5. `applyDeadline` is an ISO date-time in America/New_York.
-- **01 §5:** Home buttons use `getApplicationState()` (§3), not `applicationsOpen` directly. The closed band button "Get notified" still links to `/apply`, where the interest form lives.
+- **01 §5:** Home buttons use `getApplicationState()` (§3), not `applicationsOpen` directly. The closed band button "Keep me posted" still links to `/apply`, where the interest form lives.
 
 ---
 
 ## 9. Acceptance criteria
 
 1. With `applicationsOpen: true` and a future deadline, the header shows the open state, and Apply opens `applyUrl` in a new tab with `rel="noopener noreferrer"`.
-2. With `applicationsOpen: false`, the header leads with "Be first to know when applications open.", the header has exactly one link ("Get notified"), and the band reads "Don't miss the next cycle." Every "Get notified" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
+2. With `applicationsOpen: false`, the header leads with "Be first to know when applications open.", the header has exactly one link ("Keep me posted"), and the band reads "Don't miss the next cycle." Every "Keep me posted" opens `interestFormUrl`. Without an interest form, the "Email us →" mailto link appears instead.
 3. With `applicationsOpen: true` but a deadline in the past *at build time*, every page renders the closed state.
 4. With the deadline passing *after* the build, `/apply` swaps to the closed state in the browser, the change is announced via `aria-live`, and there's no layout shift beyond the swapped text.
 5. All dates render from ISO values in America/New_York with the formats shown in §4. No typed display strings appear in content.
@@ -242,4 +242,4 @@ export const apply = {
 9. Lighthouse (mobile) ≥ 95 in all categories. The client island adds no more than about 2 KB of gzipped JavaScript.
 10. No hard-coded hex values or font stacks. Only spec-00 tokens.
 11. Draft FAQ answers render on preview deployments and never on production.
-12. Every Apply and Get notified action on `/apply` carries the spec 06 §7.1 tracking attributes with its placement.
+12. Every Apply and Keep me posted action on `/apply` carries the spec 06 §7.1 tracking attributes with its placement.

@@ -36,7 +36,7 @@ describe("ApplyPage", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Be first to know when applications open.");
     expect(screen.getByText(/^Applications are closed · /)).toBeInTheDocument();
-    const notify = screen.getAllByRole("link", { name: /^Get notified/ });
+    const notify = screen.getAllByRole("link", { name: /^Keep me posted/ });
     expect(notify).toHaveLength(3);
     notify.forEach((link) => expect(link).toHaveAttribute("href", "https://forms.gle/notify"));
     const header = screen.getByRole("heading", { level: 1 }).closest("header")!;
@@ -91,7 +91,7 @@ describe("ApplyPage", () => {
 
   it("shows generic process copy and no dates when closed", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
-    expect(screen.getByText("We recruit each fall and spring. Here's how a typical cycle works.")).toBeInTheDocument();
+    expect(screen.getByText("We open applications each fall and spring. Here's how a typical cycle works.")).toBeInTheDocument();
     expect(screen.queryByText(/^Due /)).not.toBeInTheDocument();
   });
 
@@ -101,15 +101,15 @@ describe("ApplyPage", () => {
     expect(faq.querySelectorAll("details")).toHaveLength(apply.faq.filter((f) => !f.draft).length);
   });
 
-  it("tags each Get notified action with its placement for analytics", () => {
+  it("tags each Keep me posted action with its placement for analytics", () => {
     render(<ApplyPage apply={apply} recruiting={closed} now={before} />);
     const placements = screen
-      .getAllByRole("link", { name: /^Get notified/ })
+      .getAllByRole("link", { name: /^Keep me posted/ })
       .map((link) => [link.getAttribute("data-ph-capture-attribute-cta"), link.getAttribute("data-ph-capture-attribute-placement")]);
     expect(placements).toEqual([
-      ["get-notified", "apply-header"],
-      ["get-notified", "apply-benefits"],
-      ["get-notified", "band"],
+      ["keep-me-posted", "apply-header"],
+      ["keep-me-posted", "apply-benefits"],
+      ["keep-me-posted", "band"],
     ]);
   });
 });

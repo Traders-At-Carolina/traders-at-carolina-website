@@ -9,7 +9,7 @@ export type Recruiting = {
   applicationsOpen: boolean;
   /** Google Form URL. Required (https, Google Forms) when applications are open. */
   applyUrl: string;
-  /** Google Form for "Get notified" when applications are closed. */
+  /** Google Form for "Keep me posted" when applications are closed. */
   interestFormUrl?: string;
   /** e.g. "Spring 2027" */
   cycleLabel?: string;

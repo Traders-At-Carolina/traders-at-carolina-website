@@ -2,18 +2,14 @@ import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { MembershipPage } from "@/components/membership/MembershipPage";
 import { membership } from "@/content/membership";
-import type { Recruiting } from "@/content/types";
 
-const now = new Date("2027-01-05T17:00:00Z");
-const closed: Recruiting = { applicationsOpen: false, applyUrl: "" };
-
-const renderPage = (content = membership, leadNames: Record<string, string> = {}, recruiting = closed) =>
-  render(<MembershipPage membership={content} leadNames={leadNames} recruiting={recruiting} now={now} />);
+const renderPage = (content = membership, leadNames: Record<string, string> = {}) =>
+  render(<MembershipPage membership={content} leadNames={leadNames} />);
 
 const timeCommitment = { value: "About 3 hours a week", detail: "Sessions plus practice." };
 
 describe("MembershipPage", () => {
-  it("numbers the sections it renders and has one h1 and one navy band", () => {
+  it("numbers the sections it renders and has one h1 and no navy band", () => {
     const { container } = renderPage();
     expect(screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent)).toEqual([
       "§ 01 — How it works",
@@ -21,7 +17,7 @@ describe("MembershipPage", () => {
       "§ 03 — What we do",
     ]);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
+    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
   });
 
   it("renders the three tracks in order with stable anchors and no 'required' wording inside them", () => {
@@ -94,12 +90,5 @@ describe("MembershipPage", () => {
     // Bid and ask strokes, plus their fills in a fading group; a random walk would be 3 bare paths.
     expect(art.querySelectorAll(":scope > path")).toHaveLength(2);
     expect(art.querySelectorAll(".draw-in-fill path")).toHaveLength(2);
-  });
-
-  it("keeps its own band title and says when applications are closed", () => {
-    renderPage(membership, {}, { ...closed, interestFormUrl: "https://forms.gle/interest" });
-    expect(screen.getByRole("heading", { name: "Found your track?" })).toBeInTheDocument();
-    expect(screen.getByText(/^Applications are closed for now\. We recruit each fall and spring\./)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /^Get notified/ })).toHaveAttribute("href", "https://forms.gle/interest");
   });
 });

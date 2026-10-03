@@ -1,15 +1,10 @@
 import type { ComponentProps } from "react";
-import { Button } from "@/components/Button";
-import { CTABand } from "@/components/CTABand";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { LeadershipTier } from "@/components/team/LeadershipTier";
 import { PlacementWall } from "@/components/team/PlacementWall";
 import { Placements } from "@/components/team/Placements";
-import type { CompanyMark, Placement, Recruiting, TeamContent } from "@/content/types";
-import { ctaFromLabel } from "@/lib/analytics/attributes";
-import { getApplicationState } from "@/lib/applications";
-import { homeApplyCopy } from "@/lib/home";
+import type { CompanyMark, Placement, TeamContent } from "@/content/types";
 import { coPresidents, directors, execMembers, showPlacements, sortFirms } from "@/lib/team";
 
 type TeamPageProps = {
@@ -17,17 +12,10 @@ type TeamPageProps = {
   placements: Placement[];
   /** Firms for the header strip (content/placement-wall.ts); empty omits the strip. */
   wall: CompanyMark[];
-  recruiting: Recruiting;
-  /** Build time for the static page; injectable for tests. */
-  now: Date;
 };
 
 /** Composes /team (spec 04 §2). Placements render only at 5+ firms. */
-export function TeamPage({ team, placements, wall, recruiting, now }: TeamPageProps) {
-  const state = getApplicationState(now, recruiting);
-  const band = homeApplyCopy(state, recruiting, now).band;
-  const bandTitle = state.status === "open" ? "Want to see your name here next year?" : band.title;
-
+export function TeamPage({ team, placements, wall }: TeamPageProps) {
   const presidents = coPresidents(team.people);
   const board = execMembers(team.people);
   const directorList = directors(team.people);
@@ -92,14 +80,6 @@ export function TeamPage({ team, placements, wall, recruiting, now }: TeamPagePr
           </div>
         </Section>
       ) : null}
-      <CTABand
-        title={bandTitle}
-        action={
-          <Button href={band.href} external={band.external} variant="inverse" track={{ cta: ctaFromLabel(band.label), placement: "band" }}>
-            {band.label}
-          </Button>
-        }
-      />
     </>
   );
 }

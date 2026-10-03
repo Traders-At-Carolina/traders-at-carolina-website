@@ -18,7 +18,7 @@ Show a prospective member **exactly what membership involves**: how the club is 
 | Which track is right for me, and which career does it lead to? | Tracks |
 | What would I actually do, and how often? | What we do |
 | How much time does it take? Am I qualified? | Expectations |
-| How do I apply? | Apply band |
+| How do I apply? | Footer CTA zone |
 
 ---
 
@@ -32,7 +32,6 @@ Show a prospective member **exactly what membership involves**: how the club is 
 | 02 | Tracks | bone | — |
 | 03 | What we do | bone | — |
 | 04 | Expectations | white | — |
-| — | Apply band (`CTABand`) | navy | — |
 | — | `SiteFooter` | black | — |
 
 Questions about the application process (deadlines, interviews, selectivity) belong in the FAQ on `/apply` (spec 05), not here.
@@ -142,11 +141,9 @@ This is the main section of the page.
 - **Desktop:** each entry is a row: term in columns 1–4, value in columns 5–7, detail in columns 8–12. Rows are divided by hairlines.
 - **Mobile:** stacked term, then value, then detail.
 
-### 3.6 Apply band
+### 3.6 Apply band (removed 2026-10-02)
 
-- `CTABand` with the shared Apply behavior from spec 01 §5.
-- H2 working copy (open): "Found your track?"
-- This is the page's single navy band.
+The closing Apply call to action now lives in the footer on every page (spec 07). Membership no longer renders `CTABand`.
 
 ---
 
@@ -220,7 +217,7 @@ export const membership = {
 
 ## 8. Acceptance criteria
 
-1. Sections render in §2 order with the listed backgrounds. There's exactly one navy band.
+1. Sections render in §2 order with the listed backgrounds. There is no navy band on the page; the footer's CTA zone supplies it (spec 07).
 2. Exactly three tracks render in Trading → Research → Development order, each reachable at `/membership#{id}` with the heading visible below the sticky header (use `scroll-margin-top`).
 3. The words "required" or "requirements" never appear in the track blocks. The "None of these are required to join." caption is present.
 4. A `leadSlug` that doesn't exist in `content/team.ts` fails `next build` with a clear error.

@@ -2,10 +2,8 @@ import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import type { StaticImageData } from "next/image";
 import { TeamPage } from "@/components/team/TeamPage";
-import type { CompanyMark, Person, Placement, Recruiting, TeamContent } from "@/content/types";
+import type { CompanyMark, Person, Placement, TeamContent } from "@/content/types";
 
-const now = new Date("2027-01-05T17:00:00Z");
-const closed: Recruiting = { applicationsOpen: false, applyUrl: "" };
 const image = { src: "/images/team/x.jpg", width: 800, height: 1000, blurDataURL: "data:image/png;base64,iVBORw0KGgo=" } as StaticImageData;
 
 const pres: Person = {
@@ -24,7 +22,7 @@ const pres: Person = {
 const firms = (n: number): Placement[] => Array.from({ length: n }, (_, i) => ({ firm: `Firm ${String.fromCharCode(69 - i)}` }));
 
 const renderTeam = (team: TeamContent, placements: Placement[] = [], wall: CompanyMark[] = []) =>
-  render(<TeamPage team={team} placements={placements} wall={wall} recruiting={closed} now={now} />);
+  render(<TeamPage team={team} placements={placements} wall={wall} />);
 const eyebrows = () => screen.getAllByText(/^§ \d{2} — /).map((el) => el.textContent);
 
 const co: Person = { slug: "co-one", name: "Co One", role: "Co-President, Trading", group: "co-president", order: 1 };
@@ -66,7 +64,7 @@ describe("TeamPage", () => {
     expect(screen.getByText("Board profiles will be posted here soon.")).toBeInTheDocument();
     expect(eyebrows()).toEqual(["§ 01 — Operations"]);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(1);
+    expect(container.querySelectorAll("section.bg-navy")).toHaveLength(0);
   });
 
   it("renders person cards with colour headshots, anchors and LinkedIn links", () => {
