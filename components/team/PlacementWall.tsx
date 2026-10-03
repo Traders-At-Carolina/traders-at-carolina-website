@@ -38,7 +38,7 @@ function Cells({ companies, tone = "default" }: PlacementWallProps) {
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
- * Team header art: the firms leadership has worked at, as a slow looping strip that fades out at both edges (spec 04 §4.1).
+ * Team header art: the firms club members have worked at, as a slow looping strip that fades out at both edges (spec 04 §4.1).
  * It drifts on its own, can be dragged or flicked either way, and picks the drift back up when let go. The list is
  * repeated once so the loop never shows a seam; the copy is aria-hidden. Layout and the mask live in globals.css
  * (.logo-strip); with reduced motion the strip is a static wrapped row and none of the motion below runs.

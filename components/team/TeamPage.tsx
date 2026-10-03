@@ -74,7 +74,7 @@ export function TeamPage({ team, placements, wall }: TeamPageProps) {
       )}
       {showField ? (
         <Section labelledBy="firm-field-title" density="compact">
-          <TierHeader index={fieldIndex} eyebrow="Where we've worked" title="Where our leadership has worked" id="firm-field-title" />
+          <TierHeader index={fieldIndex} eyebrow="Where we've worked" title="Where our members have worked" id="firm-field-title" />
           <FirmField companies={wall} />
         </Section>
       ) : null}

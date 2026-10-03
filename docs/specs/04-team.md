@@ -23,7 +23,7 @@ Put faces and names to the club, and show where its members go.
 |---|---|
 | Who runs the club? | Executive board |
 | Who leads the track I'm interested in? | Track leads |
-| Where has the leadership worked? | Header strip and firm field |
+| Where have members worked? | Header strip and firm field |
 | Where do members end up? | Placements (when data exists) |
 | How do I join them? | Footer CTA zone |
 
@@ -144,7 +144,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 - Sits directly after the last leadership tier and takes the next § number (§ 04 with all three tiers). § Placements (§4.4) follows it, and the team note stays last.
 
 **Content**
-- Heading: the same centered heading as the leadership tiers (`TierHeader` in `components/team/LeadershipTier.tsx`): eyebrow `§ 04 — Where we've worked` in sentence case, H2 in heavy Chivo (working copy: "Where our leadership has worked", without a period, like the tier titles; see open items below), no lead.
+- Heading: the same centered heading as the leadership tiers (`TierHeader` in `components/team/LeadershipTier.tsx`): eyebrow `§ 04 — Where we've worked` in sentence case, H2 in heavy Chivo, "Where our members have worked", without a period, like the tier titles. No lead.
 - **Firms:** `content/placement-wall.ts`, the same list as the header strip and the footer strip (spec 07 §3.3). Adding an entry there updates all three.
 
 **Layout and look**
@@ -176,7 +176,7 @@ The firms from the header strip, floating loose in a field below the leadership 
 - `components/team/FirmField.tsx` (client component), `lib/float-field.ts` (seeded layout and a pure `step()` function), styles in `app/globals.css` next to `.logo-strip`.
 
 **Open items**
-- [ ] **H2 copy.** "Where our leadership has worked" may overclaim: nobody in `content/team.ts` is linked to JPMorgan Chase, and Esther Yu's Citadel entry is a competition result. Alternative: "Firms in our orbit."
+- [x] **H2 copy.** Settled 2026-10-03: `content/placement-wall.ts` lists firms where club members have worked, not only the leadership, so the H2 is "Where our members have worked".
 - [ ] **Follow-up, separate change:** the header strip (§4.1) also moves for more than 5 seconds with no pause control (WCAG 2.2.2).
 
 ---

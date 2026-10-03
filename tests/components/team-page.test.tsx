@@ -164,7 +164,7 @@ describe("TeamPage", () => {
   it("adds the firm field after the tiers as the next section, with each firm once", () => {
     renderTeam({ people: [dir, co, pres] }, [], ["Citadel", "AWS"].map(mark));
     expect(eyebrows()).toEqual(["§ 01 — Operations", "§ 02 — Leadership", "§ 03 — Programs", "§ 04 — Where we've worked"]);
-    const region = screen.getByRole("region", { name: "Where our leadership has worked" });
+    const region = screen.getByRole("region", { name: "Where our members have worked" });
     expect(within(region).getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Citadel", "AWS"]);
   });
 
@@ -175,6 +175,6 @@ describe("TeamPage", () => {
 
   it("leaves the firm field out when the wall has no firms", () => {
     renderTeam({ people: [pres] });
-    expect(screen.queryByRole("region", { name: "Where our leadership has worked" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Where our members have worked" })).not.toBeInTheDocument();
   });
 });
