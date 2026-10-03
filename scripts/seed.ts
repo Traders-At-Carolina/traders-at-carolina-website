@@ -31,7 +31,15 @@ async function upload(src: string): Promise<ImageAsset> {
   const meta = await sharp(file).metadata();
   const blur =
     ext === ".svg" ? undefined : `data:image/webp;base64,${(await sharp(file).resize(16).webp({ quality: 50 }).toBuffer()).toString("base64")}`;
-  const blob = await put(`content${src}`, file, { access: "public", addRandomSuffix: false, allowOverwrite: true, contentType: TYPES[ext] });
+  // Use the store's read-write token explicitly: a pulled VERCEL_OIDC_TOKEN is scoped to one environment and the
+  // store may not accept it from a local run.
+  const blob = await put(`content${src}`, file, {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: TYPES[ext],
+    token: process.env.BLOB_READ_WRITE_TOKEN,
+  });
   return { src: blob.url, width: meta.width ?? 0, height: meta.height ?? 0, ...(blur ? { blurDataURL: blur } : {}) };
 }
 
