@@ -73,8 +73,8 @@ export const CAMERA = {
   fov: 38,
   azimuth: 0.66,
   polar: 1.12,
-  /** Idle spin: clockwise seen from above (camera azimuth increasing), one turn every 80 seconds. */
-  spin: (2 * Math.PI) / 80,
+  /** Idle spin: clockwise seen from above (camera azimuth increasing), one turn every 60 seconds. */
+  spin: (2 * Math.PI) / 60,
   /** Dragging is free in every direction (all the way round, over the top and underneath). */
   minPolar: 0.02,
   maxPolar: Math.PI - 0.02,

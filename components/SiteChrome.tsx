@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { SectionProgress } from "@/components/SectionProgress";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -10,6 +11,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <SiteHeader />
+      <SectionProgress />
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         {children}
       </main>

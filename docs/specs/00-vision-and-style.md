@@ -66,7 +66,7 @@ The look combines the **prestige** of a financial journal with the **design lang
 **Restraint rules**
 
 - At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. The `/team` firm field (spec 04 §4.6) is a motif in its own section, well below the header strip, so the two never share a viewport. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
-- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography.
+- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** the footer's `BitWordmark` (a decorative field of 0s and 1s, drawn in the site's own sans, [spec 08](08-footer-bit-wordmark.md)) is allowed. It counts as a motif and appears nowhere else.
 
 ---
 
@@ -254,7 +254,9 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 |---|---|
 | Section reveal | Fade in and translate up 8px over 400ms, `ease-out`, once per element |
 | Header random walk / depth chart | Stroke draw-in over 1.2s on load (depth-chart fills fade in alongside) |
-| Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 80s, eased in after a drag; stops on interaction, resumes after 4s |
+| Hero 3D surface — spin | Continuous clockwise turn (seen from above), one revolution per 60s, eased in after a drag; stops on interaction, resumes after 1.5s |
+| Section markers | The § 01 / 02 / 03 hairline draws left to right (900ms) and the eyebrow wipes in behind it, once, on entering the viewport; static under reduced motion or without JS |
+| Section progress rail | Thin fixed line down the left edge (md+): fills with page scroll, tick per section, current section's tick emphasised; decorative, hidden on pages with under two sections |
 | Hero 3D surface — market cycle | Holds each regime 5s, then morphs to the next over 2.6s (cubic ease-in-out); only while visible |
 | Home intro | On every full load of Home: graph paper sweeps in, logo and name rise, then it dissolves into the hero grid over ~2.15s; any key, click or scroll skips it (spec 01 §3.6) |
 | Link underline | Underline scales in from the left on hover, 200ms |
@@ -284,6 +286,7 @@ Page specs reference these by name. Each one is built once and reused.
 ### `SiteFooter`
 - Defined in spec 07: a navy CTA zone, then a black base (`black` background, `bone` text, `rule-inverse` hairlines) with the Club / Join / Reach link grid, the placement strip and the legal row.
 - Contact, social and the UNC student-organization disclaimer still depend on §14.
+- The very bottom of the footer carries the `BitWordmark` band: a decorative, scroll-triggered field of 0s and 1s that resolves into "Traders at Carolina" and lights up around the cursor ([spec 08](08-footer-bit-wordmark.md)).
 
 ### `Button`
 All variants are square (except the header's Apply button, §10 `SiteHeader`), use the Button type role, and have 12px × 24px padding with a minimum height of 44px. The one exception is the desktop header's compact `sm` Apply (32px tall, 6px × 20px padding).
@@ -390,6 +393,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 04 | `04-team.md` | Executive board, track leads, placements (firm names) |
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
 | 06 | `06-admin.md` | Admin dashboard: content editing (photos, officers, tracks, sponsors, placements), admin access, usage analytics |
+| 08 | `08-footer-bit-wordmark.md` | Footer 0s-and-1s wordmark: scroll-in scramble and load, glitching letters, cursor-lit hover, cropped at the page end |
 
 **Every page spec contains:**
 1. The page's goal, and the visitor questions it answers.

@@ -153,6 +153,8 @@ export type MembershipContent = {
     attendance?: Expectation;
     prerequisites: Expectation;
   };
+  /** 0 (hidden) or 3 photos: the first runs wide under "How it works", the other two pair up after Activities. */
+  photos?: HomePhoto[];
 };
 
 /** A company's official mark on a transparent background, static-imported from public/images/companies. */

@@ -5,6 +5,7 @@ import { Button } from "@/components/Button";
 import { Container, Grid } from "@/components/Container";
 import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
+import { BitWordmark } from "@/components/footer/BitWordmark";
 import { FooterZone } from "@/components/FooterZone";
 import { PlacementWall } from "@/components/team/PlacementWall";
 import { TextLink } from "@/components/TextLink";
@@ -90,7 +91,7 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
     <footer className="on-dark bg-black text-bone">
       <FooterZone hideOn={["/apply"]}>{live(ctaZone)}</FooterZone>
 
-      <Container className="py-16 md:py-20">
+      <Container className="pt-16 pb-8 md:pt-20 md:pb-12">
         <Grid className="gap-y-12">
           <div className="col-span-12 lg:col-span-5">
             <Wordmark tone="inverse" size="lg" />
@@ -203,6 +204,11 @@ export function SiteFooter({ settings = site, wall = placementWall, now = new Da
           <p>Anonymous, cookie-free analytics tell us which pages are useful.</p>
           {disclaimer ? <p className="max-w-[60ch]">{disclaimer}</p> : null}
         </div>
+      </Container>
+
+      {/* Decorative 0s-and-1s wordmark that closes the page (spec 08). Flush with the page end, so no bottom padding. */}
+      <Container>
+        <BitWordmark />
       </Container>
     </footer>
   );

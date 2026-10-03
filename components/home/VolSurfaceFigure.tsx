@@ -15,7 +15,7 @@ const VolSurfaceCanvas = dynamic(() => import("@/components/home/VolSurfaceCanva
 /** How long each market is held, and how long the surface takes to morph into the next. */
 const HOLD_MS = 5000;
 const MORPH_MS = 2600;
-const IDLE_MS = 4000;
+const IDLE_MS = 1500;
 
 function usePageVisible() {
   return useSyncExternalStore(
