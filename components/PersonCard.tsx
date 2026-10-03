@@ -45,7 +45,7 @@ export function PersonCard({ person, sizes = "(min-width: 640px) 192px, 50vw" }:
             className="object-cover object-[50%_25%]"
           />
         ) : (
-          <div aria-hidden="true" className="flex h-full items-center justify-center border border-rule bg-white">
+          <div aria-hidden="true" className="flex h-full items-center justify-center on-dark surface-graphite border border-rule">
             <span className="font-display text-h1 text-navy">{initials(person.name)}</span>
           </div>
         )}
