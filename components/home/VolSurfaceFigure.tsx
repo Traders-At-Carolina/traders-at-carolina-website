@@ -1,8 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { VolSurfacePoster } from "@/components/home/VolSurfacePoster";
+import { usePageVisible } from "@/lib/use-page-visible";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { MARKET_REGIMES, describeSurface, easeInOut, impliedVol, lerpParams, type VolParams } from "@/lib/vol-surface";
 
@@ -16,17 +17,6 @@ const VolSurfaceCanvas = dynamic(() => import("@/components/home/VolSurfaceCanva
 const HOLD_MS = 5000;
 const MORPH_MS = 2600;
 const IDLE_MS = 1500;
-
-function usePageVisible() {
-  return useSyncExternalStore(
-    (onChange) => {
-      document.addEventListener("visibilitychange", onChange);
-      return () => document.removeEventListener("visibilitychange", onChange);
-    },
-    () => !document.hidden,
-    () => true,
-  );
-}
 
 const pct = (v: number) => (v * 100).toFixed(1);
 

@@ -420,22 +420,90 @@ main:has(+ footer [data-cta-band]) > section:last-child {
     animation-delay: 240ms;
   }
 
-  /* Area fills under drawn-in strokes (the Membership depth chart) fade in instead of drawing. */
-  .draw-in .draw-in-fill {
+  /* Membership depth chart (00 §7.6): held back until its script has zeroed the book, so the build never
+     flashes the finished chart; the mid line rises and its dot lands as the levels grow out. */
+  html.js .depth-chart:not([data-ready]) {
     opacity: 0;
-    animation: fade-in 1.2s ease-out 200ms forwards;
   }
 
-  .draw-in .draw-in-fill path {
-    stroke-dasharray: none;
-    stroke-dashoffset: 0;
-    animation: none;
+  /* Drawn, not raised: each side's clip (the pen) widens out from the spread, drawing the curve and the ladder
+     under it as it goes; the fills wash in once the line is mostly down. */
+  html.js .depth-chart [data-pen] {
+    transform: scaleX(0);
+    transform-box: fill-box;
+  }
+
+  html.js .depth-chart [data-pen="bids"] {
+    transform-origin: right;
+  }
+
+  html.js .depth-chart [data-pen="asks"] {
+    transform-origin: left;
+  }
+
+  html.js .depth-chart[data-ready] [data-pen] {
+    animation: depth-pen 1.2s cubic-bezier(0.45, 0, 0.25, 1) forwards;
+  }
+
+  html.js .depth-chart[data-ready] [data-pen="asks"] {
+    animation-delay: 80ms;
+  }
+
+  html.js .depth-chart [data-layer="fills"] {
+    opacity: 0;
+  }
+
+  html.js .depth-chart[data-ready] [data-layer="fills"] {
+    animation: fade-in 800ms ease-out 600ms forwards;
+  }
+
+  html.js .depth-chart [data-layer="mid"] {
+    opacity: 0;
+    transform: scaleY(0);
+    transform-box: fill-box;
+    transform-origin: bottom;
+    transition:
+      opacity 400ms ease-out,
+      transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html.js .depth-chart [data-layer="mid-dot"] {
+    opacity: 0;
+    transition: opacity 300ms ease-out 550ms;
+  }
+
+  html.js .depth-chart[data-ready] :is([data-layer="mid"], [data-layer="mid-dot"]) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* A fill printing at the touch: a ring that opens and fades. */
+  .depth-pulse {
+    animation: depth-pulse 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+}
+
+@keyframes depth-pen {
+  to {
+    transform: scaleX(1);
   }
 }
 
 @keyframes fade-in {
   to {
     opacity: 1;
+  }
+}
+
+@keyframes depth-pulse {
+  from {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.25);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.6);
   }
 }
 
