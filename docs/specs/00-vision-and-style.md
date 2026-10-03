@@ -65,8 +65,8 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. The `/team` firm field (spec 04 §4.6) is a motif in its own section, well below the header strip, so the two never share a viewport. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
-- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** the footer's `BitWordmark` (a decorative field of 0s and 1s, drawn in the site's own sans, [spec 08](08-footer-bit-wordmark.md)) is allowed. It counts as a motif and appears nowhere else.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (drawn in 1s and 0s) and the masked graph-paper grid behind it likewise count as one. The `/team` firm field (spec 04 §4.6) is a motif in its own section, well below the header strip, so the two never share a viewport. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** fields of 0s and 1s, drawn in the site's own sans (never a monospace face), are allowed in exactly two places: the footer's `BitWordmark` ([spec 08](08-footer-bit-wordmark.md)) and the Home hero's volatility surface ([spec 01 §3.1](01-home.md)). Each counts as its section's motif, the two never share a viewport, and the glyphs appear nowhere else.
 
 ---
 
@@ -184,7 +184,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
   - One path is solid `navy` at 1.5px.
   - The others are navy at 30% opacity and black at 25% opacity, each at 1px.
 - **Deterministic:** generated from a fixed seed at build time, with no runtime randomness, so there are no hydration mismatches and the art stays the same between visits.
-- **Placement:** in each `PageHeader`, unless the page supplies its own art (`/membership` uses the depth chart, §7.6). (The Home hero uses a 3D volatility surface instead; spec 01 §3.1.)
+- **Placement:** in each `PageHeader`, unless the page supplies its own art (`/membership` uses the depth chart, §7.6). (The Home hero uses a 3D volatility surface drawn in 1s and 0s instead; spec 01 §3.1.)
 - **Motion:** an optional 1.2s stroke draw-in on load (`stroke-dashoffset`), disabled under `prefers-reduced-motion`.
 - **Accessibility:** decorative, so it carries `aria-hidden="true"`.
 

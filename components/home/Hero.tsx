@@ -52,7 +52,7 @@ export function HeroActions({ apply }: { apply: HomeApplyCopy["hero"] }) {
 
 /**
  * § 01 — the club's name and how to join, beside "Fig. 1": a rotatable, simulatable 3D
- * implied-volatility surface (spec 01 §3.1). On desktop the text sits on the left and the
+ * implied-volatility surface drawn in 1s and 0s (spec 01 §3.1). On desktop the text sits on the left and the
  * figure on the right; on smaller screens the text comes first. Only the figure is a client island.
  */
 export function Hero({ hero, index, actions }: HeroProps) {
@@ -73,7 +73,7 @@ export function Hero({ hero, index, actions }: HeroProps) {
             <p className="mt-6 max-w-[34rem] text-lead text-ink-2">{hero.subhead}</p>
             {actions}
           </div>
-          <VolSurfaceFigure caption={hero.figureCaption} className="col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-1" />
+          <VolSurfaceFigure className="col-span-12 lg:col-span-6 lg:col-start-7 lg:row-start-1" />
         </Grid>
       </Container>
     </section>
