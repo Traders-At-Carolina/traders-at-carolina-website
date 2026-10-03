@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { apply } from "@/content/apply";
-import type { Recruiting } from "@/content/types";
-import { applyBandCopy, applyPrimaryAction, applyStatusCopy, formatDateRange, processLead, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
+import type { ClubEvent, Recruiting } from "@/content/types";
+import { applyPrimaryAction, applyStatusCopy, formatDateRange, processLead, stageDates, stageEfforts, visibleFaq, whileYouWait } from "@/lib/apply";
 import { getApplicationState } from "@/lib/applications";
 import { inlineToPlainText, parseInline } from "@/lib/inline-markdown";
 import { collectApplyProblems, validateApply } from "@/lib/validate-apply";
@@ -53,26 +53,6 @@ describe("applyStatusCopy", () => {
     expect(copy.action).toBeUndefined();
     expect(copy.statusLine).toBe("We recruit each fall and spring.");
     expect(copy.secondary?.href).toBe("#faq");
-  });
-});
-
-describe("applyBandCopy", () => {
-  it("matches the state and looks ahead when closed", () => {
-    expect(applyBandCopy(getApplicationState(now, open), open, undefined, now)).toMatchObject({
-      title: "Ready when you are.",
-      lead: "Applications close Sat, Feb 6.",
-    });
-    const notify = { ...closed, interestFormUrl: "https://forms.gle/notify" };
-    expect(applyBandCopy(getApplicationState(now, notify), notify, undefined, now)).toMatchObject({
-      title: "Don't miss the next cycle.",
-      lead: "We'll email you when applications open.",
-      action: { label: "Keep me posted", href: "https://forms.gle/notify" },
-    });
-    const dated = { ...notify, nextApplicationOpenDate: "2027-08-25" };
-    expect(applyBandCopy(getApplicationState(now, dated), dated, undefined, now).lead).toBe(
-      "Applications open Wed, Aug 25. We'll email you when they do.",
-    );
-    expect(applyBandCopy(getApplicationState(now, closed), closed, undefined, now).action.label).toBe("Read the FAQ");
   });
 });
 
@@ -165,5 +145,30 @@ describe("collectApplyProblems", () => {
 
   it("returns problems instead of throwing", () => {
     expect(collectApplyProblems({ ...apply, faq: [] })).toEqual(["faq must have at least 1 published (non-draft) entry"]);
+  });
+});
+
+describe("whileYouWait", () => {
+  const social = { instagram: "https://instagram.com/tac", linkedin: "https://linkedin.com/company/tac" };
+
+  it("falls back to the activities link with no public event, and links both socials", () => {
+    const items = whileYouWait([], social, now);
+    expect(items.map((i) => i.title)).toEqual(["See what we do", "Start getting ready", "Meet the people", "Follow along"]);
+    expect(items[3].links.map((l) => l.label)).toEqual(["Instagram", "LinkedIn"]);
+  });
+
+  it("leads with the next public event and skips signed-in ones", () => {
+    const events: ClubEvent[] = [
+      { title: "Members only", type: "social", startsAt: "2027-01-02T19:00", audience: "members", featured: false },
+      { title: "Open night", type: "workshop", startsAt: "2027-02-20T19:00", audience: "public", featured: false },
+    ];
+    const [first] = whileYouWait(events, {}, now);
+    expect(first.title).toBe("Come to an event");
+    expect(first.body).toContain("Open night");
+    expect(first.body).not.toContain("Members only");
+  });
+
+  it("drops 'Follow along' without social links", () => {
+    expect(whileYouWait([], {}, now).map((i) => i.title)).not.toContain("Follow along");
   });
 });

@@ -18,6 +18,14 @@ export function nextFeaturedEvent(events: ClubEvent[], now: Date): ClubEvent | u
   )[0];
 }
 
+/** The soonest public event that hasn't finished, for pages that point visitors at something to attend (spec 05 §4.2). */
+export function nextPublicEvent(events: ClubEvent[], now: Date): ClubEvent | undefined {
+  return upcomingEvents(
+    events.filter((event) => event.audience === "public"),
+    now,
+  )[0];
+}
+
 const TYPE_LABELS: Record<EventType, string> = {
   "general-meeting": "General meeting",
   workshop: "Workshop",

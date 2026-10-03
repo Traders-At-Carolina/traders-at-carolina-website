@@ -132,7 +132,7 @@ export default function StyleguidePage() {
         <VolSurfaceFigure caption="Fig. 1 — Home hero volatility surface: cycles through market regimes; drag to rotate." className="mt-16" />
       </Section>
 
-      <CTABand title="Ready to start?" lead="The footer's CTA zone: the one navy band on every page except /apply." />
+      <CTABand title="Ready to start?" lead="The footer's CTA zone: the one navy band on every page, /apply included." />
     </>
   );
 }

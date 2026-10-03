@@ -323,7 +323,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 
 ### `CTABand`
 - A full-bleed `navy` section: an H2 in `white`, an optional lead in `bone`, and an `inverse` Apply `Button`.
-- Rendered by `SiteFooter` (spec 07) as its CTA zone, which is the one navy band on every page except `/apply`; `/apply` keeps its own band inside the page (spec 05 §4.4) and the footer zone is left out there (§4.3).
+- Rendered by `SiteFooter` (spec 07) as its CTA zone, which is the one navy band on every page, `/apply` included.
 - The section directly above a band (the last section of `<main>` when the footer zone renders) gets one extra step of bottom padding (96 / 128 / 160px instead of 64 / 96 / 128px), so the band has more room. The padding sits on that section, so its bone or white tone runs right up to the navy.
 
 ### `RandomWalk`

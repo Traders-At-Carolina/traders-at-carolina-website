@@ -2,19 +2,23 @@ import type { ReactNode } from "react";
 import { ApplyHeader } from "@/components/apply/ApplyHeader";
 import { Faq } from "@/components/apply/Faq";
 import { Process } from "@/components/apply/Process";
+import { StickyApply } from "@/components/apply/StickyApply";
 import { WhatYouGet } from "@/components/apply/WhatYouGet";
+import { WhileYouWait } from "@/components/apply/WhileYouWait";
 import { Button } from "@/components/Button";
-import { CTABand } from "@/components/CTABand";
 import { DeadlineSwitch } from "@/components/DeadlineSwitch";
-import type { ApplyContent, Recruiting } from "@/content/types";
+import type { ApplyContent, ClubEvent, Recruiting, Site } from "@/content/types";
 import { ctaFromLabel } from "@/lib/analytics/attributes";
-import { applyBandCopy, applyPrimaryAction, applyStatusCopy, processLead, stageDates, stageEfforts, visibleFaq } from "@/lib/apply";
+import { applyPrimaryAction, applyStatusCopy, processLead, stageDates, stageEfforts, visibleFaq, whileYouWait } from "@/lib/apply";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 
 type ApplyPageProps = {
   apply: ApplyContent;
   recruiting: Recruiting;
   contactEmail?: string;
+  /** content/events.ts; the next public event feeds the closed state's "Come to an event". */
+  events?: ClubEvent[];
+  social?: Site["social"];
   /** Build time for the static page; injectable for tests. */
   now: Date;
   /** Deployment environment for draft FAQ answers; defaults to VERCEL_ENV. */
@@ -22,11 +26,11 @@ type ApplyPageProps = {
 };
 
 /**
- * Composes /apply (spec 05): status header, what you get, process, FAQ and the navy band.
+ * Composes /apply (spec 05): status header, a closed-state "until then" section, what you get, process, and FAQ. The closing navy band is the footer's CTA zone (spec 07).
  * When open with a deadline, each state-dependent part renders both variants and DeadlineSwitch
  * flips to the closed one in the browser once the deadline passes.
  */
-export function ApplyPage({ apply, recruiting, contactEmail, now, vercelEnv }: ApplyPageProps) {
+export function ApplyPage({ apply, recruiting, contactEmail, events = [], social = {}, now, vercelEnv }: ApplyPageProps) {
   const state = getApplicationState(now, recruiting);
   const closedState: ApplicationState = { status: "closed" };
 
@@ -45,6 +49,22 @@ export function ApplyPage({ apply, recruiting, contactEmail, now, vercelEnv }: A
       </Button>
     );
   };
+  const sticky = (s: ApplicationState) => {
+    const action = applyPrimaryAction(s, recruiting, contactEmail);
+    return (
+      <StickyApply>
+        <Button
+          href={action.href}
+          external={action.external}
+          fullWidth
+          track={{ cta: ctaFromLabel(action.label), placement: "apply-sticky" }}
+        >
+          {action.label}
+        </Button>
+      </StickyApply>
+    );
+  };
+  const wait = (s: ApplicationState) => (s.status === "closed" ? <WhileYouWait items={whileYouWait(events, social, now)} /> : null);
   const process = (s: ApplicationState) => (
     <Process
       stages={apply.stages}
@@ -54,26 +74,6 @@ export function ApplyPage({ apply, recruiting, contactEmail, now, vercelEnv }: A
       current={s.status === "open" ? 0 : undefined}
     />
   );
-  const band = (s: ApplicationState) => {
-    const copy = applyBandCopy(s, recruiting, contactEmail, now);
-    return (
-      <CTABand
-        title={copy.title}
-        lead={copy.lead}
-        action={
-          <Button
-            href={copy.action.href}
-            external={copy.action.external}
-            variant="inverse"
-            track={{ cta: ctaFromLabel(copy.action.label), placement: "band" }}
-          >
-            {copy.action.label}
-          </Button>
-        }
-      />
-    );
-  };
-
   const deadline = state.status === "open" ? state.deadline : undefined;
   const live = (render: (s: ApplicationState) => ReactNode) =>
     deadline ? <DeadlineSwitch deadline={deadline.toISOString()} before={render(state)} after={render(closedState)} /> : render(state);
@@ -81,10 +81,11 @@ export function ApplyPage({ apply, recruiting, contactEmail, now, vercelEnv }: A
   return (
     <>
       <div aria-live="polite">{live(header)}</div>
+      {live(sticky)}
+      {live(wait)}
       <WhatYouGet benefits={apply.benefits} action={live(primary)} />
       {live(process)}
       <Faq faq={visibleFaq(apply.faq, vercelEnv)} contactEmail={contactEmail} />
-      {live(band)}
     </>
   );
 }
