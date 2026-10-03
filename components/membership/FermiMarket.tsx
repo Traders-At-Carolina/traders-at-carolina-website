@@ -156,11 +156,12 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
         <span className="tabular">{total} points</span>
       </div>
 
-      <p key={question.id} id="fermi-prompt" className="game-enter mt-4 max-w-prose font-display text-h3">
+      <p key={question.id} id="fermi-prompt" className="game-enter mt-3 max-w-prose font-display text-h3">
         {question.prompt}
       </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 md:gap-4">
+      {/* Low, High and the action share one row from 768px, which keeps the tallest state (and so the card) short. */}
+      <div className="mt-3 grid grid-cols-2 items-end gap-3 md:grid-cols-[1fr_1fr_auto] md:gap-4">
         <label className="flex flex-col">
           <span className="text-caption text-ink-3">Low</span>
           <input
@@ -197,6 +198,24 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
             className={INPUT_CLASSES}
           />
         </label>
+        <div className="col-span-2 md:col-span-1">
+          {revealed ? (
+            <button ref={nextRef} type="button" onClick={next} className={buttonClasses({ variant: "light", shape: "rounded", className: "w-full md:w-52" })}>
+              {round + 1 >= rounds.length ? "See your result" : "Next question"}
+              <span aria-hidden="true">→</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={lockIn}
+              disabled={!valid}
+              // Fixed width: the label changes as you type, and an auto-width column would shift the inputs.
+              className={`${buttonClasses({ variant: "light", shape: "rounded", className: "w-full md:w-52" })} disabled:cursor-not-allowed disabled:opacity-40`}
+            >
+              {valid ? `Quote ${formatAmount(low)} – ${formatAmount(high)}` : "Quote spread"}
+            </button>
+          )}
+        </div>
       </div>
       <p id="fermi-help" className="mt-2 min-h-5 text-caption text-ink-3" aria-live="polite">
         {revealed ? null : (error ?? (valid ? `${formatRatio(high / low)} wide` : "Numbers, decimals, or k, m, b, t: 2.5m, 300k, 1.2b."))}
@@ -204,33 +223,18 @@ export function FermiMarket({ cta }: { cta: ReactNode }) {
 
       <NumberLine domain={domain} spread={spread} truth={revealed ? question.value : null} hit={revealed ? isHit(quote.low, quote.high, question.value) : null} />
 
-      <div className="mt-4">
-        {revealed ? (
-          <div className="game-enter" aria-live="polite">
-            <p className="text-body">
-              <span className="font-semibold">{formatAnswer(question)}.</span> <span className="text-ink-2">{question.why}</span>
-            </p>
-            <p className="mt-1 text-caption text-ink-3 tabular">
-              {isHit(quote.low, quote.high, question.value)
-                ? `Inside your spread · ${formatRatio(quote.high / quote.low)} wide · ${scores[round]} of ${MAX_ROUND_SCORE} points.`
-                : `Your spread was ${formatRatio(missFactor(quote.low, quote.high, question.value))} too ${question.value < quote.low ? "high" : "low"} · 0 points.`}
-            </p>
-            <button ref={nextRef} type="button" onClick={next} className={`mt-4 ${buttonClasses({ variant: "light", shape: "rounded" })}`}>
-              {round + 1 >= rounds.length ? "See your result" : "Next question"}
-              <span aria-hidden="true">→</span>
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={lockIn}
-            disabled={!valid}
-            className={`${buttonClasses({ variant: "light", shape: "rounded" })} disabled:cursor-not-allowed disabled:opacity-40`}
-          >
-            {valid ? `Quote ${formatAmount(low)} – ${formatAmount(high)}` : "Quote your spread"}
-          </button>
-        )}
-      </div>
+      {revealed ? (
+        <div className="game-enter mt-3" aria-live="polite">
+          <p className="text-body">
+            <span className="font-semibold">{formatAnswer(question)}.</span> <span className="text-ink-2">{question.why}</span>
+          </p>
+          <p className="mt-1 text-caption text-ink-3 tabular">
+            {isHit(quote.low, quote.high, question.value)
+              ? `Inside your spread · ${formatRatio(quote.high / quote.low)} wide · ${scores[round]} of ${MAX_ROUND_SCORE} points.`
+              : `Your spread was ${formatRatio(missFactor(quote.low, quote.high, question.value))} too ${question.value < quote.low ? "high" : "low"} · 0 points.`}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

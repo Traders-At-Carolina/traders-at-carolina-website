@@ -78,7 +78,7 @@ describe("Fermi markets", () => {
     fireEvent.click(screen.getByRole("button", { name: "Make a market" }));
 
     // Can't quote until both sides read as numbers, low ≤ high.
-    expect(screen.getByRole("button", { name: "Quote your spread" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Quote spread" })).toBeDisabled();
     // Half-typed values don't flag; errors show once the field is left.
     fireEvent.change(low(), { target: { value: "2." } });
     expect(screen.queryByText(/Use a number/)).not.toBeInTheDocument();
