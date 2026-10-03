@@ -525,6 +525,12 @@ Members (phase 4) come right after the framework because the portal depends on t
   - [ ] Keep sign-up mode **Public** (games and portal need it).
   - [ ] Add `{"metadata":"{{user.public_metadata}}"}` to the session token. Without it nobody is an admin.
   - [ ] Make the first admin by hand: set `{"role":"admin"}` in their public metadata.
+- [ ] **A separate database per environment.** Site content lives in Neon, so an edit made against a shared database reaches the live site. Today Production, Preview and Development share one branch.
+  - [ ] **Production** uses the main Neon branch, and nothing else does.
+  - [ ] **Preview:** turn on "create a branch for each preview deployment" in the Neon Vercel integration. Each preview gets a copy of production's data. Edits there never reach the live site. Stale branches are deleted automatically.
+  - [ ] **Development:** a long-lived `dev` branch for local work (`vercel env pull` sets it in `.env.local`).
+  - [ ] Check the Vercel environment variables: `DATABASE_URL` and `DATABASE_URL_UNPOOLED` must differ per environment.
+  - [ ] Run migrations on Preview deploys as well as Production (`vercel-build`). Each preview migrates its own branch, so schema changes are tested before they reach production.
 - [ ] **A custom domain.** Clerk production instances do not run on `*.vercel.app`. Until the club has a domain, `/admin` runs on a Clerk development instance.
 - [ ] **PostHog**
   - [ ] Create a personal API key with the Query Read scope only.
