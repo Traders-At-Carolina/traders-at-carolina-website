@@ -3,9 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { BitWordmark } from "@/components/footer/BitWordmark";
 import { SiteFooter } from "@/components/SiteFooter";
 
-// SiteFooter's FooterZone reads the current route to hide its zones on /apply and /team.
-vi.mock("next/navigation", () => ({ usePathname: () => "/about" }));
-
 afterEach(() => vi.restoreAllMocks());
 
 describe("BitWordmark", () => {

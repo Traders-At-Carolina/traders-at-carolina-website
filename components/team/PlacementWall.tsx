@@ -8,9 +8,13 @@ import type { CompanyMark } from "@/content/types";
 
 type PlacementWallProps = {
   companies: CompanyMark[];
-  /** `inverse` draws bone marks and hairlines for black backgrounds (the footer, spec 07 §3.3). */
+  /** `inverse` draws the eyebrow, hairlines and captions for black backgrounds (the footer). The marks are never recoloured. */
   tone?: "default" | "inverse";
 };
+
+/** Cell width (the `w-48` below) and the widest strip the loop must fill with no gap on the right. */
+const CELL_PX = 192;
+const FILL_PX = 2560;
 
 /** Idle drift, px per second. */
 const DRIFT = 24;
@@ -19,19 +23,13 @@ const FRICTION = 4;
 const MAX_FLICK = 3000;
 
 function Cells({ companies, tone = "default" }: PlacementWallProps) {
-  const inverse = tone === "inverse";
   return companies.map((company) => (
     <li key={company.name} className="flex h-28 w-48 shrink-0 flex-col items-center justify-center gap-3 px-4 lg:h-32">
-      {/* Marks show in their own colours on bone (00 §7.5 exception). On black (inverse) they're flattened to bone,
-          since dark marks like JPMorgan's would disappear. The caption names the firm because some marks (Infragrid's
-          bare square) say nothing alone, so the image is decorative. */}
-      <Image
-        src={company.logo}
-        alt=""
-        draggable={false}
-        className={`h-auto max-h-8 w-auto max-w-full object-contain ${inverse ? "opacity-70 brightness-0 invert" : ""}`}
-      />
-      <span className={`text-caption ${inverse ? "text-bone" : "text-ink-2"}`}>{company.name}</span>
+      {/* Marks always show in their own colours (00 §7.5 exception). Eager, so a mark never pops in as the strip drifts
+          it into view. The caption names the firm because some marks (Infragrid's bare square) say nothing alone, so
+          the image is decorative. */}
+      <Image src={company.logo} alt="" loading="eager" draggable={false} className="h-auto max-h-8 w-auto max-w-full object-contain" />
+      <span className={`text-caption ${tone === "inverse" ? "text-bone" : "text-ink-2"}`}>{company.name}</span>
     </li>
   ));
 }
@@ -45,6 +43,9 @@ const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: r
  * (.logo-strip); with reduced motion the strip is a static wrapped row and none of the motion below runs.
  */
 export function PlacementWall({ companies, tone = "default" }: PlacementWallProps) {
+  // The track scrolls up to one list's width before it wraps, so it needs the visible width plus one list. Repeat the
+  // list enough times for the widest screen; with only two copies, strips wider than ~770px showed a gap on the right.
+  const copies = 1 + Math.max(1, Math.ceil(FILL_PX / (Math.max(companies.length, 1) * CELL_PX)));
   const stripRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   // Mutable motion state; kept out of React state because it changes every frame.
@@ -133,9 +134,11 @@ export function PlacementWall({ companies, tone = "default" }: PlacementWallProp
           <ul className="logo-strip-list">
             <Cells companies={companies} tone={tone} />
           </ul>
-          <ul aria-hidden="true" className="logo-strip-list logo-strip-copy">
-            <Cells companies={companies} tone={tone} />
-          </ul>
+          {Array.from({ length: copies - 1 }, (_, i) => (
+            <ul key={i} aria-hidden="true" className="logo-strip-list logo-strip-copy">
+              <Cells companies={companies} tone={tone} />
+            </ul>
+          ))}
         </div>
       </div>
     </Reveal>
