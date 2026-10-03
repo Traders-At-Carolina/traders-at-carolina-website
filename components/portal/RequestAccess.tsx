@@ -50,7 +50,7 @@ export function RequestAccess({ copy, request, action }: RequestAccessProps) {
         rows={2}
         maxLength={500}
         placeholder={copy.notePlaceholder}
-        className="w-full border border-rule-strong bg-white p-3 text-body placeholder:text-ink-3"
+        className="w-full surface-graphite border border-rule-strong p-3 text-body placeholder:text-ink-3"
       />
       <div>
         <button type="submit" disabled={sending} className={buttonClasses({ variant: "secondary", className: "disabled:opacity-60" })}>
