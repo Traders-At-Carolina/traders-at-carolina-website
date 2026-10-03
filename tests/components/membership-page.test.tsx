@@ -89,8 +89,11 @@ describe("MembershipPage", () => {
     const { container } = renderPage();
     const art = container.querySelector("header svg") as SVGElement;
     expect(art).toHaveAttribute("aria-hidden", "true");
-    // Bid and ask strokes, plus their fills in a fading group; a random walk would be 3 bare paths.
-    expect(art.querySelectorAll(":scope > path")).toHaveLength(2);
-    expect(art.querySelectorAll(".draw-in-fill path")).toHaveLength(2);
+    expect(art.closest(".depth-chart")).toHaveAttribute("aria-hidden", "true");
+    // Bid and ask curves over their fills and a 14-level ladder each side of a dashed mid.
+    expect(art.querySelectorAll('[data-layer="curves"] path')).toHaveLength(2);
+    expect(art.querySelectorAll('[data-layer="fills"] path')).toHaveLength(2);
+    expect(art.querySelectorAll('[data-layer="bars"] rect')).toHaveLength(28);
+    expect(art.querySelectorAll('[data-layer="mid"]')).toHaveLength(1);
   });
 });

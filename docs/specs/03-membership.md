@@ -48,7 +48,7 @@ Questions about the application process (deadlines, interviews, selectivity) bel
 - **Eyebrow:** `MEMBERSHIP`, with no § number.
 - **H1:** working copy "Three tracks. One standard."
 - **Lead:** max about 30 words. Working copy: "Members join one of three tracks — Trading, Research or Development — and build skills that map directly to roles at quantitative trading firms."
-- **Art:** an order-book depth chart (`DepthChart`, 00 §7.6) in place of the `RandomWalk`, passed through `PageHeader`'s `art` prop: bids and asks stepping out from the spread, a nod to the market-making games at the heart of the club. Unlabeled and decorative; hidden below 768px.
+- **Art:** an order-book depth chart (`DepthChart`, 00 §7.6) in place of the `RandomWalk`, passed through `PageHeader`'s `art` prop: bids and asks stepping out from the spread, a nod to the market-making games at the heart of the club. It draws out from the spread on load, then trades gently: levels resize and the odd fill prints at the touch (00 §7.6). Unlabeled and decorative; hidden below 768px.
 
 ### 3.2 How it works (§ 01)
 
