@@ -119,7 +119,8 @@ export type Expectation = { value: string; detail: string };
 /** Membership page content. Field definitions: docs/specs/03-membership.md §5. */
 export type MembershipContent = {
   header: { h1: string; lead: string };
-  headings: { how: string; tracks: string; activities: string; expectations: string };
+  /** `games` heads the mini-games section (Try a problem). */
+  headings: { how: string; tracks: string; games: string; activities: string; expectations: string };
   /** Exactly 3: Apply, Choose a track, Build with your track. */
   steps: Array<{ title: string; body: string }>;
   /** Shown under the steps when set, e.g. "Members can switch tracks at the start of each semester." */

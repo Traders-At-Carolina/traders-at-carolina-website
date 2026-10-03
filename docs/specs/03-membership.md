@@ -18,6 +18,7 @@ Show a prospective member **exactly what membership involves**: how the club is 
 | Which track is right for me, and which career does it lead to? | Tracks |
 | What would I actually do, and how often? | What we do |
 | How much time does it take? Am I qualified? | Expectations |
+| What would the interview feel like? | Try a problem |
 | How do I apply? | Footer CTA zone |
 
 ---
@@ -30,6 +31,7 @@ Show a prospective member **exactly what membership involves**: how the club is 
 | — | `PageHeader` | bone + grid | Order-book depth chart + grid (one composition) |
 | 01 | How it works | bone | — |
 | 02 | Tracks | bone | — |
+| 03 | Try a problem (§3.7) | graphite | — |
 | 03 | What we do | bone | — |
 | 04 | Expectations | white | — |
 | — | `SiteFooter` | black | — |
@@ -144,6 +146,36 @@ This is the main section of the page.
 ### 3.6 Apply band (removed 2026-10-02)
 
 The closing Apply call to action now lives in the footer on every page (spec 07). Membership no longer renders `CTABand`.
+
+### 3.7 Try a problem (§ 03, added 2026-10-02)
+
+Two short games that let a visitor feel the thinking the club trains, then point them at the interview. Sits directly after Tracks; later sections renumber (`numberSections`).
+
+**Content**
+- `SectionHeader`: eyebrow `§ 03 — TRY A PROBLEM`, H2 from `headings.games` (working copy: "Two short problems, before you apply."), lead: "The kind of question you'll work through out loud in an interview. No sign-up needed: scores are saved anonymously, and you can sign in to keep them with an account."
+- Graphite section. One card (columns 5–12 beside the header from 1024px, full width below, 16px corners, `rule` hairline, a faint bone tint over the graphite) with a two-tab segmented control: **Mental math sprint** and **Fermi markets**. A bone pill slides under the active tab; switching resets the game left behind.
+- **Rounding exception (00 §10):** the games are the one place outside the header's Apply button with rounded corners: the card (16px), the tab track (12px), and the buttons, tabs and answer input inside it (10px, `shape="rounded"`). The slider thumb is round.
+- **Buttons on graphite:** `surface-graphite` remaps navy to bone, so the games use the `light` (bone fill, graphite text) and `light-outline` button variants.
+
+**Mental math sprint** (`lib/games/mental-math.ts`): Zetamac's default rules, so scores compare with the drill trading candidates practise on. 120 seconds; each question is +, −, × or ÷ at random: + is (2–100) + (2–100), × is (2–12) × (2–100), and − and ÷ are those run backwards (whole, non-negative answers). Set in Zetamac's own type ("Helvetica Neue", Arial, Helvetica, sans-serif, the `font-zetamac` token) with the problem and answer box on one line, "780 ÷ 12 = [ ]", as Zetamac lays it out; the box is four digits wide (the largest answer is 1,200). A correct answer submits itself; Enter on a wrong one clears it with "Not quite. Try again or skip." beside the Skip button. A hairline timer drains across the top over a "N correct · Ns left" line.
+
+**Fermi markets** (`lib/games/fermi.ts`): 3 questions drawn from a bank of 40 big-number questions (populations, distances, counts, combinatorics). The visitor quotes a spread, Low and High (shorthand like `250k`, `3.5m`, `2e9` accepted), like making a two-sided market. The spread draws live as a bone band on a log-scale number line labelled in powers of ten (1, 1K, 1M…). Before the reveal the line fits only the visitor's numbers (one order of magnitude of padding each side), so its scale never hints at the answer; on lock-in it rescales to take in the answer and the answer's marker drops in. A missed spread turns from a filled band to an outline (no colour signal). Inside the spread scores `100 − 25 × log₁₀(high ÷ low)`, never below 5 (10× wide → 75, 100× → 50); a miss scores 0. Year-stamped answers (populations, GDP, store counts) should be refreshed before each recruiting season.
+
+**Result:** the score in the display size, the personal best (from the server; this browser's `localStorage` best while saving or offline), a save status line, one calm sentence tying the game to the interview, then "See how interviews work →" (`/apply#process`, `light`), `ApplyButton` (`light-outline`) and "Play again". This is the section's only link to the interview process.
+
+**Saving scores** (added 2026-10-03)
+
+- Every finished game is saved (`POST /api/games/scores` → Neon `game_scores`), with a random browser id (`localStorage` `tac:games:player`). Fermi is rescored on the server from the question ids and quotes; the sprint is client-reported, capped at 200. At most 30 saves per browser, and per hashed IP, per hour.
+- **Signed in** (Clerk, `/account/sign-in`, public sign-up): the play goes on the account, and this browser's earlier anonymous plays are claimed. Status: "Saved to your account."
+- **Signed out:** "Saved. Sign in to keep your scores with an account →". Sign-in returns to `/membership?claim=1#games`, which claims this browser's history.
+- **Name prompt:** a signed-out score in the top 10% for its game (90th percentile of saved scores; a fixed bar of 40 sprint / 200 Fermi until a game has 50 scores) replaces the note with "That's a top-10% score. Leave your name and officers may reach out about recruiting." Name (required, ≤ 60), email (optional), Save / No thanks. Asked once per browser. Stored in `game_contacts`, visible only to admins at `/admin/games`.
+- Failures are soft: the result shows this browser's best and "kept in this browser only".
+
+*Revised 2026-10-03:* section moved from white to graphite; card, tabs and controls rounded; the "In the interview" aside removed; the sprint switched from a 60-second ramp to 120-second Zetamac rules; Guess the probability replaced by Fermi markets.
+
+**Fixed height, one screen:** the section uses compact padding and, from 1024px, sets the header in columns 1–4 beside the card (columns 5–12), so the whole band fits a 1280×720 or 1024×768 screen. The card holds one height in every state and on both tabs: the tallest state, a revealed Fermi answer, plus headroom (game panel 39rem below 768px, 27.5rem to 1279px, 26rem from 1280px; Low, High and Quote/Next share one row from 768px to keep the tallest state short). Start screens centre their content, the sprint centres the problem, and results centre as one group with their buttons directly under the note. Phones scroll within the section.
+
+**Motion and access:** panels and new prompts fade up 8px over 400ms; the tab underline and answer marker ease out; none of it runs under reduced motion. Tabs follow the WAI-ARIA pattern (arrows, Home, End); focus moves to the input on start and to the result at the end; a polite live region announces ten seconds left. No colour signals right or wrong (00 §7).
 
 ---
 

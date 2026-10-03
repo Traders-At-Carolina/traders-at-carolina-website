@@ -25,6 +25,7 @@ export const membership: MembershipContent = {
   headings: {
     how: "From application to your first project.",
     tracks: "Pick the role you're preparing for.",
+    games: "Two short problems, before you apply.",
     activities: "The work, week to week.",
     expectations: "What we ask of members.",
   },
