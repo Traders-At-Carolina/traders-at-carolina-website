@@ -22,13 +22,14 @@ function Cells({ companies, tone = "default" }: PlacementWallProps) {
   const inverse = tone === "inverse";
   return companies.map((company) => (
     <li key={company.name} className="flex h-28 w-48 shrink-0 flex-col items-center justify-center gap-3 px-4 lg:h-32">
-      {/* Marks are flattened to one ink colour (bone on black when inverse). The caption names the firm because some
-          marks (Infragrid's bare square) say nothing alone, so the image is decorative. */}
+      {/* Marks show in their own colours on bone (00 §7.5 exception). On black (inverse) they're flattened to bone,
+          since dark marks like JPMorgan's would disappear. The caption names the firm because some marks (Infragrid's
+          bare square) say nothing alone, so the image is decorative. */}
       <Image
         src={company.logo}
         alt=""
         draggable={false}
-        className={`h-auto max-h-8 w-auto max-w-full object-contain opacity-70 ${inverse ? "brightness-0 invert" : "brightness-0"}`}
+        className={`h-auto max-h-8 w-auto max-w-full object-contain ${inverse ? "opacity-70 brightness-0 invert" : ""}`}
       />
       <span className={`text-caption ${inverse ? "text-bone" : "text-ink-2"}`}>{company.name}</span>
     </li>
@@ -38,7 +39,7 @@ function Cells({ companies, tone = "default" }: PlacementWallProps) {
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
- * Team header art: the firms leadership has worked at, as a slow looping strip that fades out at both edges (spec 04 §4.1).
+ * Team header art: the firms club members have worked at, as a slow looping strip that fades out at both edges (spec 04 §4.1).
  * It drifts on its own, can be dragged or flicked either way, and picks the drift back up when let go. The list is
  * repeated once so the loop never shows a seam; the copy is aria-hidden. Layout and the mask live in globals.css
  * (.logo-strip); with reduced motion the strip is a static wrapped row and none of the motion below runs.

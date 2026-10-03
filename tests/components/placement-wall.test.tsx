@@ -77,11 +77,10 @@ describe("PlacementWall tone", () => {
   });
   afterEach(() => vi.restoreAllMocks());
 
-  it("keeps ink marks and the default hairlines on the default tone", () => {
+  it("shows marks in their own colours, with the default hairlines, on the default tone", () => {
     const { container } = render(<PlacementWall companies={companies} />);
     const mark = container.querySelector("img") as HTMLElement;
-    expect(mark.className).toContain("brightness-0");
-    expect(mark.className).not.toContain("invert");
+    expect(mark.className).not.toMatch(/brightness-0|invert|grayscale|opacity-/);
     expect(container.querySelector(".logo-strip")).toHaveClass("border-rule");
     expect(screen.getAllByText("Citadel")[0]).toHaveClass("text-ink-2");
   });

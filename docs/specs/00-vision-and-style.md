@@ -65,14 +65,14 @@ The look combines the **prestige** of a financial journal with the **design lang
 
 **Restraint rules**
 
-- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
+- At most **one motif per viewport**. The motifs are the random walk, the graph-paper grid and stat rows (§7.2–7.4). In `PageHeader`, the grid and the random walk (or the page's own art, such as the `/membership` depth chart or the `/team` placement strip) form a single composition and count as one motif. In the Home hero, the 3D volatility surface (with its own floor grid) and the masked graph-paper grid behind it likewise count as one. The `/team` firm field (spec 04 §4.6) is a motif in its own section, well below the header strip, so the two never share a viewport. Section eyebrows and hairline rules are structural, not motifs, so they appear everywhere.
 - Never use stock tickers or marquees, candlestick charts, red/green up/down colors, terminal or monospace typography, or stock photography. **One exception:** the footer's `BitWordmark` (a decorative field of 0s and 1s, drawn in the site's own sans, [spec 08](08-footer-bit-wordmark.md)) is allowed. It counts as a motif and appears nowhere else.
 
 ---
 
 ## 4. Color system
 
-The four brand colors are the only hues on the site. Every other color is a tint, alpha or mix of those four.
+The four brand colors are the only hues on the site. Every other color is a tint, alpha or mix of those four. (Firm logos on `/team` are the one exception, §7.5.)
 
 ### 4.1 Tokens
 
@@ -199,6 +199,7 @@ Every major section opens with an eyebrow in the form `§ 01 — LABEL`. Numberi
 ### 7.5 Firm names
 - Placement firms are set in type by default.
 - If firm logos are used, they are monochrome (black at 60%) and uniform in height, never in full color.
+- **One exception (2026-10-03):** on `/team`, the header strip (spec 04 §4.1) and the firm field (spec 04 §4.6) show each firm's mark in its own colours, using the version made for light backgrounds. The footer strip, on black, stays monochrome (bone).
 
 ### 7.6 Order-book depth chart (`DepthChart`)
 - **Shape:** stepped cumulative bid and ask depth curves stepping outward from a narrow, centred spread, over a hairline baseline. No labels, axes or prices.
@@ -264,6 +265,7 @@ Use CSS plus a small IntersectionObserver hook. No animation library.
 | Header float | Docked bar morphs into the floating bar over 450ms, `--ease-soft` (no overshoot) |
 | Header nav highlight | One shared highlight trails the pointer between links: 70ms delay, then a 700ms `--ease-spring` (~4% overshoot). Header only |
 | Mobile menu card | Fades in and drops 8px over 250ms, `--ease-soft`. Header only |
+| Team firm field | Firm marks drift at 10–18px/s with soft collisions; drag and flick, with momentum easing back to cruise speed; only while on screen; a "Pause motion" button stops it (spec 04 §4.6) |
 
 - No parallax, marquees, scroll-jacking or auto-advancing carousels.
 - Under `prefers-reduced-motion: reduce`, every effect above is disabled and content renders in its final state.
