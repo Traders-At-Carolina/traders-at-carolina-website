@@ -6,8 +6,8 @@ import { events } from "@/content/events";
 import { membership } from "@/content/membership";
 import { portal } from "@/content/portal";
 import { site } from "@/content/site";
-import { team } from "@/content/team";
 import { requireViewer } from "@/lib/auth/viewer";
+import { getPeople, getTracks } from "@/lib/data/public";
 import {
   myRequest,
   portalAnnouncements,
@@ -26,7 +26,6 @@ import { validatePortal } from "@/lib/validate-portal";
 validatePortal(portal);
 validateEvents(events);
 
-const leadNames = trackLeadNames(team.people);
 
 export const metadata: Metadata = {
   title: "Portal",
@@ -41,7 +40,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   const viewer = await requireViewer();
   const audience = audienceViewer(viewer.isMember);
-  const [settings, upcoming, resources, announcements, links, timeline, request] = await Promise.all([
+  const [settings, upcoming, resources, announcements, links, timeline, request, people, tracks] = await Promise.all([
     portalSettings(),
     portalEvents(audience),
     portalResources(audience),
@@ -49,12 +48,14 @@ export default async function Page() {
     portalLinks(audience),
     recruitingTimeline(),
     viewer.isMember ? null : myRequest(viewer.userId),
+    getPeople(),
+    getTracks(),
   ]);
   return (
     <PortalPage
       viewer={viewer}
       portal={portal}
-      membership={membership}
+      membership={{ ...membership, tracks }}
       apply={apply}
       site={site}
       timeline={timeline}
@@ -65,7 +66,7 @@ export default async function Page() {
       settings={settings}
       request={request}
       requestAction={requestMembership}
-      leadNames={leadNames}
+      leadNames={trackLeadNames(people)}
       now={new Date()}
       account={<UserButton />}
     />

@@ -16,7 +16,21 @@ type ImageUploadProps = {
   kind?: "photo" | "logo";
   label: string;
   error?: string;
+  /** Logos only: told whether the image's corners are fully opaque (it would render as a solid block in a mask). */
+  onAnalyze?: (info: { opaque: boolean }) => void;
 };
+
+/** True when all four corner pixels are fully opaque, i.e. the logo has no transparent background. */
+function opaqueCorners(bitmap: ImageBitmap): boolean {
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return false;
+  ctx.drawImage(bitmap, 0, 0);
+  const corners: Array<[number, number]> = [[0, 0], [bitmap.width - 1, 0], [0, bitmap.height - 1], [bitmap.width - 1, bitmap.height - 1]];
+  return corners.every(([x, y]) => ctx.getImageData(x, y, 1, 1).data[3] === 255);
+}
 
 const RASTER = ["image/jpeg", "image/png", "image/webp"];
 
@@ -56,7 +70,7 @@ async function svgSize(file: File): Promise<{ width: number; height: number }> {
 }
 
 /** Drop or pick an image; it is prepared in the browser and uploaded straight to Blob through /api/admin/blob. */
-export function ImageUpload({ name, folder, value, onChange, kind = "photo", label, error }: ImageUploadProps) {
+export function ImageUpload({ name, folder, value, onChange, kind = "photo", label, error, onAnalyze }: ImageUploadProps) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<{ busy: boolean; message?: string }>({ busy: false });
@@ -81,8 +95,10 @@ export function ImageUpload({ name, folder, value, onChange, kind = "photo", lab
         const size = await svgSize(file);
         const blob = await upload(pathname, file, { access: "public", handleUploadUrl: "/api/admin/blob", contentType: file.type });
         image = { src: blob.url, ...size };
+        onAnalyze?.({ opaque: false });
       } else if (kind === "logo") {
         const bitmap = await createImageBitmap(file);
+        onAnalyze?.({ opaque: opaqueCorners(bitmap) });
         const blob = await upload(pathname, file, { access: "public", handleUploadUrl: "/api/admin/blob", contentType: file.type });
         image = { src: blob.url, width: bitmap.width, height: bitmap.height };
         bitmap.close();

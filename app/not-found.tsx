@@ -4,6 +4,7 @@ import { Eyebrow } from "@/components/Eyebrow";
 import { SiteChrome } from "@/components/SiteChrome";
 import { TextLink } from "@/components/TextLink";
 import { Bit404 } from "@/components/notfound/Bit404";
+import { getPlacements } from "@/lib/data/public";
 
 export const metadata: Metadata = { title: "Page not found" };
 
@@ -11,9 +12,10 @@ export const metadata: Metadata = { title: "Page not found" };
  * Unmatched URLs render under the root layout only, so this page brings the site chrome itself. The 3D bit "404"
  * (spec 10) is decorative; the eyebrow, heading and link carry the message.
  */
-export default function NotFound() {
+export default async function NotFound() {
+  const { wall } = await getPlacements();
   return (
-    <SiteChrome>
+    <SiteChrome wall={wall}>
       {/* One screen: the section fills the viewport below the 64 / 80px header and the figure takes what's left. */}
       <Container className="flex min-h-[calc(100svh-4rem)] flex-col justify-center py-10 md:min-h-[calc(100svh-5rem)] md:py-12">
         <Eyebrow>Error 404</Eyebrow>

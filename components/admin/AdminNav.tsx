@@ -12,10 +12,19 @@ const GROUPS = [
     label: "Club",
     links: [
       { href: "/admin/members", label: "Members" },
+      { href: "/admin/officers", label: "Officers" },
       { href: "/admin/admins", label: "Admins" },
     ],
   },
-  { label: "Website", links: [{ href: "/admin/photos", label: "Photos" }] },
+  {
+    label: "Website",
+    links: [
+      { href: "/admin/photos", label: "Photos" },
+      { href: "/admin/sponsors", label: "Sponsors" },
+      { href: "/admin/placements", label: "Placements" },
+      { href: "/admin/tracks", label: "Tracks" },
+    ],
+  },
   {
     label: "Insights",
     links: [

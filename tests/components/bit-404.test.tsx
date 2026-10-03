@@ -3,6 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import NotFound from "@/app/not-found";
 import { Bit404 } from "@/components/notfound/Bit404";
 
+vi.mock("@/lib/data/public", () => ({ getPlacements: async () => ({ firms: [], wall: [] }) }));
+
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 afterEach(() => vi.restoreAllMocks());
@@ -45,18 +47,18 @@ describe("Bit404", () => {
 });
 
 describe("NotFound", () => {
-  it("fits the whole 404 section in one screen below the header", () => {
+  it("fits the whole 404 section in one screen below the header", async () => {
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
-    render(<NotFound />);
+    render(await NotFound());
     const section = screen.getByRole("main").querySelector("canvas.bit-404")?.parentElement;
     expect(section?.className).toMatch(/\bflex\b.*\bflex-col\b/);
     expect(section?.className).toContain("min-h-[calc(100svh-4rem)]");
     expect(section?.className).toContain("md:min-h-[calc(100svh-5rem)]");
   });
 
-  it("shows the eyebrow, the bit figure, the heading, the lead and the way home, in that order", () => {
+  it("shows the eyebrow, the bit figure, the heading, the lead and the way home, in that order", async () => {
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
-    render(<NotFound />);
+    render(await NotFound());
     const main = screen.getByRole("main");
     const eyebrow = within(main).getByText("Error 404");
     const figure = main.querySelector("canvas.bit-404");

@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { TeamPage } from "@/components/team/TeamPage";
-import { placements } from "@/content/placements";
-import { placementWall } from "@/content/placement-wall";
 import { team } from "@/content/team";
+import { getPeople, getPlacements, getSeason } from "@/lib/data/public";
 import { validateTeam } from "@/lib/validate-team";
-
-validateTeam(team, placements);
 
 export const metadata: Metadata = {
   title: "Team",
@@ -13,6 +10,10 @@ export const metadata: Metadata = {
   description: "Traders at Carolina is run by students. Meet the executive board, co-presidents and directors.",
 };
 
-export default function Page() {
-  return <TeamPage team={team} placements={placements} wall={placementWall} />;
+/** Officers, placements and the academic year come from the admin (spec 06 §6.3, §6.8); the note is content/team.ts. */
+export default async function Page() {
+  const [people, { firms, wall }, season] = await Promise.all([getPeople(), getPlacements(), getSeason()]);
+  const content = { note: team.note, academicYear: season.academicYear, people };
+  validateTeam(content, firms);
+  return <TeamPage team={content} placements={firms} wall={wall} />;
 }
