@@ -126,8 +126,9 @@ export function MathSprint({ cta }: { cta: ReactNode }) {
         <div className="game-timer h-full origin-left bg-navy" style={{ transform: `scaleX(${remaining / SPRINT_MS})` }} />
       </div>
       <div className="mt-3 flex items-baseline justify-between text-caption text-ink-3">
-        <span className="tabular">{correct} correct</span>
+        {/* Time on the left, score on the right, as on Zetamac. */}
         <span className={`tabular ${remaining <= WARN_MS ? "font-semibold text-navy" : ""}`}>{seconds}s left</span>
+        <span className="tabular">{correct} correct</span>
       </div>
       <p className="sr-only" aria-live="polite">
         {remaining <= WARN_MS ? "Ten seconds left." : ""}
