@@ -14,3 +14,21 @@ export async function requirePage(): Promise<{ userId: string }> {
   if (!isAdminClaims(sessionClaims)) notFound();
   return { userId };
 }
+
+/** Thrown by requireAdmin(); route handlers turn it into a 401. */
+export class AdminAccessError extends Error {
+  constructor() {
+    super("Admins only");
+    this.name = "AdminAccessError";
+  }
+}
+
+/**
+ * Gate for server actions and /api/admin handlers (spec 06 §4). The proxy already protects /admin, but Server Functions
+ * are POSTs that can be replayed against any route, so every write checks again here.
+ */
+export async function requireAdmin(): Promise<{ userId: string }> {
+  const { userId, sessionClaims } = await auth();
+  if (!userId || !isAdminClaims(sessionClaims)) throw new AdminAccessError();
+  return { userId };
+}

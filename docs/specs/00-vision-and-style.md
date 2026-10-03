@@ -349,7 +349,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 - **Header nav:** About · Membership · Team · [Apply]. The logo links to Home.
 - **Footer nav:** mirrors the header (the Club group). The Join and Reach groups are defined in spec 07.
 - **Reserved for the future (not built, not linked):** `/resources`, `/events`. The header layout must still fit two more nav items at ≥ 1024px without crowding.
-- **Admin (not linked, not indexed):** `/admin`, defined in spec 06. It is invite-only and does not use the site header or footer.
+- **Admin (not linked, not indexed):** `/admin`, defined in spec 06. Only users with the admin role can use it. It does not use the site header or footer.
 - **Portal (signed in, not in the nav, not indexed):** `/portal`, defined in spec 09. The corner button on every public page links to it. It is the first home for interview prep and events (the resource hub in §1); a public `/resources` or `/events` can reuse its content later.
 
 ---
@@ -369,7 +369,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
   | `content/placements.ts` | Firms where members have placed: firm name only (spec 04 §5) |
   | `content/timeline.ts` | Club history milestones: year, title, description |
 
-  Field-level shapes are finalized in the page spec that first uses each file. [Spec 06](06-admin.md) replaces the earlier "no CMS until the resource hub exists" rule. Photos, officers, tracks, sponsors and placements move into a database that admins edit at `/admin`, and their `content/*.ts` files become seed data. All other copy stays in `content/`.
+  Field-level shapes are finalized in the page spec that first uses each file. [Spec 06](06-admin.md) replaces the earlier "no CMS until the resource hub exists" rule. Photos, officers, tracks, sponsors, placements, recruiting settings and events move into a database that admins edit at `/admin`, and those `content/*.ts` exports become seed data. All other copy stays in `content/` (spec 06 §2 lists it).
 - **Assets:** `public/brand/` (logo variants), `public/images/events/`, `public/images/team/`.
 - **SEO:**
   - Per-page `metadata` (title template `%s · Traders at Carolina`, plus a description).
@@ -394,7 +394,7 @@ All variants are square (except the header's Apply button, §10 `SiteHeader`), u
 | 03 | `03-membership.md` | Club structure, tracks, weekly cadence, expectations |
 | 04 | `04-team.md` | Executive board, track leads, placements (firm names) |
 | 05 | `05-apply.md` | Process, timeline, FAQ, Google Form handoff, open/closed states |
-| 06 | `06-admin.md` | Admin dashboard: content editing (photos, officers, tracks, sponsors, placements), admin access, usage analytics |
+| 06 | `06-admin.md` | Admin dashboard: member roster and access requests, website lists and seasonal settings (photos, officers, tracks, sponsors, placements, recruiting, events), portal content, undo and history, admin access, usage analytics |
 | 08 | `08-footer-bit-wordmark.md` | Footer 0s-and-1s wordmark: scroll-in scramble and load, glitching letters, cursor-lit hover, cropped at the page end |
 | 09 | `09-portal.md` | Signed-in portal: recruiting, interview prep, events, tracks and the club for everyone; learning, internship tracker and competitions for members |
 
