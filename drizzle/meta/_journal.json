@@ -15,6 +15,13 @@
       "when": 1791055409911,
       "tag": "0001_wild_the_liberteens",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791057438310,
+      "tag": "0002_audit_undo_and_slots",
+      "breakpoints": true
     }
   ]
 }

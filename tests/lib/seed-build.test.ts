@@ -13,7 +13,7 @@ const person = (p: Partial<Person> & Pick<Person, "slug" | "name">): Person => (
 const input = (over: Partial<SeedInput> = {}): SeedInput => ({
   home: { ...home, photos: [] } as HomeContent,
   about: { ...about, partners: [] },
-  membership: membership as MembershipContent,
+  membership: { ...membership, photos: [] } as MembershipContent,
   team: { people: [] },
   placements: [],
   wall: [],
@@ -30,6 +30,16 @@ describe("buildSeed", () => {
     expect(rows.photos.map((p) => [p.caption, p.homeOrder, p.image.src])).toEqual([
       ["First", 1, "/images/events/a.jpg"],
       ["Second", 2, "/images/events/b.jpg"],
+    ]);
+  });
+
+  it("keeps one library row per image, with a slot on each page that uses it", () => {
+    const shared = { src: img("/images/events/a.jpg"), alt: "A", caption: "Shared", ratio: "3:2" as const };
+    const only = { src: img("/images/events/m.jpg"), alt: "M", caption: "Membership only", ratio: "4:5" as const };
+    const rows = buildSeed(input({ home: { ...home, photos: [shared] }, membership: { ...membership, photos: [only, shared] } }));
+    expect(rows.photos.map((p) => [p.caption, p.homeOrder, p.membershipOrder])).toEqual([
+      ["Shared", 1, 2],
+      ["Membership only", undefined, 1],
     ]);
   });
 

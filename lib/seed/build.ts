@@ -13,7 +13,7 @@ export type SeedInput = {
 export type PlacementRow = { firm: string; logo?: ImageAsset; logoOnDark?: ImageAsset; showOnWall: boolean; wallOrder?: number };
 
 export type SeedRows = {
-  photos: Array<{ image: ImageAsset; alt: string; caption: string; ratio: "3:2" | "4:5"; homeOrder: number }>;
+  photos: Array<{ image: ImageAsset; alt: string; caption: string; ratio: "3:2" | "4:5"; homeOrder?: number; membershipOrder?: number }>;
   placements: PlacementRow[];
   people: Array<{
     slug: string;
@@ -66,8 +66,18 @@ export function buildSeed(input: SeedInput, resolve: (image: ImageAsset) => Imag
     if (!placements.has(key(firm))) placements.set(key(firm), { firm, showOnWall: false });
   }
 
+  // One library row per image; a photo used on both pages carries both slot numbers.
+  const photos = new Map<string, SeedRows["photos"][number]>();
+  const slot = (list: HomeContent["photos"] | undefined, field: "homeOrder" | "membershipOrder") =>
+    (list ?? []).forEach((p, i) => {
+      const row = photos.get(p.src.src) ?? { image: resolve(p.src), alt: p.alt, caption: p.caption, ratio: p.ratio };
+      photos.set(p.src.src, { ...row, [field]: i + 1 });
+    });
+  slot(input.home.photos, "homeOrder");
+  slot(input.membership.photos, "membershipOrder");
+
   return {
-    photos: input.home.photos.map((p, i) => ({ image: resolve(p.src), alt: p.alt, caption: p.caption, ratio: p.ratio, homeOrder: i + 1 })),
+    photos: [...photos.values()],
     placements: [...placements.values()],
     people: input.team.people.map((p) => ({
       slug: p.slug,

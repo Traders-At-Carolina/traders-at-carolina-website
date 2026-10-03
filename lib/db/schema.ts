@@ -49,7 +49,7 @@ const timestamps = {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 };
 
-/** Photo library; `home_order` 1–3 puts a photo in the Home "Inside the club" section (spec 01 §6). */
+/** Photo library. `home_order` 1–3 fills the Home "Inside the club" slots (01 §6); `membership_order` 1–3 the Membership photo band (03). */
 export const photos = pgTable(
   "photos",
   {
@@ -59,9 +59,15 @@ export const photos = pgTable(
     caption: text("caption").notNull(),
     ratio: text("ratio", { enum: ["3:2", "4:5"] }).notNull(),
     homeOrder: smallint("home_order"),
+    membershipOrder: smallint("membership_order"),
     ...timestamps,
   },
-  (t) => [uniqueIndex("photos_home_order_idx").on(t.homeOrder), check("photos_home_order_range", sql`${t.homeOrder} between 1 and 3`)],
+  (t) => [
+    uniqueIndex("photos_home_order_idx").on(t.homeOrder),
+    check("photos_home_order_range", sql`${t.homeOrder} between 1 and 3`),
+    uniqueIndex("photos_membership_order_idx").on(t.membershipOrder),
+    check("photos_membership_order_range", sql`${t.membershipOrder} between 1 and 3`),
+  ],
 );
 
 /** Firms members have joined. Feeds the Team firm list, the placement wall and officers' company badges (spec 04). */
@@ -99,6 +105,8 @@ export const people = pgTable(
     placementNote: text("placement_note"),
     companyId: uuid("company_id").references(() => placements.id, { onDelete: "set null" }),
     linkedin: text("linkedin"),
+    /** "Show on Team page" (spec 06 rev 2): hidden people keep their row, e.g. a track lead only linked from /membership. */
+    visible: boolean("visible").notNull().default(true),
     ...timestamps,
   },
   (t) => [index("people_group_order_idx").on(t.group, t.sortOrder)],
@@ -131,7 +139,10 @@ export const sponsors = pgTable(
   (t) => [uniqueIndex("sponsors_name_ci_idx").on(sql`lower(${t.name})`)],
 );
 
-/** Who changed what, and when (spec 06 §5). No diffs: enough to answer "who deleted X". */
+/**
+ * Who changed what, and when (spec 06 §5.1). `before`/`after` hold the row on each side of the change so Undo can write
+ * `before` back through the save wrapper (spec 06 §3); null `before` means a create, null `after` a delete.
+ */
 export const auditLog = pgTable(
   "audit_log",
   {
@@ -139,9 +150,30 @@ export const auditLog = pgTable(
     at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
     actorId: text("actor_id").notNull(),
     actorEmail: text("actor_email"),
-    action: text("action", { enum: ["create", "update", "delete", "reorder", "grant-admin", "revoke-admin", "invite", "revoke-invite"] }).notNull(),
+    action: text("action", {
+      enum: [
+        "create",
+        "update",
+        "delete",
+        "reorder",
+        "grant-admin",
+        "revoke-admin",
+        "invite",
+        "revoke-invite",
+        "undo",
+        "add-members",
+        "update-members",
+        "remove-members",
+        "approve-request",
+        "decline-request",
+      ],
+    }).notNull(),
     entity: text("entity").notNull(),
+    /** The changed row's id: a uuid as text, a track id, or a Clerk user id for admin changes. */
+    entityId: text("entity_id"),
     entityLabel: text("entity_label").notNull(),
+    before: jsonb("before"),
+    after: jsonb("after"),
   },
-  (t) => [index("audit_log_at_idx").on(t.at.desc())],
+  (t) => [index("audit_log_at_idx").on(t.at.desc()), index("audit_log_entity_idx").on(t.entity, t.entityId, t.at.desc())],
 );

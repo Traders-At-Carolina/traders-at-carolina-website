@@ -47,17 +47,17 @@ export async function inviteAdmin(_prev: ActionState, formData: FormData): Promi
     if (existing) {
       if (isAdminUser(existing.publicMetadata)) return { error: `${parsed.email} is already an admin.` };
       await client.users.updateUserMetadata(existing.id, { publicMetadata: { role: "admin" } });
-      await recordAudit({ ...who, action: "grant-admin", entity: "admin", entityLabel: parsed.email });
+      await recordAudit({ ...who, action: "grant-admin", entity: "admin", entityId: existing.id, entityLabel: parsed.email });
       revalidatePath("/admin/admins");
       return { ok: `${parsed.email} is now an admin. It takes effect the next time they load a page (within a minute).` };
     }
 
-    await client.invitations.createInvitation({
+    const invitation = await client.invitations.createInvitation({
       emailAddress: parsed.email,
       redirectUrl: `${await origin()}/admin/sign-up`,
       publicMetadata: { role: "admin" },
     });
-    await recordAudit({ ...who, action: "invite", entity: "admin", entityLabel: parsed.email });
+    await recordAudit({ ...who, action: "invite", entity: "admin", entityId: invitation.id, entityLabel: parsed.email });
     revalidatePath("/admin/admins");
     return { ok: `Invitation sent to ${parsed.email}.` };
   } catch (error) {
@@ -77,7 +77,7 @@ export async function removeAdmin(_prev: ActionState, formData: FormData): Promi
     if (reason) return { error: reason };
     const client = await clerkClient();
     await client.users.updateUserMetadata(targetId, { publicMetadata: { role: null } });
-    await recordAudit({ ...who, action: "revoke-admin", entity: "admin", entityLabel: target.email ?? target.name });
+    await recordAudit({ ...who, action: "revoke-admin", entity: "admin", entityId: targetId, entityLabel: target.email ?? target.name });
     revalidatePath("/admin/admins");
     return { ok: `${target.name} is no longer an admin.` };
   } catch (error) {
@@ -92,7 +92,7 @@ export async function revokeInvite(_prev: ActionState, formData: FormData): Prom
     const email = String(formData.get("email") ?? "");
     const client = await clerkClient();
     await client.invitations.revokeInvitation(invitationId);
-    await recordAudit({ ...who, action: "revoke-invite", entity: "admin", entityLabel: email });
+    await recordAudit({ ...who, action: "revoke-invite", entity: "admin", entityId: invitationId, entityLabel: email });
     revalidatePath("/admin/admins");
     return { ok: `Invitation to ${email} revoked.` };
   } catch (error) {

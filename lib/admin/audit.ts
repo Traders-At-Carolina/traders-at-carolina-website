@@ -5,8 +5,9 @@ import { auditLog } from "@/lib/db/schema";
 export type AuditEntry = typeof auditLog.$inferInsert;
 
 /**
- * Records who changed what (spec 06 §5). Called after a change succeeds; a logging failure is reported but never
- * undoes or blocks the change itself.
+ * Records who changed what (spec 06 §5.1). Called after a change succeeds; a logging failure is reported but never
+ * undoes or blocks the change itself. Editors pass `entityId` plus the row's `before`/`after` so the change can be
+ * undone (spec 06 §3); admin grants and invitations carry only the Clerk id.
  */
 export async function recordAudit(entry: AuditEntry): Promise<void> {
   try {
