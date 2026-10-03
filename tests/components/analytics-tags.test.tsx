@@ -67,13 +67,11 @@ describe("tracked links", () => {
     expect([cta(about), target(about), placement(about)]).toEqual(["nav", "About", "header"]);
   });
 
-  it("tags footer links and says analytics are privacy-respecting", () => {
+  it("tags footer links", () => {
     render(<SiteFooter />);
-    const footer = screen.getByRole("contentinfo");
     const about = screen.getByRole("link", { name: "About" });
     expect([cta(about), placement(about)]).toEqual(["nav", "footer"]);
     const apply = screen.getByRole("link", { name: /Apply/ });
     expect([cta(apply), placement(apply)]).toEqual(["apply", "footer"]);
-    expect(footer).toHaveTextContent(/anonymous, cookie-free analytics/i);
   });
 });

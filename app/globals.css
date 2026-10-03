@@ -371,9 +371,24 @@ main:has(+ footer [data-cta-band]) > section:last-child {
     transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  /* The eyebrow glides in behind the rule: a soft-edged mask sweeps across it (no hard step per letter) while it fades
+     and settles up a few pixels, on the same easing as the rule. */
   html.js .section-marker .eyebrow {
-    clip-path: inset(0 100% 0 0);
-    transition: clip-path 700ms steps(14, end) 250ms;
+    opacity: 0;
+    transform: translateY(6px);
+    -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent 60%);
+    mask-image: linear-gradient(90deg, #000 40%, transparent 60%);
+    -webkit-mask-size: 250% 100%;
+    mask-size: 250% 100%;
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transition:
+      mask-position 1100ms cubic-bezier(0.22, 1, 0.36, 1) 200ms,
+      -webkit-mask-position 1100ms cubic-bezier(0.22, 1, 0.36, 1) 200ms,
+      opacity 700ms ease-out 200ms,
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1) 200ms;
   }
 
   html.js .section-marker.is-drawn .section-rule {
@@ -381,7 +396,10 @@ main:has(+ footer [data-cta-band]) > section:last-child {
   }
 
   html.js .section-marker.is-drawn .eyebrow {
-    clip-path: inset(0);
+    opacity: 1;
+    transform: none;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
   }
 
   .draw-in path {

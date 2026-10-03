@@ -17,10 +17,23 @@ type InsideTheClubProps = {
   upcoming?: HomeContent["upcoming"];
 };
 
-function Photo({ photo, ratio, sizes, className = "" }: { photo: HomePhoto; ratio: HomePhoto["ratio"]; sizes: string; className?: string }) {
+function Photo({
+  photo,
+  ratio,
+  sizes,
+  className = "",
+  stretch = false,
+}: {
+  photo: HomePhoto;
+  ratio: HomePhoto["ratio"];
+  sizes: string;
+  className?: string;
+  /** From lg up, fill the height of the grid area instead of holding the ratio (the lead photo beside a stacked pair). */
+  stretch?: boolean;
+}) {
   return (
-    <figure className={className}>
-      <div className={`relative overflow-hidden ${ratio === "4:5" ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
+    <figure className={`${className} ${stretch ? "lg:flex lg:flex-col" : ""}`}>
+      <div className={`relative overflow-hidden ${ratio === "4:5" ? "aspect-[4/5]" : "aspect-[3/2]"} ${stretch ? "lg:aspect-auto lg:min-h-0 lg:flex-1" : ""}`}>
         <Image
           src={photo.src}
           alt={photo.alt}
@@ -84,9 +97,16 @@ export function InsideTheClub({ index, title, photos, upcoming }: InsideTheClubP
           </Grid>
         ) : third ? (
           // Three photos: one large lead (cols 1–8) with the other two stacked beside it (cols 9–12).
-          // Below 1024px the lead runs full width and the pair sits side by side under it.
+          // Below 1024px the lead runs full width and the pair sits side by side under it. From 1024px the lead stretches
+          // to the full height of the pair, so the two columns start and end together (images and captions).
           <Grid className="items-start gap-y-10">
-            <Photo photo={first} ratio="3:2" sizes="(min-width: 1024px) 66vw, 100vw" className="col-span-12 lg:col-span-8 lg:col-start-1 lg:row-span-2 lg:row-start-1" />
+            <Photo
+              photo={first}
+              ratio="3:2"
+              stretch
+              sizes="(min-width: 1024px) 66vw, 100vw"
+              className="col-span-12 lg:col-span-8 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-stretch"
+            />
             {[second, third].map((photo, i) => (
               <Photo
                 key={photo.src.src}

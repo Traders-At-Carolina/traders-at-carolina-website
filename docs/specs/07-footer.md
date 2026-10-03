@@ -120,7 +120,7 @@ Exact column spans are a starting point; confirm them in the browser at 375, 768
 
 ### 3.4 Legal row
 
-`© {year} Traders at Carolina` on the left; the one-line analytics note from spec 06 §7.1 ("Anonymous, cookie-free analytics tell us which pages are useful."); the disclaimer, if `site.disclaimer` is set, on the right (stacked on mobile), above a `rule-inverse` hairline.
+`© {year} Traders at Carolina` on the left; the disclaimer, if `site.disclaimer` is set, on the right (stacked on mobile), above a `rule-inverse` hairline.
 
 ---
 
