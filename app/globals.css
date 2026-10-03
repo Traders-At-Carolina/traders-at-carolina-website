@@ -210,6 +210,17 @@ header[data-floating="false"]:has(~ main [data-nav-float-point]) [data-nav-grid]
   display: none;
 }
 
+/* Footer bit wordmark (components/footer/BitWordmark.tsx, spec 08 §3): the left, right and top edges fade to nothing,
+   so the field has no hard boundary. The bottom edge is the end of the page and stays solid. */
+.bit-wordmark {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent), linear-gradient(to bottom, transparent, #000 14%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent), linear-gradient(to bottom, transparent, #000 14%);
+  mask-composite: intersect;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .logo-strip {
     overflow: hidden;
