@@ -177,3 +177,45 @@ export const auditLog = pgTable(
   },
   (t) => [index("audit_log_at_idx").on(t.at.desc()), index("audit_log_entity_idx").on(t.entity, t.entityId, t.at.desc())],
 );
+
+// ── Members (spec 06 §5.1, §9). Membership lives here, never in Clerk metadata. ──
+
+/** The roster. Matched to a Clerk account by `user_id`, or by a verified email (case-insensitive), then linked. */
+export const members = pgTable(
+  "members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").notNull(),
+    name: text("name").notNull(),
+    status: text("status", { enum: ["active", "alumni", "inactive"] }).notNull().default("active"),
+    track: text("track", { enum: ["trading", "research", "development"] }),
+    classYear: smallint("class_year"),
+    /** e.g. "Fall 2026": the recruiting cycle they joined in. */
+    cohort: text("cohort"),
+    userId: text("user_id").unique(),
+    /** Visible to admins only. */
+    notes: text("notes"),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("members_email_ci_idx").on(sql`lower(${t.email})`), index("members_status_idx").on(t.status)],
+);
+
+/** "Request access" from the portal. At most one pending request per user (partial unique index). */
+export const membershipRequests = pgTable(
+  "membership_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    email: text("email").notNull(),
+    name: text("name").notNull(),
+    note: text("note"),
+    status: text("status", { enum: ["pending", "approved", "declined"] }).notNull().default("pending"),
+    decidedBy: text("decided_by"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("membership_requests_one_pending_idx").on(t.userId).where(sql`${t.status} = 'pending'`),
+    index("membership_requests_user_idx").on(t.userId, t.createdAt.desc()),
+  ],
+);

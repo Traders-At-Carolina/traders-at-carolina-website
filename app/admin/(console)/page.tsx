@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { UndoButton } from "@/components/admin/UndoButton";
 import { latestIdsFor, recentChanges } from "@/lib/admin/audit";
+import { pendingRequestCount } from "@/lib/admin/members-db";
 import { canUndoEntity } from "@/lib/admin/undo";
 import { requirePage } from "@/lib/auth/admin";
 
@@ -13,13 +14,29 @@ export default async function AdminHome() {
   await requirePage();
   const changes = await recentChanges().catch(() => null);
   const latest = changes ? await latestIdsFor(changes).catch(() => new Set<number>()) : new Set<number>();
+  const waiting = await pendingRequestCount().catch(() => 0);
   return (
     <>
       <h1 className="text-h1">Overview</h1>
       <p className="mt-4 max-w-prose text-lead text-ink-2">
         Edit club photos, manage admins and review game scores. Editors for officers, tracks, sponsors and placements arrive next.
       </p>
+      {waiting ? (
+        <section aria-label="Needs attention" className="mt-8 border border-rule bg-white p-4">
+          <p className="text-body text-black">
+            {waiting} membership request{waiting === 1 ? "" : "s"} waiting.{" "}
+            <Link href="/admin/members?tab=requests" className="link-underline text-navy">
+              Review
+            </Link>
+          </p>
+        </section>
+      ) : null}
       <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
+        <li>
+          <Link href="/admin/members" className="link-underline text-navy">
+            Members
+          </Link>
+        </li>
         <li>
           <Link href="/admin/photos" className="link-underline text-navy">
             Photos

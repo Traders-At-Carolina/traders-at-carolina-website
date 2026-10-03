@@ -2,13 +2,18 @@ import { events as contentEvents } from "@/content/events";
 import { site } from "@/content/site";
 import type { ClubEvent, Recruiting, TrackId } from "@/content/types";
 import { upcomingEvents } from "@/lib/events";
+import { desc, eq } from "drizzle-orm";
+import { db } from "@/lib/db/client";
+import { membershipRequests } from "@/lib/db/schema";
 import { canSee, type AudienceViewer } from "@/lib/members/audience";
+import { portalAccessSettings } from "@/lib/members/settings";
 
 /**
  * Portal getters (spec 06 §8). Uncached and per viewer; every one filters with canSee on the server.
  *
- * INTERIM bodies until spec 06 phases 4, 6 and 7 add the tables: events come from content/events.ts, recruiting from
- * content/site.ts, the internship tracker from a server-only environment variable, and everything else is empty.
+ * Requests are real (phase 4). INTERIM bodies until spec 06 phases 6 and 7 add the tables: events come from
+ * content/events.ts, recruiting from content/site.ts, the internship tracker from a server-only environment variable,
+ * and everything else is empty.
  * Those phases replace the bodies; the signatures and return types stay, so the portal needs no changes.
  */
 
@@ -72,12 +77,10 @@ export async function portalLinks(viewer: AudienceViewer, env: Record<string, st
   ];
 }
 
-/**
- * Welcome lines and the request toggle. Interim: no custom welcome lines, and requests stay off until phase 4 has
- * somewhere to keep them (spec 06's default is on).
- */
+/** Welcome lines and the request toggle. Interim: no custom welcome lines until phase 7; requests use the default (on). */
 export async function portalSettings(): Promise<PortalSettings> {
-  return { acceptRequests: false };
+  const { acceptRequests } = await portalAccessSettings();
+  return { acceptRequests };
 }
 
 /** Recruiting settings plus upcoming `recruiting` events, for the non-member timeline. Interim: content files. */
@@ -91,8 +94,13 @@ export async function recruitingTimeline(now: Date = new Date()): Promise<Recrui
   };
 }
 
-/** The viewer's latest access request, if any. Interim: none until phase 4. */
+/** The viewer's latest access request, if any (spec 06 §8). */
 export async function myRequest(userId: string): Promise<AccessRequest | null> {
-  void userId;
-  return null;
+  const [row] = await db()
+    .select({ status: membershipRequests.status })
+    .from(membershipRequests)
+    .where(eq(membershipRequests.userId, userId))
+    .orderBy(desc(membershipRequests.createdAt))
+    .limit(1);
+  return row ?? null;
 }

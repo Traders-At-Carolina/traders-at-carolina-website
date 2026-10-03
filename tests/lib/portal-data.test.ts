@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { fakeDb } from "../helpers/fake-db";
 import type { ClubEvent } from "@/content/types";
 
 const sample: ClubEvent[] = [
@@ -9,10 +10,11 @@ const sample: ClubEvent[] = [
   { title: "Last term's kickoff", type: "general-meeting", startsAt: "2026-09-01T19:00", audience: "public", featured: false },
 ];
 vi.mock("@/content/events", () => ({ events: sample }));
+const fake = fakeDb();
+vi.mock("@/lib/db/client", () => ({ db: () => fake.db() }));
 
 const { myRequest, portalAnnouncements, portalEvents, portalLinks, portalResources, portalSettings, recruitingTimeline } = await import("@/lib/data/portal");
 const { audienceViewer, canSee } = await import("@/lib/members/audience");
-const { getMembership } = await import("@/lib/members/resolve");
 const { site } = await import("@/content/site");
 
 const now = new Date("2027-01-05T17:00:00Z");
@@ -31,11 +33,6 @@ describe("canSee", () => {
   });
 });
 
-describe("getMembership (stub until spec 06 phase 4)", () => {
-  it("finds nobody on the roster yet, so only admins see the member view", async () => {
-    expect(await getMembership({ id: "user_1", verifiedEmails: ["ada@unc.edu"] })).toBeNull();
-  });
-});
 
 describe("portalEvents", () => {
   it("returns upcoming events the viewer may see, soonest first", async () => {
@@ -73,11 +70,19 @@ describe("portalLinks", () => {
   });
 });
 
-describe("the rest, empty until spec 06 phases 4 and 7", () => {
-  it("has no resources, announcements or requests, and keeps requests off", async () => {
+describe("access requests (spec 06 phase 4)", () => {
+  it("accepts requests by default and returns the viewer's latest request", async () => {
+    expect(await portalSettings()).toEqual({ acceptRequests: true });
+    fake.queue([{ status: "declined" }]);
+    expect(await myRequest("user_1")).toEqual({ status: "declined" });
+    fake.queue([]);
+    expect(await myRequest("user_2")).toBeNull();
+  });
+});
+
+describe("the rest, empty until spec 06 phase 7", () => {
+  it("has no resources or announcements", async () => {
     expect(await portalResources("member")).toEqual({ learning: [], "interview-prep": [], recruiting: [], other: [] });
     expect(await portalAnnouncements("member")).toEqual([]);
-    expect(await myRequest("user_1")).toBeNull();
-    expect(await portalSettings()).toEqual({ acceptRequests: false });
   });
 });
