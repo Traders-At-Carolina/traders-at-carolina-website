@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Chivo, Gelasio, Public_Sans } from "next/font/google";
 import { site } from "@/content/site";
@@ -46,7 +47,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
       </head>
       {/* Public pages get the site chrome from app/(site)/layout.tsx; /admin brings its own (spec 06). */}
-      <body className="flex min-h-dvh flex-col">{children}</body>
+      <body className="flex min-h-dvh flex-col">
+        <ClerkProvider>
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -27,6 +28,8 @@ const SHELL_BASE =
 
 const SHELL_DOCKED =
   "h-16 w-full rounded-none border-transparent bg-transparent px-5 md:h-20 md:px-8 lg:px-12";
+
+const AUTH_LINK = "flex min-h-9 items-center rounded-[0.625rem] px-3.5 text-nav font-medium transition-colors duration-150 hover:text-navy";
 
 const FLOAT_SHADOW = "shadow-[0_10px_30px_-12px_rgb(0_0_0/0.25)]";
 
@@ -188,11 +191,29 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
               ))}
             </ul>
           </div>
+          <Show when="signed-out">
+            <SignInButton>
+              <button type="button" className={AUTH_LINK}>
+                Sign in
+              </button>
+            </SignInButton>
+            <SignUpButton>
+              <button type="button" className={AUTH_LINK}>
+                Sign up
+              </button>
+            </SignUpButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
           {applyButton({ size: "sm", placement: "header" })}
         </nav>
 
         {/* Mobile: Apply stays one tap away beside the menu button; the open menu has its own full-width Apply. */}
         <div className="flex items-center gap-2 md:hidden">
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
           {open ? null : applyButton({ size: "compact", placement: "header-mobile" })}
           <button
             ref={menuButtonRef}
@@ -239,6 +260,20 @@ export function SiteHeaderClient({ links, applyHref, applyExternal, applyDeadlin
               ))}
             </ul>
           </nav>
+          <Show when="signed-out">
+            <div className="mt-3 flex gap-2">
+              <SignInButton>
+                <button type="button" className="-mx-3 flex min-h-12 flex-1 items-center rounded-[0.625rem] px-3 font-display text-h3 active:bg-wash">
+                  Sign in
+                </button>
+              </SignInButton>
+              <SignUpButton>
+                <button type="button" className="flex min-h-12 flex-1 items-center rounded-[0.625rem] px-3 font-display text-h3 active:bg-wash">
+                  Sign up
+                </button>
+              </SignUpButton>
+            </div>
+          </Show>
           <div className="mt-4" onClick={close}>
             {applyButton({ fullWidth: true, placement: "menu" })}
           </div>
