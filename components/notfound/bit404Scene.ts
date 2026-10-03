@@ -40,11 +40,11 @@ const WALL_SHADE = 0.6;
 export const ALPHA_404 = { scrambled: 0.4, glitch: 0.5 } as const;
 
 /**
- * Grid cell size in px, the figure's box (height / width) and the share of the box's width the "404" fills. The box
- * leaves room around the glyphs so the figure stays inside it at full tilt.
+ * Grid cell size in px, and how much of the figure's box the "404" may fill: `fit` of its width and `capFit` of its
+ * height (cap height), whichever is smaller. The margins keep the figure inside the box at full tilt.
  */
 export function figureLayout(wide: boolean) {
-  return wide ? { cell: 9, aspect: 0.5, fit: 0.7 } : { cell: 6, aspect: 0.62, fit: 0.7 };
+  return wide ? { cell: 9, fit: 0.7, capFit: 0.62 } : { cell: 6, fit: 0.7, capFit: 0.62 };
 }
 
 /** The box around the letter cells, inclusive, or null if there are none. */

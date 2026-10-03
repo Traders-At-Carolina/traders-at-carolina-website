@@ -33,9 +33,17 @@ function mask(rows: string[]) {
 const deg = (d: number) => (d * Math.PI) / 180;
 
 describe("figureLayout", () => {
-  it("uses 9px cells from md up and 6px below, with a taller box on narrow screens", () => {
-    expect(figureLayout(true)).toMatchObject({ cell: 9, aspect: 0.5 });
-    expect(figureLayout(false)).toMatchObject({ cell: 6, aspect: 0.62 });
+  it("uses 9px cells from md up and 6px below", () => {
+    expect(figureLayout(true).cell).toBe(9);
+    expect(figureLayout(false).cell).toBe(6);
+  });
+
+  it("leaves a margin on both axes so the figure stays inside its box at full tilt", () => {
+    for (const wide of [true, false]) {
+      const { fit, capFit } = figureLayout(wide);
+      expect(fit).toBeLessThan(0.8);
+      expect(capFit).toBeLessThan(0.7);
+    }
   });
 });
 

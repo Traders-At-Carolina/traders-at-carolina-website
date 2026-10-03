@@ -19,10 +19,11 @@ describe("Bit404", () => {
     expect(canvas).not.toHaveAttribute("tabindex");
   });
 
-  it("reserves its height with an aspect ratio so the page never shifts", () => {
+  it("takes the height its flex column leaves, within a floor and a cap, so CSS sizes it before it draws", () => {
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
     const { container } = render(<Bit404 />);
-    expect(container.querySelector("canvas")?.className).toMatch(/aspect-\[100\/62\].*md:aspect-\[100\/50\]/);
+    const classes = container.querySelector("canvas")?.className.split(/\s+/) ?? [];
+    expect(classes).toEqual(expect.arrayContaining(["flex-1", "h-0", "min-h-36", "max-h-[min(28rem,62vw)]", "[contain:size]"]));
   });
 
   it("does not block vertical scrolling on touch", () => {
@@ -44,6 +45,15 @@ describe("Bit404", () => {
 });
 
 describe("NotFound", () => {
+  it("fits the whole 404 section in one screen below the header", () => {
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+    render(<NotFound />);
+    const section = screen.getByRole("main").querySelector("canvas.bit-404")?.parentElement;
+    expect(section?.className).toMatch(/\bflex\b.*\bflex-col\b/);
+    expect(section?.className).toContain("min-h-[calc(100svh-4rem)]");
+    expect(section?.className).toContain("md:min-h-[calc(100svh-5rem)]");
+  });
+
   it("shows the eyebrow, the bit figure, the heading, the lead and the way home, in that order", () => {
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
     render(<NotFound />);

@@ -94,8 +94,11 @@ export function Bit404({ className = "" }: { className?: string }) {
     const bone = style.getPropertyValue("--color-bone").trim() || "#ebeae4";
     const wideQuery = window.matchMedia("(min-width: 48rem)");
 
-    /** Draws "404" once, big and centered, fitted to `fit` of the width, and averages it down to a letter mask. */
-    function measureLetters(cols: number, rows: number, fit: number) {
+    /**
+     * Draws "404" once, big and centered, and averages it down to a letter mask. It is as large as fits both `fit` of
+     * the width and `capFit` of the height, so a short box (a short screen) shrinks it instead of clipping it.
+     */
+    function measureLetters(cols: number, rows: number, fit: number, capFit: number) {
       const w = cols * MASK_SCALE;
       const h = rows * MASK_SCALE;
       const off = document.createElement("canvas");
@@ -104,9 +107,10 @@ export function Bit404({ className = "" }: { className?: string }) {
       const octx = off.getContext("2d", { willReadFrequently: true });
       if (!octx) return new Uint8Array(cols * rows);
 
-      // Text width scales linearly with font size.
+      // Text width and cap height scale linearly with font size: measure once at size h, then scale to fit.
       octx.font = `800 ${h}px ${title}`;
-      const size = (h * w * fit) / octx.measureText(TEXT).width;
+      const probe = octx.measureText(TEXT);
+      const size = h * Math.min((w * fit) / probe.width, (h * capFit) / (probe.actualBoundingBoxAscent || h * 0.72));
       octx.font = `800 ${size}px ${title}`;
       const capHeight = octx.measureText(TEXT).actualBoundingBoxAscent || size * 0.72;
       octx.fillStyle = "#000";
@@ -143,7 +147,7 @@ export function Bit404({ className = "" }: { className?: string }) {
       canvas!.width = Math.round(width * dpr);
       canvas!.height = Math.round(height * dpr);
 
-      const mask = measureLetters(cols, rows, layout.fit);
+      const mask = measureLetters(cols, rows, layout.fit, layout.capFit);
       const bounds = letterBounds(mask, cols, rows);
       shell = buildShell(mask, cols, rows, extrusionLayers(bounds ? bounds.r1 - bounds.r0 + 1 : 0));
       projection = emptyProjection(shell.count);
@@ -324,14 +328,15 @@ export function Bit404({ className = "" }: { className?: string }) {
     };
   }, [reduced]);
 
-  // Aspect ratios mirror figureLayout (0.62 narrow, 0.50 from md up) so the figure's height is reserved before the
-  // canvas draws and the page never shifts.
+  // The figure grows to fill the height its flex column leaves (the 404 page is one screen tall), between a floor and
+  // a cap tied to its width. Size containment stops the canvas's pixel buffer (its intrinsic aspect ratio) from
+  // propping the column taller than the screen. CSS sets that height before the canvas draws, so nothing shifts.
   return (
     <canvas
       ref={ref}
       aria-hidden="true"
       role="presentation"
-      className={`bit-404 mx-auto block aspect-[100/62] w-full max-w-[56rem] touch-pan-y select-none md:aspect-[100/50] ${className}`}
+      className={`bit-404 mx-auto block h-0 max-h-[min(28rem,62vw)] min-h-36 w-full max-w-[56rem] flex-1 touch-pan-y [contain:size] select-none ${className}`}
     />
   );
 }

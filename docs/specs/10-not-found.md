@@ -28,25 +28,25 @@ Spec 00 §3 allows the bit field only in the footer's `BitWordmark`. This spec e
 
 ## 3. Page layout
 
-Inside `SiteChrome`, in one `Container` with `py-24 md:py-32`, top to bottom:
+Inside `SiteChrome`, in one `Container`, top to bottom. **The whole section fits one screen:** the container is a flex column at least as tall as the viewport below the header (`100svh` − 64px, or − 80px from `md` up), with `py-10` (`md:py-12`), and its content is centered vertically.
 
 | Order | Element | Spec |
 |---|---|---|
 | 1 | `Eyebrow` | "Error 404" |
-| 2 | `Bit404` | Centered, full container width up to `56rem`, 32px below the eyebrow (40px from `md` up) |
-| 3 | H1 | "This page isn't here." (unchanged copy), 32px below the figure |
+| 2 | `Bit404` | Centered, full container width up to `56rem`, 16px below the eyebrow (24px from `md` up). Its height flexes (below) |
+| 3 | H1 | "This page isn't here." (unchanged copy), 16px below the figure (24px from `md` up) |
 | 4 | Lead | "The link may be out of date, or the page hasn't been published yet." (unchanged), `max-w-prose`, `ink-2` |
 | 5 | `TextLink` | "Back to the home page", with an arrow, to `/` |
 
 - The text stays left-aligned with the container, as on every other page. Only the figure is centered.
 - `app/not-found.tsx` stays a server component and keeps `metadata = { title: "Page not found" }`. `Bit404` is a client component imported into it.
-- **Height:** the figure's height is set by its aspect ratio (height / width): 0.50 from `md` up and 0.62 below. That's about 448px at 896px wide and about 208px at 335px wide. The extra room around the glyphs keeps the shape inside the canvas at full tilt.
+- **Height:** the figure takes whatever height the column leaves after the eyebrow and text (`flex-1`), at least 144px and at most `min(28rem, 62vw)`. The canvas uses `contain: size`, so its pixel buffer never props the column taller. "404" is drawn as large as fits **both** 70% of the box's width and 62% of its height (cap height), so on a short screen it shrinks rather than clips, and the margins keep it inside the box at full tilt. Measured: 896 × 448 at 1440 × 900 and 1920 × 1080, 896 × 316 at 1280 × 720, 704 × 448 at 768 × 1024, 335 × 233 at 375 × 667. On every one of these the home link sits above the fold. Only on very short screens (a phone in landscape) does the 144px floor let the page scroll.
 
 ---
 
 ## 4. Shape
 
-- **Mask:** on mount, after `document.fonts` loads, and on resize, "404" is drawn once to an offscreen canvas in `--font-chivo` 800, fitted so its width is 70% of the canvas width and centered. The pixels are averaged down to a grid of square cells: 9px from `md` up, 6px below. A cell is a **letter cell** if its coverage is at least 50% (`buildLetterMask`, spec 08 §4).
+- **Mask:** on mount, after `document.fonts` loads, and on resize, "404" is drawn once to an offscreen canvas in `--font-chivo` 800, as large as fits 70% of the canvas width and 62% of its height (cap height), and centered. The pixels are averaged down to a grid of square cells: 9px from `md` up, 6px below. A cell is a **letter cell** if its coverage is at least 50% (`buildLetterMask`, spec 08 §4).
 - **Extrusion:** the mask is extruded into a solid. The depth is 0.3 × the cap height of "404", rounded to whole cells, with a minimum of 4 layers. Layers are one cell apart.
 - **Voxel shell:** only the visible surface becomes bits:
   - the **front face** and **back face**: every letter cell, at the two outer layers
@@ -107,11 +107,11 @@ Same language as spec 08 §5, but it plays **once on load**, not on scroll-in, b
 
 - **Decorative:** `aria-hidden="true"`, `role="presentation"`, not focusable. The page's meaning lives in the eyebrow, H1, lead and link.
 - **`prefers-reduced-motion: reduce` (00 §9.2):** the canvas draws the **finished figure once, at the rest pose**: resolved, with no flicker, glitch, cursor tracking or sway. The loop never starts and no pointer listeners are added.
-- **No JavaScript / before mount:** the figure's box reserves its height (aspect ratio) and stays empty bone. The text below is unaffected.
+- **No JavaScript / before mount:** the figure's box gets its height from CSS layout and stays empty bone. The text below is unaffected.
 - **Performance:**
   - Each frame projects every bit, sorts by depth (typed arrays, reusing one index buffer) and stamps one of two sprites with `globalAlpha`. Target: smooth 60fps on a mid-range laptop.
   - The loop runs only while the canvas is at least 10% visible (`IntersectionObserver`) and the tab is visible (`document.hidden` false).
-  - No layout shift: the height is reserved by `aspect-ratio`.
+  - No layout shift: the height comes from CSS layout (the flex column), never from the canvas.
 
 ---
 
@@ -150,6 +150,7 @@ Same language as spec 08 §5, but it plays **once on load**, not on scroll-in, b
 7. With `prefers-reduced-motion: reduce`, the finished figure shows statically at the rest pose, with no tracking, sway or glitch.
 8. The canvas is `aria-hidden`. Nothing new is announced by assistive tech or reachable by keyboard.
 9. There's no layout shift, and the loop is stopped while the figure is out of view or the tab is hidden.
+13. The eyebrow, figure, heading, lead and home link all show in the first screen, without scrolling, at 375 × 667, 768 × 1024, 1280 × 720, 1440 × 900 and 1920 × 1080.
 10. The footer `BitWordmark` behaves exactly as before. Its tests pass unchanged after the `bitCore.ts` extraction.
 11. The pure-module unit tests pass, and `pnpm test`, `pnpm typecheck` and `pnpm lint` are clean.
 12. Spec 00 §3, §10 and §13, and spec 08 §2, carry the extended exception from §2 above.
