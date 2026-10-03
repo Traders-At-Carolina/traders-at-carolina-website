@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MembershipPage } from "@/components/membership/MembershipPage";
 import { membership } from "@/content/membership";
 import { team } from "@/content/team";
+import { getMembershipPhotos } from "@/lib/data/public";
 import { trackLeadNames } from "@/lib/team";
 import { validateMembership } from "@/lib/validate-membership";
 
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: membership.header.lead,
 };
 
-export default function Page() {
-  return <MembershipPage membership={membership} leadNames={leadNames} />;
+/** Photo bands come from the admin photo library's Membership slots (spec 06 §6.6). */
+export default async function Page() {
+  return <MembershipPage membership={{ ...membership, photos: await getMembershipPhotos() }} leadNames={leadNames} />;
 }
