@@ -23,6 +23,12 @@ const VERSION = "v1";
 /** Local development without a database falls back to content/*.ts. Production never does (spec 06 §3). */
 const offline = () => !process.env.DATABASE_URL && process.env.NODE_ENV !== "production";
 
+/** Postgres "undefined_table" (42P01), raised directly or as the cause of a Drizzle query error. */
+export function missingTable(error: unknown): boolean {
+  const codes = [error, (error as { cause?: unknown })?.cause].map((e) => (e as { code?: unknown } | null)?.code);
+  return codes.includes("42P01");
+}
+
 type PhotoRow = typeof photos.$inferSelect;
 
 const toHomePhoto = (row: PhotoRow): HomePhoto => ({ src: row.image, alt: row.alt, caption: row.caption, ratio: row.ratio });
@@ -82,7 +88,15 @@ export const getPlacements = unstable_cache(
 export const getSeason = unstable_cache(
   async (): Promise<{ academicYear?: string }> => {
     if (offline()) return team.academicYear ? { academicYear: team.academicYear } : {};
-    const [row] = await db().select().from(settings).where(eq(settings.key, "season")).limit(1);
+    let row: { value: unknown } | undefined;
+    try {
+      [row] = await db().select().from(settings).where(eq(settings.key, "season")).limit(1);
+    } catch (error) {
+      // Preview builds share the production database, where migrations run only on production deploys (vercel-build).
+      // Until `settings` exists there, no academic year is set, which is also the state before anyone saves one.
+      if (!missingTable(error)) throw error;
+      console.warn("settings table not migrated yet; treating the season as unset");
+    }
     const value = (row?.value ?? {}) as { academicYear?: unknown };
     return typeof value.academicYear === "string" && value.academicYear.trim() ? { academicYear: value.academicYear.trim() } : {};
   },
