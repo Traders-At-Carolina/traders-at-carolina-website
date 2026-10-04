@@ -251,3 +251,68 @@ export const events = pgTable(
   },
   (t) => [index("events_starts_idx").on(t.startsAt)],
 );
+
+// ── Portal content (spec 06 §5.1 phase 7, §6.11–6.13). Read per viewer by lib/data/portal.ts, never cached. ──
+
+/** An uploaded resource file in the private Blob store. `pathname` never leaves the server (spec 06 §8). */
+export type StoredFile = { pathname: string; size: number; contentType: string };
+
+const PORTAL_AUDIENCES = ["signed_in", "members"] as const;
+const TRACK_IDS = ["trading", "research", "development"] as const;
+
+/**
+ * Slides, notes, textbooks and links for the portal (spec 06 §6.11). A resource has an uploaded `file` or an https
+ * `url`, never both. `tracks` empty means every track. Hidden resources keep their row but never reach the portal.
+ */
+export const resources = pgTable(
+  "resources",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    kind: text("kind", { enum: ["slides", "notes", "textbook", "problem-set", "video", "link"] }).notNull(),
+    section: text("section", { enum: ["learning", "interview-prep", "recruiting", "other"] }).notNull(),
+    tracks: text("tracks", { enum: TRACK_IDS })
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    description: text("description"),
+    file: jsonb("file").$type<StoredFile>(),
+    url: text("url"),
+    audience: text("audience", { enum: PORTAL_AUDIENCES }).notNull().default("members"),
+    pinned: boolean("pinned").notNull().default(false),
+    sortOrder: smallint("sort_order").notNull().default(0),
+    hidden: boolean("hidden").notNull().default(false),
+    ...timestamps,
+  },
+  (t) => [index("resources_section_order_idx").on(t.section, t.sortOrder), check("resources_one_source", sql`(${t.file} is null) <> (${t.url} is null)`)],
+);
+
+/** Short notes at the top of the portal (spec 06 §6.12). `body` is inline markdown. Outside its dates it isn't shown. */
+export const announcements = pgTable(
+  "announcements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    audience: text("audience", { enum: PORTAL_AUDIENCES }).notNull().default("signed_in"),
+    pinned: boolean("pinned").notNull().default(false),
+    showFrom: timestamp("show_from", { withTimezone: true }),
+    showUntil: timestamp("show_until", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [check("announcements_dates_order", sql`${t.showFrom} is null or ${t.showUntil} is null or ${t.showUntil} >= ${t.showFrom}`)],
+);
+
+/** Member tools links (spec 06 §6.13): the internship tracker, Slack, the Drive folder… in admin order. */
+export const portalLinks = pgTable(
+  "portal_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    label: text("label").notNull(),
+    url: text("url").notNull(),
+    description: text("description"),
+    audience: text("audience", { enum: PORTAL_AUDIENCES }).notNull().default("members"),
+    sortOrder: smallint("sort_order").notNull(),
+  },
+  (t) => [index("portal_links_order_idx").on(t.sortOrder)],
+);

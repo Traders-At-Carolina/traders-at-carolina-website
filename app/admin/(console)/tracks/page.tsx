@@ -1,4 +1,5 @@
 import { TrackForm } from "@/components/admin/ListForms";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { listPeople, listTracks } from "@/lib/admin/lists-db";
 import { requirePage } from "@/lib/auth/admin";
 import { updateTrackAction } from "./actions";
@@ -14,11 +15,8 @@ export default async function TracksPage() {
   const leads = people.filter((p) => p.visible).map((p) => ({ slug: p.slug, name: p.name }));
   return (
     <>
-      <h1 className="text-h1">Tracks</h1>
-      <p className="mt-4 max-w-prose text-body text-ink-2">
-        The three tracks on the Membership page. Leads are picked from officers shown on the Team page. Background is recommended, never required.
-      </p>
-      <div className="mt-8 flex flex-col gap-10">
+      <PageHeader title="Tracks" description="The three tracks on the Membership page. Leads are picked from officers shown on the Team page. Background is recommended, never required." />
+      <div className="flex flex-col gap-6">
         {ORDER.map((id) => {
           const t = rows.find((r) => r.id === id);
           return t ? <TrackForm key={id} track={t} leads={leads} action={updateTrackAction.bind(null, id)} /> : null;

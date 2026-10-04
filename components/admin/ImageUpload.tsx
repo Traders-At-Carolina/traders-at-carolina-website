@@ -1,7 +1,9 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
+import { ImagePlus, LoaderCircle } from "lucide-react";
 import { useId, useRef, useState } from "react";
+import { buttonClasses } from "@/components/admin/ui/Button";
 import type { ImageAsset } from "@/content/types";
 import { fitWithin, isHeic, uploadPathname } from "@/lib/admin/image-prep";
 
@@ -116,8 +118,8 @@ export function ImageUpload({ name, folder, value, onChange, kind = "photo", lab
 
   const describedBy = `${id}-status${error ? ` ${id}-error` : ""}`;
   return (
-    <div>
-      <span id={`${id}-label`} className="text-caption font-medium text-ink-2">
+    <div className="flex flex-col gap-1.5">
+      <span id={`${id}-label`} className="text-ui-label font-medium text-ui-text">
         {label}
       </span>
       <div
@@ -131,19 +133,21 @@ export function ImageUpload({ name, folder, value, onChange, kind = "photo", lab
           setOver(false);
           void handle(e.dataTransfer.files[0]);
         }}
-        className={`mt-2 flex flex-col items-center justify-center gap-2 border border-dashed px-4 py-6 text-center ${
-          over ? "border-navy bg-wash" : error ? "border-black" : "border-rule bg-white"
+        className={`flex flex-col items-center justify-center gap-2 rounded-ui-lg border border-dashed px-4 py-6 text-center transition-colors duration-150 ${
+          over ? "border-ui-accent bg-ui-accent-soft" : error ? "border-ui-danger bg-ui-surface" : "border-ui-border-strong bg-ui-surface hover:bg-ui-accent-soft"
         }`}
       >
-        <p className="text-body text-ink-2">{value ? "Drop a new file to replace it, or" : "Drop an image here, or"}</p>
+        <ImagePlus aria-hidden className="size-5 text-ui-text-3" />
+        <p className="text-ui-base text-ui-text-2">{value ? "Drop a new file to replace it, or" : "Drop an image here, or"}</p>
         <button
           type="button"
           onClick={() => input.current?.click()}
           disabled={status.busy}
           aria-describedby={describedBy}
-          className="min-h-11 px-3 font-semibold text-navy underline underline-offset-4 disabled:opacity-60"
+          className={buttonClasses({ variant: "secondary", size: "sm" })}
         >
-          {status.busy ? "Uploading…" : "choose a file"}
+          {status.busy ? <LoaderCircle aria-hidden className="size-4 animate-spin" /> : null}
+          {status.busy ? "Uploading…" : "Choose a file"}
         </button>
         <input
           ref={input}
@@ -156,11 +160,11 @@ export function ImageUpload({ name, folder, value, onChange, kind = "photo", lab
         />
       </div>
       <input type="hidden" name={name} value={value ? JSON.stringify(value) : ""} />
-      <p id={`${id}-status`} role="status" className="mt-2 min-h-5 text-caption text-ink-2">
+      <p id={`${id}-status`} role="status" className="min-h-4 text-ui-hint text-ui-text-3">
         {status.message ?? ""}
       </p>
       {error ? (
-        <p id={`${id}-error`} className="text-caption text-black">
+        <p id={`${id}-error`} className="text-ui-hint font-medium text-ui-danger">
           {error}
         </p>
       ) : null}

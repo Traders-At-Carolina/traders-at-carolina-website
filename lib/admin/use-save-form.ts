@@ -22,5 +22,5 @@ export function useSaveForm(action: (p: ActionState, f: FormData) => Promise<Act
   useEffect(() => {
     if (state.redirectTo) router.push(state.redirectTo);
   }, [state.redirectTo, router]);
-  return { state, formAction, pending, markDirty: () => setDirty(true), err: state.fieldErrors ?? {} };
+  return { state, formAction, pending, dirty, markDirty: () => setDirty(true), err: state.fieldErrors ?? {} };
 }

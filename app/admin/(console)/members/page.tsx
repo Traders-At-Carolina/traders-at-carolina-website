@@ -1,12 +1,19 @@
-import Link from "next/link";
-import { buttonClasses } from "@/components/Button";
+import { Download, Inbox, Plus, Search, UserRound } from "lucide-react";
 import { AccountActions, RequestActions } from "@/components/admin/MemberRowActions";
 import { RosterTable } from "@/components/admin/RosterTable";
 import { SaveToast } from "@/components/admin/SaveToast";
+import { Badge } from "@/components/admin/ui/Badge";
+import { Button, ButtonLink, buttonClasses } from "@/components/admin/ui/Button";
+import { Card } from "@/components/admin/ui/Card";
+import { Banner, EmptyState } from "@/components/admin/ui/Feedback";
+import { Field, Input, Select } from "@/components/admin/ui/Field";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
+import { Table, TBody, TD, TH, THead, TR } from "@/components/admin/ui/Table";
+import { Tabs } from "@/components/admin/ui/Tabs";
 import { getEntry } from "@/lib/admin/audit";
 import { listAccounts } from "@/lib/admin/clerk-admins";
 import { rosterFilter } from "@/lib/admin/members-filter";
-import { listMembers, pendingRequests, rosterUserIds } from "@/lib/admin/members-db";
+import { listMembers, pendingRequests, rosterEmails, rosterUserIds } from "@/lib/admin/members-db";
 import { requirePage } from "@/lib/auth/admin";
 import { portalAccessSettings } from "@/lib/members/settings";
 import { inviteAdmin } from "../admins/actions";
@@ -16,7 +23,6 @@ export const metadata = { title: "Members" };
 
 const asked = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "America/New_York" });
 const day = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "America/New_York" });
-const ctl = "mt-2 min-h-11 w-full border border-rule bg-white px-2 text-body";
 
 /** Members (spec 06 §6.2): Roster, Requests and All accounts. Membership lives in the roster, never in Clerk. */
 export default async function MembersPage({ searchParams }: PageProps<"/admin/members">) {
@@ -24,122 +30,115 @@ export default async function MembersPage({ searchParams }: PageProps<"/admin/me
   const q = await searchParams;
   const params = new URLSearchParams(Object.entries(q).flatMap(([k, v]) => (typeof v === "string" ? [[k, v]] : [])));
   const tab = q.tab === "requests" || q.tab === "accounts" ? q.tab : "roster";
-  const [requests, settings] = await Promise.all([pendingRequests(), portalAccessSettings()]);
+  const filter = rosterFilter(params);
+  const [requests, settings, onRoster, rows] = await Promise.all([pendingRequests(), portalAccessSettings(), rosterEmails(), tab === "roster" ? listMembers(filter) : Promise.resolve([])]);
   const saved = typeof q.saved === "string" && /^\d+$/.test(q.saved) ? await getEntry(Number(q.saved)) : undefined;
-
-  const tabs = [
-    { key: "roster", label: "Roster" },
-    { key: "requests", label: `Requests${requests.length ? ` (${requests.length})` : ""}` },
-    { key: "accounts", label: "All accounts" },
-  ];
+  const exportHref = `/api/admin/members/export${params.toString() ? `?${params}` : ""}`;
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-h1">Members</h1>
-          <p className="mt-4 max-w-prose text-body text-ink-2">The roster decides who sees members-only portal content. Changes take effect on each person&apos;s next page load.</p>
-        </div>
-        <Link href="/admin/members/add" className={buttonClasses({})}>
-          Add members
-        </Link>
-      </div>
+      <PageHeader
+        title="Members"
+        description="The roster decides who sees members-only portal content. Changes take effect on each person's next page load."
+        actions={
+          <>
+            {tab === "roster" ? (
+              // A plain <a>: the export is a file download from an API route, not a page.
+              <a href={exportHref} className={buttonClasses({ variant: "secondary" })}>
+                <Download aria-hidden className="size-4" />
+                Export CSV <span className="text-ui-text-3 tabular-nums">({rows.length})</span>
+              </a>
+            ) : null}
+            <ButtonLink href="/admin/members/add" variant="primary" icon={Plus}>
+              Add members
+            </ButtonLink>
+          </>
+        }
+      />
 
-      <nav aria-label="Members sections" className="mt-8 flex gap-1 border-b border-rule">
-        {tabs.map((t) => (
-          <Link
-            key={t.key}
-            href={t.key === "roster" ? "/admin/members" : `/admin/members?tab=${t.key}`}
-            aria-current={tab === t.key ? "page" : undefined}
-            className={`-mb-px min-h-11 content-center border-b-2 px-3 text-nav font-medium ${tab === t.key ? "border-navy text-navy" : "border-transparent text-ink-2 hover:text-navy"}`}
-          >
-            {t.label}
-          </Link>
-        ))}
-      </nav>
+      <Tabs
+        label="Members sections"
+        tabs={[
+          { href: "/admin/members", label: "Roster", count: onRoster.size, current: tab === "roster" },
+          { href: "/admin/members?tab=requests", label: "Requests", count: requests.length, current: tab === "requests" },
+          { href: "/admin/members?tab=accounts", label: "All accounts", current: tab === "accounts" },
+        ]}
+      />
 
-      <div className="mt-6">
-        {tab === "roster" ? <Roster params={params} /> : null}
-        {tab === "requests" ? (
-          !settings.acceptRequests ? (
-            <p className="text-ink-2">Access requests are turned off, so the portal hides the Request access button.</p>
-          ) : requests.length === 0 ? (
-            <p className="text-ink-3">No requests waiting.</p>
-          ) : (
-            <ul className="divide-y divide-rule border-y border-rule">
-              {requests.map((r) => (
-                <li key={r.id} className="flex flex-col justify-between gap-3 py-4 sm:flex-row">
-                  <div>
-                    <p className="text-body text-black">{r.name}</p>
-                    <p className="text-caption text-ink-3">
-                      {r.email} · asked {asked.format(r.createdAt)}
-                    </p>
-                    {r.note ? <p className="mt-2 max-w-prose text-body text-ink-2">“{r.note}”</p> : null}
-                  </div>
-                  <RequestActions id={r.id} name={r.name} approve={approveRequest} decline={declineRequest} />
-                </li>
-              ))}
-            </ul>
-          )
-        ) : null}
-        {tab === "accounts" ? <Accounts /> : null}
-      </div>
+      {tab === "roster" ? (
+        <Card>
+          <form aria-label="Filter the roster" className="grid gap-3 border-b border-ui-border px-5 py-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto] lg:items-end">
+            <Field label="Search" className="sm:col-span-2 lg:col-span-1">
+              <Input name="q" defaultValue={filter.q ?? ""} placeholder="Name or email" />
+            </Field>
+            <Field label="Status">
+              <Select name="status" defaultValue={filter.status ?? ""}>
+                <option value="">Any</option>
+                <option value="active">Active</option>
+                <option value="alumni">Alumni</option>
+                <option value="inactive">Inactive</option>
+              </Select>
+            </Field>
+            <Field label="Track">
+              <Select name="track" defaultValue={filter.track ?? ""}>
+                <option value="">Any</option>
+                <option value="trading">Trading</option>
+                <option value="research">Research</option>
+                <option value="development">Development</option>
+              </Select>
+            </Field>
+            <Field label="Class year">
+              <Input name="year" inputMode="numeric" defaultValue={filter.classYear ?? ""} placeholder="2027" className="tabular-nums" />
+            </Field>
+            <Button type="submit" icon={Search}>
+              Apply filters
+            </Button>
+          </form>
+          {filter.classYear ? (
+            <Banner tone="info" className="mx-5 mt-4">
+              Year end: select all, then Mark alumni.
+            </Banner>
+          ) : null}
+          <div className={filter.classYear ? "mt-4 border-t border-ui-border" : undefined}>
+            <RosterTable
+              rows={rows.map((r) => ({ id: r.id, name: r.name, email: r.email, status: r.status, track: r.track, classYear: r.classYear, cohort: r.cohort, signedUp: Boolean(r.userId) }))}
+              action={bulkMembers}
+              classYear={filter.classYear}
+            />
+          </div>
+        </Card>
+      ) : null}
+
+      {tab === "requests" ? (
+        !settings.acceptRequests ? (
+          <Banner tone="info" title="Access requests are turned off">
+            The portal hides the Request access button.
+          </Banner>
+        ) : requests.length === 0 ? (
+          <Card>
+            <EmptyState icon={Inbox} title="No requests waiting" description="New access requests from the portal show up here." />
+          </Card>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {requests.map((r) => (
+              <Card as="li" key={r.id} className="flex flex-col justify-between gap-4 px-5 py-4 sm:flex-row sm:items-start">
+                <div className="min-w-0">
+                  <p className="text-ui-base font-medium text-ui-text">{r.name}</p>
+                  <p className="mt-0.5 text-ui-hint text-ui-text-3">
+                    {r.email} · asked <span className="tabular-nums">{asked.format(r.createdAt)}</span>
+                  </p>
+                  {r.note ? <p className="mt-2 max-w-prose border-l-2 border-ui-border pl-3 text-ui-base text-ui-text-2">“{r.note}”</p> : null}
+                </div>
+                <RequestActions id={r.id} name={r.name} approve={approveRequest} decline={declineRequest} />
+              </Card>
+            ))}
+          </ul>
+        )
+      ) : null}
+
+      {tab === "accounts" ? <Accounts /> : null}
 
       {saved ? <SaveToast state={{ ok: saved.action === "delete" ? `${saved.entityLabel} removed from the roster.` : `Added ${saved.entityLabel}.`, undoId: saved.id, at: saved.id }} /> : null}
-    </>
-  );
-}
-
-async function Roster({ params }: { params: URLSearchParams }) {
-  const filter = rosterFilter(params);
-  const rows = await listMembers(filter);
-  const exportHref = `/api/admin/members/export${params.toString() ? `?${params}` : ""}`;
-  return (
-    <>
-      <form className="grid gap-4 sm:grid-cols-5" aria-label="Filter the roster">
-        <label className="text-caption font-medium text-ink-2 sm:col-span-2">
-          Search
-          <input name="q" defaultValue={filter.q ?? ""} placeholder="Name or email" className={ctl} />
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Status
-          <select name="status" defaultValue={filter.status ?? ""} className={ctl}>
-            <option value="">Any</option>
-            <option value="active">Active</option>
-            <option value="alumni">Alumni</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Track
-          <select name="track" defaultValue={filter.track ?? ""} className={ctl}>
-            <option value="">Any</option>
-            <option value="trading">Trading</option>
-            <option value="research">Research</option>
-            <option value="development">Development</option>
-          </select>
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Class year
-          <input name="year" inputMode="numeric" defaultValue={filter.classYear ?? ""} placeholder="2027" className={ctl} />
-        </label>
-        <div className="flex flex-wrap gap-6 sm:col-span-5">
-          <button type="submit" className="min-h-11 text-caption font-medium text-navy underline underline-offset-4">
-            Apply filters
-          </button>
-          <a href={exportHref} className="min-h-11 content-center text-caption font-medium text-navy underline underline-offset-4">
-            Export CSV ({rows.length})
-          </a>
-        </div>
-      </form>
-      {filter.classYear ? <p className="mt-4 text-caption text-ink-2">Year end: select all, then Mark alumni.</p> : null}
-      <div className="mt-6">
-        <RosterTable
-          rows={rows.map((r) => ({ id: r.id, name: r.name, email: r.email, status: r.status, track: r.track, classYear: r.classYear, cohort: r.cohort, signedUp: Boolean(r.userId) }))}
-          action={bulkMembers}
-          classYear={filter.classYear}
-        />
-      </div>
     </>
   );
 }
@@ -147,25 +146,45 @@ async function Roster({ params }: { params: URLSearchParams }) {
 async function Accounts() {
   const [accounts, linked] = await Promise.all([listAccounts(), rosterUserIds()]);
   return (
-    <ul className="divide-y divide-rule border-y border-rule">
-      {accounts.map((a) => {
-        const member = linked.get(a.id);
-        return (
-          <li key={a.id} className="flex flex-col justify-between gap-3 py-4 sm:flex-row sm:items-center">
-            <div>
-              <p className="text-body text-black">
-                {a.name}
-                {member ? <span className="ml-2 rounded-full bg-wash px-2 py-0.5 text-caption text-navy">Member</span> : null}
-                {a.isAdmin ? <span className="ml-2 rounded-full bg-wash px-2 py-0.5 text-caption text-navy">Admin</span> : null}
-              </p>
-              <p className="text-caption text-ink-3">
-                {a.email ?? "No email"} · joined {day.format(a.createdAt)} · {a.lastSignInAt ? `last signed in ${day.format(a.lastSignInAt)}` : "never signed in"}
-              </p>
-            </div>
-            <AccountActions userId={a.id} email={a.email} name={a.name} isMember={Boolean(member)} isAdmin={a.isAdmin} makeMember={makeMember} makeAdmin={inviteAdmin} />
-          </li>
-        );
-      })}
-    </ul>
+    <Card>
+      {accounts.length === 0 ? (
+        <EmptyState icon={UserRound} title="No accounts yet" description="People appear here once they sign up on the site." />
+      ) : (
+        <Table>
+          <THead>
+            <TR>
+              <TH>Name</TH>
+              <TH>Joined</TH>
+              <TH>Last signed in</TH>
+              <TH className="text-right">
+                <span className="sr-only">Actions</span>
+              </TH>
+            </TR>
+          </THead>
+          <TBody>
+            {accounts.map((a) => {
+              const member = linked.get(a.id);
+              return (
+                <TR key={a.id}>
+                  <TD className="min-w-56">
+                    <p className="flex flex-wrap items-center gap-1.5 font-medium text-ui-text">
+                      {a.name}
+                      {member ? <Badge tone="success">Member</Badge> : null}
+                      {a.isAdmin ? <Badge tone="accent">Admin</Badge> : null}
+                    </p>
+                    <p className="text-ui-hint text-ui-text-3">{a.email ?? "No email"}</p>
+                  </TD>
+                  <TD className="whitespace-nowrap text-ui-text-2 tabular-nums">{day.format(a.createdAt)}</TD>
+                  <TD className="whitespace-nowrap text-ui-text-2 tabular-nums">{a.lastSignInAt ? day.format(a.lastSignInAt) : <span className="text-ui-text-3">Never</span>}</TD>
+                  <TD className="text-right">
+                    <AccountActions userId={a.id} email={a.email} name={a.name} isMember={Boolean(member)} isAdmin={a.isAdmin} makeMember={makeMember} makeAdmin={inviteAdmin} />
+                  </TD>
+                </TR>
+              );
+            })}
+          </TBody>
+        </Table>
+      )}
+    </Card>
   );
 }

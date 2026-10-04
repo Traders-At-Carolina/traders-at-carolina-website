@@ -1,14 +1,17 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
-import { buttonClasses } from "@/components/Button";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { SaveToast } from "@/components/admin/SaveToast";
+import { Button } from "@/components/admin/ui/Button";
+import { Card, CardSection } from "@/components/admin/ui/Card";
+import { ConfirmDialog } from "@/components/admin/ui/Dialog";
+import { Field, Input, Select, Textarea } from "@/components/admin/ui/Field";
+import { FormFooter } from "@/components/admin/ui/Form";
 import type { ActionState } from "@/lib/admin/action";
 import type { MemberSnapshot } from "@/lib/admin/members-db";
 import { useUnsavedChanges } from "@/lib/admin/use-unsaved-changes";
-
-const ctl = (bad?: boolean) => `mt-2 min-h-11 w-full border bg-white px-2 text-body focus:border-navy focus:outline-none ${bad ? "border-black" : "border-rule"}`;
 
 /** Edit one roster row (spec 06 §6.2). Notes are admin-only. */
 export function MemberForm({ member, action, remove }: { member: MemberSnapshot; action: (p: ActionState, f: FormData) => Promise<ActionState>; remove: () => Promise<ActionState> }) {
@@ -17,6 +20,8 @@ export function MemberForm({ member, action, remove }: { member: MemberSnapshot;
   const [removeState, removeAction, removing] = useActionState<ActionState>(remove, {});
   const [dirty, setDirty] = useState(false);
   const [seenAt, setSeenAt] = useState(state.at);
+  const [confirming, setConfirming] = useState(false);
+  const removeForm = useRef<HTMLFormElement>(null);
   if (state.at !== seenAt) {
     setSeenAt(state.at);
     if (state.ok) setDirty(false);
@@ -26,76 +31,71 @@ export function MemberForm({ member, action, remove }: { member: MemberSnapshot;
     if (removeState.redirectTo) router.push(removeState.redirectTo);
   }, [removeState.redirectTo, router]);
   const err = state.fieldErrors ?? {};
-  const field = (name: keyof typeof err) => (err[name] ? <p className="mt-1 text-caption text-black">{err[name]}</p> : null);
 
   return (
-    <>
-      <form action={formAction} onChange={() => setDirty(true)} className="grid max-w-2xl gap-5 sm:grid-cols-2" noValidate>
-        <label className="text-caption font-medium text-ink-2">
-          Name
-          <input name="name" defaultValue={member.name} aria-invalid={Boolean(err.name)} className={ctl(Boolean(err.name))} />
-          {field("name")}
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Email
-          <input name="email" type="email" defaultValue={member.email} aria-invalid={Boolean(err.email)} className={ctl(Boolean(err.email))} />
-          {field("email")}
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Status
-          <select name="status" defaultValue={member.status} className={ctl()}>
-            <option value="active">Active</option>
-            <option value="alumni">Alumni</option>
-            <option value="inactive">Inactive (no member access)</option>
-          </select>
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Track
-          <select name="track" defaultValue={member.track ?? ""} className={ctl()}>
-            <option value="">None</option>
-            <option value="trading">Trading</option>
-            <option value="research">Research</option>
-            <option value="development">Development</option>
-          </select>
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Class year
-          <input name="classYear" inputMode="numeric" defaultValue={member.classYear ?? ""} aria-invalid={Boolean(err.classYear)} className={ctl(Boolean(err.classYear))} />
-          {field("classYear")}
-        </label>
-        <label className="text-caption font-medium text-ink-2">
-          Cohort
-          <input name="cohort" defaultValue={member.cohort ?? ""} placeholder="Fall 2026" className={ctl()} />
-        </label>
-        <label className="text-caption font-medium text-ink-2 sm:col-span-2">
-          Notes <span className="font-normal text-ink-3">(admins only)</span>
-          <textarea name="notes" rows={3} defaultValue={member.notes ?? ""} className={`${ctl()} py-2`} />
-        </label>
-        <p className="text-caption text-ink-3 sm:col-span-2">{member.userId ? "Linked to their account." : "Not signed up yet: they become a member when they sign up with this email."}</p>
-        {state.error ? (
-          <p role="alert" className="text-body text-black sm:col-span-2">
-            {state.error}
-          </p>
-        ) : null}
-        <div className="sm:col-span-2">
-          <button type="submit" disabled={pending} className={buttonClasses({ className: "disabled:opacity-60" })}>
-            {pending ? "Saving…" : "Save"}
-          </button>
-        </div>
+    <div className="max-w-3xl">
+      <form action={formAction} onChange={() => setDirty(true)} noValidate>
+        <Card as="div">
+          <CardSection>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Name" error={err.name}>
+                <Input name="name" defaultValue={member.name} />
+              </Field>
+              <Field label="Email" error={err.email}>
+                <Input name="email" type="email" defaultValue={member.email} />
+              </Field>
+              <Field label="Status">
+                <Select name="status" defaultValue={member.status}>
+                  <option value="active">Active</option>
+                  <option value="alumni">Alumni</option>
+                  <option value="inactive">Inactive (no member access)</option>
+                </Select>
+              </Field>
+              <Field label="Track">
+                <Select name="track" defaultValue={member.track ?? ""}>
+                  <option value="">None</option>
+                  <option value="trading">Trading</option>
+                  <option value="research">Research</option>
+                  <option value="development">Development</option>
+                </Select>
+              </Field>
+              <Field label="Class year" error={err.classYear}>
+                <Input name="classYear" inputMode="numeric" defaultValue={member.classYear ?? ""} className="tabular-nums" />
+              </Field>
+              <Field label="Cohort">
+                <Input name="cohort" defaultValue={member.cohort ?? ""} placeholder="Fall 2026" />
+              </Field>
+              <Field label="Notes" hint="Only admins see these." className="sm:col-span-2">
+                <Textarea name="notes" rows={3} defaultValue={member.notes ?? ""} />
+              </Field>
+              <p className="text-ui-hint text-ui-text-3 sm:col-span-2">{member.userId ? "Linked to their account." : "Not signed up yet: they become a member when they sign up with this email."}</p>
+            </div>
+          </CardSection>
+          <FormFooter pending={pending} dirty={dirty} submitLabel="Save" cancelHref="/admin/members" error={state.error} />
+        </Card>
       </form>
-      <form
-        action={removeAction}
-        onSubmit={(e) => {
-          if (!window.confirm(`Remove ${member.name} from the roster? They lose member access on their next page load; their account stays.`)) e.preventDefault();
-        }}
-        className="mt-10 border-t border-rule pt-6"
-      >
-        <button type="submit" disabled={removing} className="min-h-11 text-caption font-medium text-navy hover:underline disabled:opacity-60">
+      <form ref={removeForm} action={removeAction} className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-ui-lg border border-ui-danger/25 bg-ui-surface px-5 py-4 shadow-ui-card">
+        <div>
+          <p className="text-ui-base font-medium text-ui-text">Remove from roster</p>
+          <p className="mt-0.5 text-ui-label text-ui-text-2">They lose member access; their account stays. You can undo this right after.</p>
+          {removeState.error ? <p className="mt-1 text-ui-label font-medium text-ui-danger">{removeState.error}</p> : null}
+        </div>
+        <Button variant="secondary" icon={Trash2} pending={removing} onClick={() => setConfirming(true)} className="text-ui-danger">
           {removing ? "Removing…" : "Remove from roster"}
-        </button>
-        {removeState.error ? <p className="mt-2 text-caption text-black">{removeState.error}</p> : null}
+        </Button>
+        <ConfirmDialog
+          open={confirming}
+          onClose={() => setConfirming(false)}
+          onConfirm={() => {
+            setConfirming(false);
+            removeForm.current?.requestSubmit();
+          }}
+          title={`Remove ${member.name} from the roster?`}
+          description="They lose member access on their next page load; their account stays."
+          confirmLabel="Remove"
+        />
       </form>
       <SaveToast state={state} />
-    </>
+    </div>
   );
 }

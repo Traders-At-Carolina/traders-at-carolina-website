@@ -157,4 +157,9 @@ describe("SiteFooter legal row", () => {
     renderFooter(settings({}, { disclaimer: "Not an official UNC organization." }));
     expect(screen.getByText("Not an official UNC organization.")).toBeInTheDocument();
   });
+
+  it("carries the analytics notice (spec 06 §7.1)", () => {
+    renderFooter();
+    expect(screen.getByText("This site uses privacy-respecting analytics. No cookies.")).toBeInTheDocument();
+  });
 });

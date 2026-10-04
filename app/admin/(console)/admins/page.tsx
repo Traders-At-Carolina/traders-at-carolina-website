@@ -1,5 +1,11 @@
+import { MailOpen } from "lucide-react";
 import { InviteAdminForm } from "@/components/admin/InviteAdminForm";
 import { RowActionForm } from "@/components/admin/RowActionForm";
+import { Badge } from "@/components/admin/ui/Badge";
+import { Card, CardHeader, CardSection } from "@/components/admin/ui/Card";
+import { EmptyState } from "@/components/admin/ui/Feedback";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
+import { Table, TBody, TD, TH, THead, TR } from "@/components/admin/ui/Table";
 import { listAdmins, listPendingAdminInvites } from "@/lib/admin/clerk-admins";
 import { requirePage } from "@/lib/auth/admin";
 import { inviteAdmin, removeAdmin, revokeInvite } from "./actions";
@@ -15,75 +21,96 @@ export default async function AdminsPage() {
 
   return (
     <>
-      <h1 className="text-h1">Admins</h1>
-      <p className="mt-4 max-w-prose text-body text-ink-2">
-        Admins can edit the site and see its analytics. Someone who already has an account gets access straight away; anyone else gets an
-        email invitation.
-      </p>
+      <PageHeader
+        title="Admins"
+        description="Admins can edit the site and see its analytics. Someone who already has an account gets access straight away; anyone else gets an email invitation."
+      />
 
-      <section className="mt-10" aria-labelledby="invite-title">
-        <h2 id="invite-title" className="text-h3">
-          Add an admin
-        </h2>
-        <div className="mt-4 max-w-xl">
-          <InviteAdminForm action={inviteAdmin} />
-        </div>
-      </section>
+      <div className="flex flex-col gap-6">
+        <Card aria-labelledby="invite-title">
+          <CardHeader id="invite-title" title="Add an admin" />
+          <CardSection>
+            <div className="max-w-xl">
+              <InviteAdminForm action={inviteAdmin} />
+            </div>
+          </CardSection>
+        </Card>
 
-      <section className="mt-10" aria-labelledby="admins-title">
-        <h2 id="admins-title" className="text-h3">
-          Current admins ({admins.length})
-        </h2>
-        <ul className="mt-4 divide-y divide-rule border-y border-rule">
-          {admins.map((a) => (
-            <li key={a.id} className="flex items-center justify-between gap-4 py-3">
-              <div>
-                <p className="text-body text-black">
-                  {a.name}
-                  {a.id === userId ? <span className="text-ink-3"> (you)</span> : null}
-                </p>
-                {a.email && a.email !== a.name ? <p className="text-caption text-ink-3">{a.email}</p> : null}
-              </div>
-              {a.id === userId || admins.length <= 1 ? null : (
-                <RowActionForm
-                  action={removeAdmin}
-                  fields={{ userId: a.id }}
-                  label="Remove"
-                  ariaLabel={`Remove ${a.name} as admin`}
-                  confirm={`Remove ${a.name} as an admin? Their account stays; they just lose access to /admin.`}
-                />
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
+        <Card aria-labelledby="admins-title">
+          <CardHeader id="admins-title" title={<>Current admins <span className="font-normal text-ui-text-3 tabular-nums">({admins.length})</span></>} />
+          <Table>
+            <THead>
+              <TR>
+                <TH>Name</TH>
+                <TH>Email</TH>
+                <TH className="text-right">
+                  <span className="sr-only">Actions</span>
+                </TH>
+              </TR>
+            </THead>
+            <TBody>
+              {admins.map((a) => (
+                <TR key={a.id}>
+                  <TD className="font-medium">
+                    <span className="inline-flex flex-wrap items-center gap-1.5">
+                      {a.name}
+                      {a.id === userId ? <Badge>You</Badge> : null}
+                    </span>
+                  </TD>
+                  <TD className="text-ui-text-2">{a.email && a.email !== a.name ? a.email : "—"}</TD>
+                  <TD className="text-right">
+                    {a.id === userId || admins.length <= 1 ? null : (
+                      <RowActionForm
+                        action={removeAdmin}
+                        fields={{ userId: a.id }}
+                        label="Remove"
+                        ariaLabel={`Remove ${a.name} as admin`}
+                        confirm={`Remove ${a.name} as an admin? Their account stays; they just lose access to /admin.`}
+                      />
+                    )}
+                  </TD>
+                </TR>
+              ))}
+            </TBody>
+          </Table>
+        </Card>
 
-      <section className="mt-10" aria-labelledby="invites-title">
-        <h2 id="invites-title" className="text-h3">
-          Pending invitations ({invites.length})
-        </h2>
-        {invites.length === 0 ? (
-          <p className="mt-4 text-ink-3">None.</p>
-        ) : (
-          <ul className="mt-4 divide-y divide-rule border-y border-rule">
-            {invites.map((i) => (
-              <li key={i.id} className="flex items-center justify-between gap-4 py-3">
-                <div>
-                  <p className="text-body text-black">{i.email}</p>
-                  <p className="text-caption text-ink-3">Sent {sent.format(i.createdAt)}</p>
-                </div>
-                <RowActionForm
-                  action={revokeInvite}
-                  fields={{ invitationId: i.id, email: i.email }}
-                  label="Revoke"
-                  ariaLabel={`Revoke the invitation to ${i.email}`}
-                  confirm={`Revoke the invitation to ${i.email}?`}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <Card aria-labelledby="invites-title">
+          <CardHeader id="invites-title" title={<>Pending invitations <span className="font-normal text-ui-text-3 tabular-nums">({invites.length})</span></>} />
+          {invites.length === 0 ? (
+            <EmptyState icon={MailOpen} title="No pending invitations" description="Invitations sent to people without an account wait here until they sign up." />
+          ) : (
+            <Table>
+              <THead>
+                <TR>
+                  <TH>Email</TH>
+                  <TH>Sent</TH>
+                  <TH className="text-right">
+                    <span className="sr-only">Actions</span>
+                  </TH>
+                </TR>
+              </THead>
+              <TBody>
+                {invites.map((i) => (
+                  <TR key={i.id}>
+                    <TD className="font-medium">{i.email}</TD>
+                    <TD className="whitespace-nowrap text-ui-text-2 tabular-nums">{sent.format(i.createdAt)}</TD>
+                    <TD className="text-right">
+                      <RowActionForm
+                        action={revokeInvite}
+                        fields={{ invitationId: i.id, email: i.email }}
+                        label="Revoke"
+                        ariaLabel={`Revoke the invitation to ${i.email}`}
+                        confirm={`Revoke the invitation to ${i.email}?`}
+                      />
+                    </TD>
+                  </TR>
+                ))}
+              </TBody>
+            </Table>
+          )}
+        </Card>
+      </div>
     </>
   );
 }

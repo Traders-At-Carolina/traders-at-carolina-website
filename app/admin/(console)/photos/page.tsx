@@ -1,8 +1,13 @@
+import { Images, Upload } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { buttonClasses } from "@/components/Button";
 import { SaveToast } from "@/components/admin/SaveToast";
 import { SlotsForm } from "@/components/admin/SlotsForm";
+import { Badge } from "@/components/admin/ui/Badge";
+import { ButtonLink } from "@/components/admin/ui/Button";
+import { Card, CardHeader } from "@/components/admin/ui/Card";
+import { EmptyState } from "@/components/admin/ui/Feedback";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { getEntry } from "@/lib/admin/audit";
 import { getSlots, listPhotos } from "@/lib/admin/photos-db";
 import { requirePage } from "@/lib/auth/admin";
@@ -17,30 +22,27 @@ export default async function PhotosPage({ searchParams }: PageProps<"/admin/pho
   const [library, home, membership] = await Promise.all([listPhotos(), getSlots("home"), getSlots("membership")]);
   // A create or delete redirects here with ?saved=<audit id>, so the toast can offer Undo.
   const savedEntry = typeof saved === "string" && /^\d+$/.test(saved) ? await getEntry(Number(saved)) : undefined;
-  const options = library.map((p) => ({ id: p.id, caption: p.caption }));
+  const options = library.map((p) => ({ id: p.id, caption: p.caption, image: p.image }));
   const homeCount = home.filter(Boolean).length;
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-h1">Photos</h1>
-          <p className="mt-4 max-w-prose text-body text-ink-2">The library holds every club photo. Put up to three on Home and three on Membership.</p>
-        </div>
-        <Link href="/admin/photos/new" className={buttonClasses({})}>
-          Add photo
-        </Link>
-      </div>
+      <PageHeader
+        title="Photos"
+        description="The library holds every club photo. Put up to three on Home and three on Membership."
+        actions={
+          <ButtonLink href="/admin/photos/new" variant="primary" icon={Upload}>
+            Upload photo
+          </ButtonLink>
+        }
+      />
 
-      <div className="mt-10 flex flex-col gap-10">
+      <div className="flex flex-col gap-6">
         <SlotsForm
           page="home"
           title="Home photos"
-          hint={
-            homeCount < 2
-              ? "Inside the club needs 2 photos, so it is hidden right now. Slot 1 runs large; slots 2 and 3 stack beside it."
-              : "Inside the club, on the Home page. Slot 1 runs large; slots 2 and 3 stack beside it."
-          }
+          hint="Inside the club, on the Home page. Slot 1 runs large; slots 2 and 3 stack beside it."
+          notice={homeCount < 2 ? "Inside the club needs 2 photos, so it is hidden right now." : undefined}
           slotLabels={["Slot 1 · large", "Slot 2", "Slot 3"]}
           options={options}
           slots={home}
@@ -55,40 +57,66 @@ export default async function PhotosPage({ searchParams }: PageProps<"/admin/pho
           slots={membership}
           action={saveSlots}
         />
-      </div>
 
-      <section aria-labelledby="library-title" className="mt-12 border-t border-rule pt-6">
-        <h2 id="library-title" className="text-h3">
-          Library ({library.length})
-        </h2>
-        {library.length === 0 ? (
-          <p className="mt-4 text-ink-3">No photos yet.</p>
-        ) : (
-          <ul className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-3">
-            {library.map((p) => {
-              const where = [p.homeOrder ? `Home ${p.homeOrder}` : null, p.membershipOrder ? `Membership ${p.membershipOrder}` : null].filter(Boolean);
-              return (
-                <li key={p.id}>
-                  <Link href={`/admin/photos/${p.id}`} className="group block">
-                    <div className={`relative overflow-hidden bg-wash ${p.ratio === "4:5" ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
-                      <Image
-                        src={p.image}
-                        alt={p.alt}
-                        fill
-                        sizes="(min-width: 768px) 240px, 45vw"
-                        placeholder={p.image.blurDataURL ? "blur" : "empty"}
-                        className="object-cover transition-opacity group-hover:opacity-90"
-                      />
-                    </div>
-                    <p className="mt-2 text-body text-black group-hover:underline">{p.caption}</p>
-                    <p className="text-caption text-ink-3">{where.length ? where.join(" · ") : "Not on a page"}</p>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+        <Card aria-labelledby="library-title">
+          <CardHeader
+            id="library-title"
+            title={
+              <span className="flex items-center gap-2">
+                Library
+                <Badge className="tabular-nums">{library.length}</Badge>
+              </span>
+            }
+            description="Select a photo to edit its caption, alt text or crop."
+          />
+          {library.length === 0 ? (
+            <EmptyState
+              icon={Images}
+              title="No photos yet"
+              description="Upload a photo, then put it on Home or Membership above."
+              action={
+                <ButtonLink href="/admin/photos/new" variant="primary" icon={Upload}>
+                  Upload photo
+                </ButtonLink>
+              }
+            />
+          ) : (
+            <ul className="grid grid-cols-2 gap-4 p-5 md:grid-cols-3 xl:grid-cols-4">
+              {library.map((p) => {
+                const where = [p.homeOrder ? `Home ${p.homeOrder}` : null, p.membershipOrder ? `Membership ${p.membershipOrder}` : null].filter((w): w is string => w !== null);
+                return (
+                  <li key={p.id}>
+                    <Link href={`/admin/photos/${p.id}`} className="group flex h-full flex-col rounded-ui-lg border border-ui-border bg-ui-surface p-2 transition-colors duration-150 hover:border-ui-border-strong hover:bg-ui-canvas">
+                      <div className={`relative overflow-hidden rounded-ui-md bg-ui-subtle ${p.ratio === "4:5" ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
+                        <Image
+                          src={p.image}
+                          alt={p.alt}
+                          fill
+                          sizes="(min-width: 1280px) 220px, (min-width: 768px) 30vw, 45vw"
+                          placeholder={p.image.blurDataURL ? "blur" : "empty"}
+                          className="object-cover transition-opacity group-hover:opacity-90"
+                        />
+                      </div>
+                      <p className="mt-2 line-clamp-2 px-1 text-ui-base font-medium text-ui-text group-hover:text-ui-accent">{p.caption}</p>
+                      <div className="mt-auto flex flex-wrap gap-1 px-1 pt-2 pb-1">
+                        {where.length ? (
+                          where.map((w) => (
+                            <Badge key={w} tone="accent">
+                              {w}
+                            </Badge>
+                          ))
+                        ) : (
+                          <Badge>Not on a page</Badge>
+                        )}
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
+      </div>
 
       {savedEntry ? (
         <SaveToast

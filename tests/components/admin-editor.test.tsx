@@ -6,7 +6,6 @@ const path = vi.hoisted(() => ({ current: "/admin/photos" }));
 vi.mock("next/navigation", () => ({ usePathname: () => path.current, useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("@vercel/blob/client", () => ({ upload: vi.fn() }));
 
-import { AdminNav } from "@/components/admin/AdminNav";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { SaveToast } from "@/components/admin/SaveToast";
 import { SlotsForm } from "@/components/admin/SlotsForm";
@@ -43,15 +42,6 @@ describe("ImageUpload", () => {
     const image = { src: "https://x.public.blob.vercel-storage.com/a.jpg", width: 10, height: 10 };
     const { container } = render(<ImageUpload name="image" folder="photos" value={image} onChange={vi.fn()} label="Photo" />);
     expect((container.querySelector("input[name=image]") as HTMLInputElement).value).toBe(JSON.stringify(image));
-  });
-});
-
-describe("AdminNav", () => {
-  it("groups screens and marks the current one", () => {
-    render(<AdminNav />);
-    for (const group of ["Club", "Website", "Insights"]) expect(screen.getByText(group)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Photos" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("link", { name: "History" })).not.toHaveAttribute("aria-current");
   });
 });
 

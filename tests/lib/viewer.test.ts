@@ -14,7 +14,7 @@ const redirect = vi.fn((url: string) => {
 });
 vi.mock("next/navigation", () => ({ redirect: (url: string) => redirect(url) }));
 
-const { PORTAL_SIGN_IN_HREF, requireViewer } = await import("@/lib/auth/viewer");
+const { PORTAL_SIGN_IN_HREF, getViewer, requireViewer } = await import("@/lib/auth/viewer");
 
 const signedIn = () => ({ userId: "user_1" });
 const email = (emailAddress: string, status: string | null) => ({ emailAddress, verification: status ? { status } : null });
@@ -23,6 +23,14 @@ beforeEach(() => {
   vi.clearAllMocks();
   currentUser.mockResolvedValue({ firstName: "Ada", emailAddresses: [email("ada@unc.edu", "verified")] });
   getMembership.mockResolvedValue(null);
+});
+
+describe("getViewer", () => {
+  it("is null for signed-out visitors, without redirecting (the file route answers them itself)", async () => {
+    auth.mockResolvedValue({ userId: null });
+    expect(await getViewer()).toBeNull();
+    expect(redirect).not.toHaveBeenCalled();
+  });
 });
 
 describe("requireViewer", () => {

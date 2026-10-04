@@ -1,3 +1,4 @@
+import { sameState } from "@/lib/admin/same-state";
 import { FormError } from "@/lib/admin/action";
 import {
   deletePerson,
@@ -34,7 +35,7 @@ import type { Handler } from "@/lib/admin/undo";
 import { TAGS } from "@/lib/data/public";
 
 const CHANGED = "This item has changed since. Undo the newer change first.";
-const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+const same = sameState;
 
 /**
  * One Undo handler per website list (spec 06 §3). Each refuses unless the item still looks exactly as the change left

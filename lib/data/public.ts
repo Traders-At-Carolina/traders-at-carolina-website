@@ -39,7 +39,7 @@ export const SCHEDULED_REVALIDATE = 300;
 const VERSION = "v1";
 
 /** Local development without a database falls back to content/*.ts. Production never does (spec 06 §3). */
-const offline = () => !process.env.DATABASE_URL && process.env.NODE_ENV !== "production";
+export const offline = () => !process.env.DATABASE_URL && process.env.NODE_ENV !== "production";
 
 /** Postgres "undefined_table" (42P01), raised directly or as the cause of a Drizzle query error. */
 export function missingTable(error: unknown): boolean {

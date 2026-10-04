@@ -10,6 +10,7 @@ import type { ClubEvent, HomeContent, Partner, Recruiting } from "@/content/type
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
 import { nextFeaturedEvent } from "@/lib/events";
 import { homeApplyCopy, numberSections, type HomeApplyCopy } from "@/lib/home";
+import { HOME_INSIDE_MIN_PHOTOS } from "@/lib/thresholds";
 
 type HomePageProps = {
   home: HomeContent;
@@ -48,7 +49,7 @@ export function HomePage({ home, recruiting, sponsors = [], events = [], now }: 
     { value: partnerFirms !== undefined && sponsors.length === 0 ? String(partnerFirms) : undefined, label: "Partner firms", phrase: `${partnerFirms} partner firms` },
   ];
   const showNumbers = stats.some((s) => s.value) || sponsors.length > 0;
-  const showInside = home.photos.length >= 2;
+  const showInside = home.photos.length >= HOME_INSIDE_MIN_PHOTOS;
   const upcoming = nextFeaturedEvent(events, now);
 
   const keys: SectionKey[] = ["hero", "pillars"];

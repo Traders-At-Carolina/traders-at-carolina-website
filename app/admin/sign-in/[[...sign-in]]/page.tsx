@@ -1,11 +1,12 @@
 import { SignIn } from "@clerk/nextjs";
+import { AuthFrame } from "@/components/admin/AuthFrame";
 
 export const metadata = { title: "Admin sign in" };
 
 export default function Page() {
   return (
-    <main id="main" className="flex flex-1 items-center justify-center px-4 py-16">
+    <AuthFrame>
       <SignIn path="/admin/sign-in" signUpUrl="/admin/sign-up" fallbackRedirectUrl="/admin" />
-    </main>
+    </AuthFrame>
   );
 }
