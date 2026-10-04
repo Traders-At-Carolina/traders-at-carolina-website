@@ -5,6 +5,7 @@ import { PortalButton } from "@/components/PortalButton";
 import { SectionProgress } from "@/components/SectionProgress";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SignOutButton } from "@/components/SignOutButton";
 
 /** Skip link, header, main landmark and footer around every public page (00 §10, §12). /admin has its own shell (spec 06). */
 export function SiteChrome({
@@ -30,6 +31,7 @@ export function SiteChrome({
       </main>
       <SiteFooter wall={wall} settings={recruiting ? { ...site, recruiting } : undefined} />
       <PortalButton />
+      <SignOutButton />
     </>
   );
 }
