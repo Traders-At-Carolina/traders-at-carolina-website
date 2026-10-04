@@ -1,6 +1,6 @@
 # Spec 06 — Admin Dashboard
 
-**Status:** Revision 2, for review · **Date:** 2026-10-03 (revision 1: 2026-10-02) · **Route:** `/admin` (not linked, not indexed) · **Depends on:** [Spec 00](00-vision-and-style.md), and the data shapes in specs [01](01-home.md)–[05](05-apply.md) · **Feeds:** Spec 09 (member portal, to be written)
+**Status:** Revision 2, for review · **Date:** 2026-10-03 (revision 1: 2026-10-02) · **Route:** `/admin` (not linked, not indexed) · **Depends on:** [Spec 00](00-vision-and-style.md), and the data shapes in specs [01](01-home.md)–[05](05-apply.md) · **Feeds:** [Spec 09](09-portal.md) (member portal) · **Console look and navigation:** [Spec 11](11-admin-console.md)
 
 This spec replaces "No CMS until the resource hub exists" (00 §12). Content that officers edit moves from `content/*.ts` into a database. Public pages stay statically cached and update within seconds of a save.
 
@@ -223,7 +223,7 @@ The admin UI uses the spec 00 tokens and the shared primitives (`Button`, `Card`
 
 ### 6.0 Conventions for every screen
 
-- **Sidebar** in four groups: **Club** (Members, Officers, Admins), **Website** (Recruiting, Photos, Sponsors, Placements, Tracks), **Events & portal** (Events, Resources, Announcements, Portal settings), **Insights** (Analytics, Game scores, History). Overview sits above the groups.
+- **Navigation** is defined by [spec 11 §3](11-admin-console.md), which replaces the sidebar described here in revision 2: a top bar with five sections (Overview, Club, Website, Portal, Insights) and a row of sub-tabs. Events moves to Website.
 - **Save feedback.** A toast: "Saved · live in a few seconds", with **Undo** and **View on site**.
 - **Unsaved changes.** Leaving a form with unsaved changes asks first.
 - **"Hidden until…" hints.** Where a public section has a threshold, the editor says so. Examples: "Inside the club needs 2 photos", "The placements list appears at 5 firms", "Home shows Upcoming only for a future featured event".
@@ -539,13 +539,13 @@ Each phase is its own implementation plan and PR. A phase is implemented only wh
 |---|---|---|
 | 0 | Refactor with no behaviour change: `(site)` route group, `ImageAsset`, and the validator split | Done |
 | 1 | Analytics capture: tracking attributes, canonical URLs. Ships early so data accumulates. | Done (footer notice still to add) |
-| 2 | Infrastructure and auth shell: Clerk, Neon, Blob; `proxy.ts`, sign-in, Admins screen, schema `0001` + `0002` (undo columns, Membership photo slots, officer visibility), seed | In review (PR #26) |
-| 3 | **Editor framework + Photos.** `lib/data/public.ts`, `lib/admin/action.ts`, `ImageUpload`, save toast with Undo, History, the console sidebar groups. Photos end to end with Home and Membership slots. The template for every other editor. | |
-| 4 | **Members.** Roster, bulk add with optional invitations, requests, all accounts, CSV export. Fills in the `lib/members/resolve.ts` stub that spec 09 creates. | |
-| 5 | **Website lists.** Sponsors → Placements → Officers (visible flag, academic year) → Tracks, each with its public page cut over. | |
-| 6 | **Recruiting, season and events.** The `settings` and `events` tables, the recruiting cut-over, Home "Upcoming" from events, member-count modes, the 5-minute backstop, the games `DeadlineSwitch` fix. Replaces the interim `portalEvents` and `recruitingTimeline` bodies. | |
-| 7 | **Portal content.** Resources (private Blob store and the file route), Announcements, Portal settings and links. Replaces the remaining interim bodies in `lib/data/portal.ts`. Can run alongside spec 09. | |
-| 8 | **Analytics dashboard** and the Overview visitor metrics. | |
+| 2 | Infrastructure and auth shell: Clerk, Neon, Blob; `proxy.ts`, sign-in, Admins screen, schema `0001` + `0002` (undo columns, Membership photo slots, officer visibility), seed | Done (PR #26) |
+| 3 | **Editor framework + Photos.** `lib/data/public.ts`, `lib/admin/action.ts`, `ImageUpload`, save toast with Undo, History, the console sidebar groups. Photos end to end with Home and Membership slots. The template for every other editor. | Done (PR #32) |
+| 4 | **Members.** Roster, bulk add with optional invitations, requests, all accounts, CSV export. Fills in the `lib/members/resolve.ts` stub that spec 09 creates. | Done (PR #37) |
+| 5 | **Website lists.** Sponsors → Placements → Officers (visible flag, academic year) → Tracks, each with its public page cut over. | Done (PR #38) |
+| 6 | **Recruiting, season and events.** The `settings` and `events` tables, the recruiting cut-over, Home "Upcoming" from events, member-count modes, the 5-minute backstop, the games `DeadlineSwitch` fix. Replaces the interim `portalEvents` and `recruitingTimeline` bodies. | Done (PR #39) |
+| 7 | **Portal content.** Resources (private Blob store and the file route), Announcements, Portal settings and links. Replaces the remaining interim bodies in `lib/data/portal.ts`. Can run alongside spec 09. | Delivered as spec 11 phase C |
+| 8 | **Analytics dashboard** and the Overview visitor metrics. | Delivered as spec 11 phase E |
 
 Members (phase 4) come right after the framework because the portal depends on them. Phase 5's placements work assumes the PlacementWall branch has merged (it has).
 
