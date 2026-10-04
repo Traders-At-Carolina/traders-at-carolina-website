@@ -1,106 +1,100 @@
 "use client";
 
-import { useState } from "react";
-import { buttonClasses } from "@/components/Button";
+import { Copy, CopyPlus } from "lucide-react";
+import { type ReactNode, useRef, useState } from "react";
 import { SaveToast } from "@/components/admin/SaveToast";
+import { Button } from "@/components/admin/ui/Button";
+import { Card, CardHeader, CardSection } from "@/components/admin/ui/Card";
+import { ConfirmDialog } from "@/components/admin/ui/Dialog";
+import { DateTimeInput, Field, Input, Select, Textarea } from "@/components/admin/ui/Field";
+import { FormFooter } from "@/components/admin/ui/Form";
+import { Menu } from "@/components/admin/ui/Menu";
+import { Switch } from "@/components/admin/ui/Switch";
 import type { ClubEvent, Recruiting } from "@/content/types";
 import type { ActionState } from "@/lib/admin/action";
 import { useSaveForm } from "@/lib/admin/use-save-form";
 
 type Action = (p: ActionState, f: FormData) => Promise<ActionState>;
-const ctl = (bad?: boolean) => `mt-2 min-h-11 w-full border bg-white px-2 text-body focus:border-navy focus:outline-none ${bad ? "border-black" : "border-rule"}`;
-const label = "text-caption font-medium text-ink-2";
-const Err = ({ m }: { m?: string }) => (m ? <p className="mt-1 text-caption text-black">{m}</p> : null);
-const Alert = ({ state }: { state: ActionState }) =>
-  state.error ? (
-    <p role="alert" className="text-body text-black">
-      {state.error}
-    </p>
-  ) : null;
+
+/** A radio choice styled as a selectable row; the kit has no radio group yet. */
+function RadioOption({ name, value, checked, onChange, children }: { name: string; value: string; checked: boolean; onChange: () => void; children: ReactNode }) {
+  return (
+    <label className="flex min-h-9 cursor-pointer flex-wrap items-center gap-2.5 rounded-ui-md border border-ui-border bg-ui-surface px-3 py-2 text-ui-base text-ui-text transition-colors duration-150 hover:border-ui-border-strong has-[:checked]:border-ui-accent has-[:checked]:bg-ui-accent-soft">
+      <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="size-4 shrink-0 accent-ui-accent" />
+      {children}
+    </label>
+  );
+}
+
+function Legend({ children }: { children: ReactNode }) {
+  return <legend className="text-ui-label font-medium text-ui-text">{children}</legend>;
+}
 
 /** Recruiting fields (spec 06 §6.5). Dates and times are Eastern, as the inputs show them. */
 export function RecruitingForm({ recruiting, action }: { recruiting: Recruiting; action: Action }) {
-  const { state, formAction, pending, markDirty, err } = useSaveForm(action);
+  const { state, formAction, pending, dirty, markDirty, err } = useSaveForm(action);
   const initial = recruiting.mode ?? (recruiting.applicationsOpen ? "open" : "closed");
   const [mode, setMode] = useState(initial);
   const dt = (v?: string) => (v && v.length === 10 ? `${v}T23:59` : (v ?? ""));
   return (
-    <form action={formAction} onChange={markDirty} className="grid max-w-3xl gap-5 sm:grid-cols-2" noValidate>
-      <fieldset className="sm:col-span-2">
-        <legend className={label}>Applications</legend>
-        <div className="mt-2 flex flex-wrap gap-6">
-          {(
-            [
-              ["open", "Open"],
-              ["closed", "Closed"],
-              ["scheduled", "Scheduled (opens automatically at the next-open time)"],
-            ] as const
-          ).map(([v, l]) => (
-            <label key={v} className="flex min-h-11 items-center gap-2 text-body">
-              <input type="radio" name="mode" value={v} checked={mode === v} onChange={() => setMode(v)} />
-              {l}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <label className={`${label} sm:col-span-2`}>
-        Apply form URL <span className="font-normal text-ink-3">(Google Forms)</span>
-        <input name="applyUrl" type="url" defaultValue={recruiting.applyUrl} placeholder="https://forms.gle/…" aria-invalid={Boolean(err.applyUrl)} className={ctl(Boolean(err.applyUrl))} />
-        <Err m={err.applyUrl} />
-      </label>
-      <label className={`${label} sm:col-span-2`}>
-        “Keep me posted” form URL <span className="font-normal text-ink-3">(Google Forms, optional)</span>
-        <input name="interestFormUrl" type="url" defaultValue={recruiting.interestFormUrl ?? ""} aria-invalid={Boolean(err.interestFormUrl)} className={ctl(Boolean(err.interestFormUrl))} />
-        <Err m={err.interestFormUrl} />
-      </label>
-      <label className={label}>
-        Cycle label
-        <input name="cycleLabel" defaultValue={recruiting.cycleLabel ?? ""} placeholder="Fall 2026" className={ctl()} />
-      </label>
-      <label className={label}>
-        Application length (minutes)
-        <input name="applicationMinutes" inputMode="numeric" defaultValue={recruiting.applicationMinutes ?? ""} aria-invalid={Boolean(err.applicationMinutes)} className={ctl(Boolean(err.applicationMinutes))} />
-        <Err m={err.applicationMinutes} />
-      </label>
-      <label className={label}>
-        Deadline (ET)
-        <input name="applyDeadline" type="datetime-local" defaultValue={dt(recruiting.applyDeadline)} aria-invalid={Boolean(err.applyDeadline)} aria-describedby="deadline-reminder" className={ctl(Boolean(err.applyDeadline))} />
-        <Err m={err.applyDeadline} />
-        <span id="deadline-reminder" className="mt-1 block text-caption font-normal text-ink-3">
-          At the deadline, also close the Google Form.
-        </span>
-      </label>
-      <label className={label}>
-        Next-open date and time (ET)
-        <input
-          name="nextApplicationOpenDate"
-          type="datetime-local"
-          defaultValue={dt(recruiting.nextApplicationOpenDate)}
-          aria-invalid={Boolean(err.nextApplicationOpenDate)}
-          className={ctl(Boolean(err.nextApplicationOpenDate))}
-        />
-        <Err m={err.nextApplicationOpenDate} />
-      </label>
-      <label className={label}>
-        Interviews start
-        <input name="interviewStart" type="date" defaultValue={recruiting.interviewWindow?.start ?? ""} className={ctl()} />
-      </label>
-      <label className={label}>
-        Interviews end
-        <input name="interviewEnd" type="date" defaultValue={recruiting.interviewWindow?.end ?? ""} aria-invalid={Boolean(err.interviewEnd)} className={ctl(Boolean(err.interviewEnd))} />
-        <Err m={err.interviewEnd} />
-      </label>
-      <label className={label}>
-        Decision date
-        <input name="decisionDate" type="date" defaultValue={recruiting.decisionDate ?? ""} aria-invalid={Boolean(err.decisionDate)} className={ctl(Boolean(err.decisionDate))} />
-        <Err m={err.decisionDate} />
-      </label>
-      <div className="sm:col-span-2">
-        <Alert state={state} />
-        <button type="submit" disabled={pending} className={buttonClasses({ className: "mt-2 disabled:opacity-60" })}>
-          {pending ? "Saving…" : "Save recruiting"}
-        </button>
-      </div>
+    <form action={formAction} onChange={markDirty} noValidate>
+      <Card as="div">
+        <CardHeader title="Applications" description="Open or close applications, link the Google Forms and set the cycle's dates." />
+        <CardSection>
+          <fieldset>
+            <Legend>Applications are</Legend>
+            <div className="mt-1.5 grid gap-2 sm:grid-cols-3">
+              {(
+                [
+                  ["open", "Open"],
+                  ["closed", "Closed"],
+                  ["scheduled", "Scheduled (opens automatically at the next-open time)"],
+                ] as const
+              ).map(([v, l]) => (
+                <RadioOption key={v} name="mode" value={v} checked={mode === v} onChange={() => setMode(v)}>
+                  {l}
+                </RadioOption>
+              ))}
+            </div>
+          </fieldset>
+        </CardSection>
+        <CardSection title="Forms">
+          <div className="grid gap-5">
+            <Field label="Apply form URL" hint="Google Forms" error={err.applyUrl}>
+              <Input name="applyUrl" type="url" defaultValue={recruiting.applyUrl} placeholder="https://forms.gle/…" />
+            </Field>
+            <Field label="“Keep me posted” form URL" hint="Google Forms" optional error={err.interestFormUrl}>
+              <Input name="interestFormUrl" type="url" defaultValue={recruiting.interestFormUrl ?? ""} />
+            </Field>
+          </div>
+        </CardSection>
+        <CardSection title="Cycle and dates" description="All times are Eastern.">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Cycle label">
+              <Input name="cycleLabel" defaultValue={recruiting.cycleLabel ?? ""} placeholder="Fall 2026" />
+            </Field>
+            <Field label="Application length (minutes)" error={err.applicationMinutes}>
+              <Input name="applicationMinutes" inputMode="numeric" defaultValue={recruiting.applicationMinutes ?? ""} className="tabular-nums" />
+            </Field>
+            <Field label="Deadline" hint="Eastern time. At the deadline, also close the Google Form." error={err.applyDeadline}>
+              <DateTimeInput name="applyDeadline" defaultValue={dt(recruiting.applyDeadline)} />
+            </Field>
+            <Field label="Next-open date and time" hint="Eastern time" error={err.nextApplicationOpenDate}>
+              <DateTimeInput name="nextApplicationOpenDate" defaultValue={dt(recruiting.nextApplicationOpenDate)} />
+            </Field>
+            <Field label="Interviews start">
+              <Input name="interviewStart" type="date" defaultValue={recruiting.interviewWindow?.start ?? ""} />
+            </Field>
+            <Field label="Interviews end" error={err.interviewEnd}>
+              <Input name="interviewEnd" type="date" defaultValue={recruiting.interviewWindow?.end ?? ""} />
+            </Field>
+            <Field label="Decision date" error={err.decisionDate}>
+              <Input name="decisionDate" type="date" defaultValue={recruiting.decisionDate ?? ""} />
+            </Field>
+          </div>
+        </CardSection>
+        <FormFooter pending={pending} dirty={dirty} submitLabel="Save recruiting" error={state.error} />
+      </Card>
       <SaveToast state={state} />
     </form>
   );
@@ -108,35 +102,34 @@ export function RecruitingForm({ recruiting, action }: { recruiting: Recruiting;
 
 /** "Active members on Home" (spec 06 §6.5 Season card). */
 export function MemberCountForm({ mode, value, activeCount, action }: { mode: "auto" | "manual" | "hidden"; value?: number; activeCount: number; action: Action }) {
-  const { state, formAction, pending, markDirty, err } = useSaveForm(action);
+  const { state, formAction, pending, dirty, markDirty, err } = useSaveForm(action);
   const [m, setM] = useState(mode);
   return (
-    <form action={formAction} onChange={markDirty} className="flex flex-col gap-4" noValidate>
-      <fieldset>
-        <legend className={label}>Active members on Home</legend>
-        <div className="mt-2 flex flex-col gap-1">
-          <label className="flex min-h-11 items-center gap-2 text-body">
-            <input type="radio" name="mode" value="auto" checked={m === "auto"} onChange={() => setM("auto")} />
-            Auto: the Active roster count ({activeCount} now)
-          </label>
-          <label className="flex min-h-11 flex-wrap items-center gap-2 text-body">
-            <input type="radio" name="mode" value="manual" checked={m === "manual"} onChange={() => setM("manual")} />
-            Manual:
-            <input name="value" inputMode="numeric" defaultValue={value ?? ""} aria-label="Number of members" disabled={m !== "manual"} className="min-h-11 w-24 border border-rule bg-white px-2 disabled:opacity-50" />
-          </label>
-          <label className="flex min-h-11 items-center gap-2 text-body">
-            <input type="radio" name="mode" value="hidden" checked={m === "hidden"} onChange={() => setM("hidden")} />
-            Hide the number
-          </label>
-        </div>
-        <Err m={err.value} />
-      </fieldset>
-      <Alert state={state} />
-      <div>
-        <button type="submit" disabled={pending} className={buttonClasses({ variant: "secondary", className: "disabled:opacity-60" })}>
-          {pending ? "Saving…" : "Save"}
-        </button>
-      </div>
+    <form action={formAction} onChange={markDirty} noValidate>
+      <Card as="div">
+        <CardHeader title="Season" description="The member count Home shows." />
+        <CardSection>
+          <fieldset>
+            <Legend>Active members on Home</Legend>
+            <div className="mt-1.5 flex flex-col gap-2">
+              <RadioOption name="mode" value="auto" checked={m === "auto"} onChange={() => setM("auto")}>
+                <span>
+                  Auto: the Active roster count (<span className="tabular-nums">{activeCount}</span> now)
+                </span>
+              </RadioOption>
+              <RadioOption name="mode" value="manual" checked={m === "manual"} onChange={() => setM("manual")}>
+                Manual:
+                <Input name="value" inputMode="numeric" defaultValue={value ?? ""} aria-label="Number of members" aria-invalid={Boolean(err.value) || undefined} disabled={m !== "manual"} className="w-24 tabular-nums" />
+              </RadioOption>
+              <RadioOption name="mode" value="hidden" checked={m === "hidden"} onChange={() => setM("hidden")}>
+                Hide the number
+              </RadioOption>
+            </div>
+            {err.value ? <p className="mt-1.5 text-ui-hint font-medium text-ui-danger">{err.value}</p> : null}
+          </fieldset>
+        </CardSection>
+        <FormFooter pending={pending} dirty={dirty} submitLabel="Save" error={state.error} />
+      </Card>
       <SaveToast state={state} />
     </form>
   );
@@ -156,76 +149,79 @@ export type EventValues = Omit<ClubEvent, "endsAt" | "location" | "description" 
 
 /** Event form (spec 06 §6.10). Only website events can be featured on Home. */
 export function EventForm({ event, action }: { event?: EventValues; action: Action }) {
-  const { state, formAction, pending, markDirty, err } = useSaveForm(action);
+  const { state, formAction, pending, dirty, markDirty, err } = useSaveForm(action);
   const [audience, setAudience] = useState<ClubEvent["audience"]>(event?.audience ?? "public");
   return (
-    <form action={formAction} onChange={markDirty} className="grid max-w-3xl gap-5 sm:grid-cols-2" noValidate>
-      <label className={`${label} sm:col-span-2`}>
-        Title
-        <input name="title" defaultValue={event?.title} aria-invalid={Boolean(err.title)} className={ctl(Boolean(err.title))} />
-        <Err m={err.title} />
-      </label>
-      <label className={label}>
-        Type
-        <select name="type" defaultValue={event?.type ?? "general-meeting"} className={ctl()}>
-          {TYPES.map(([v, l]) => (
-            <option key={v} value={v}>
-              {l}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className={label}>
-        Location
-        <input name="location" defaultValue={event?.location ?? ""} placeholder="Gardner Hall 105" className={ctl()} />
-      </label>
-      <label className={label}>
-        Starts (ET)
-        <input name="startsAt" type="datetime-local" defaultValue={event?.startsAt} aria-invalid={Boolean(err.startsAt)} className={ctl(Boolean(err.startsAt))} />
-        <Err m={err.startsAt} />
-      </label>
-      <label className={label}>
-        Ends (ET, optional)
-        <input name="endsAt" type="datetime-local" defaultValue={event?.endsAt ?? ""} aria-invalid={Boolean(err.endsAt)} className={ctl(Boolean(err.endsAt))} />
-        <Err m={err.endsAt} />
-      </label>
-      <label className={`${label} sm:col-span-2`}>
-        Short description
-        <textarea name="description" rows={2} defaultValue={event?.description ?? ""} className={`${ctl()} py-2`} />
-      </label>
-      <label className={`${label} sm:col-span-2`}>
-        Link (RSVP or details)
-        <input name="url" type="url" defaultValue={event?.url ?? ""} placeholder="https://" aria-invalid={Boolean(err.url)} className={ctl(Boolean(err.url))} />
-        <Err m={err.url} />
-      </label>
-      <fieldset className="sm:col-span-2">
-        <legend className={label}>Audience</legend>
-        <div className="mt-2 flex flex-col gap-1">
-          {(
-            [
-              ["public", "Website and portal"],
-              ["signed_in", "Portal, anyone signed in"],
-              ["members", "Portal, members only"],
-            ] as const
-          ).map(([v, l]) => (
-            <label key={v} className="flex min-h-11 items-center gap-2 text-body">
-              <input type="radio" name="audience" value={v} checked={audience === v} onChange={() => setAudience(v)} />
-              {l}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <label className="flex min-h-11 items-center gap-3 text-body sm:col-span-2">
-        <input type="checkbox" name="featured" defaultChecked={event?.featured} disabled={audience !== "public"} className="size-5" />
-        Feature on Home <span className="text-caption text-ink-3">(Home shows the next featured website event, and hides it once it ends)</span>
-      </label>
-      <Err m={err.featured} />
-      <div className="sm:col-span-2">
-        <Alert state={state} />
-        <button type="submit" disabled={pending} className={buttonClasses({ className: "mt-2 disabled:opacity-60" })}>
-          {pending ? "Saving…" : event ? "Save" : "Add event"}
-        </button>
-      </div>
+    <form action={formAction} onChange={markDirty} noValidate className="max-w-3xl">
+      <Card as="div">
+        <CardSection title="Basics">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Title" error={err.title} className="sm:col-span-2">
+              <Input name="title" defaultValue={event?.title} />
+            </Field>
+            <Field label="Type">
+              <Select name="type" defaultValue={event?.type ?? "general-meeting"}>
+                {TYPES.map(([v, l]) => (
+                  <option key={v} value={v}>
+                    {l}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="Link (RSVP or details)" error={err.url} optional>
+              <Input name="url" type="url" defaultValue={event?.url ?? ""} placeholder="https://" />
+            </Field>
+            <Field label="Short description" optional className="sm:col-span-2">
+              <Textarea name="description" rows={2} defaultValue={event?.description ?? ""} />
+            </Field>
+          </div>
+        </CardSection>
+        <CardSection title="When and where">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Starts" hint="Eastern time" error={err.startsAt}>
+              <DateTimeInput name="startsAt" defaultValue={event?.startsAt} />
+            </Field>
+            <Field label="Ends" hint="Eastern time" error={err.endsAt} optional>
+              <DateTimeInput name="endsAt" defaultValue={event?.endsAt ?? ""} />
+            </Field>
+            <Field label="Location" optional className="sm:col-span-2">
+              <Input name="location" defaultValue={event?.location ?? ""} placeholder="Gardner Hall 105" />
+            </Field>
+          </div>
+        </CardSection>
+        <CardSection title="Visibility">
+          <div className="grid gap-5">
+            <fieldset>
+              <Legend>Audience</Legend>
+              <div className="mt-1.5 grid gap-2 sm:grid-cols-3">
+                {(
+                  [
+                    ["public", "Website and portal"],
+                    ["signed_in", "Portal, anyone signed in"],
+                    ["members", "Portal, members only"],
+                  ] as const
+                ).map(([v, l]) => (
+                  <RadioOption key={v} name="audience" value={v} checked={audience === v} onChange={() => setAudience(v)}>
+                    {l}
+                  </RadioOption>
+                ))}
+              </div>
+            </fieldset>
+            <div>
+              <Switch
+                name="featured"
+                label="Feature on Home"
+                hint="Home shows the next featured website event, and hides it once it ends."
+                defaultChecked={event?.featured}
+                disabled={audience !== "public"}
+                onCheckedChange={markDirty}
+              />
+              {err.featured ? <p className="mt-1.5 text-ui-hint font-medium text-ui-danger">{err.featured}</p> : null}
+            </div>
+          </div>
+        </CardSection>
+        <FormFooter pending={pending} dirty={dirty} submitLabel={event ? "Save" : "Add event"} cancelHref="/admin/events" error={state.error} />
+      </Card>
       <SaveToast state={state} />
     </form>
   );
@@ -235,15 +231,66 @@ export function EventForm({ event, action }: { event?: EventValues; action: Acti
 export function DuplicateButtons({ id, action }: { id: string; action: Action }) {
   const { state, formAction, pending } = useSaveForm(action);
   return (
-    <form action={formAction} className="flex flex-wrap gap-4">
+    <form action={formAction} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="id" value={id} />
-      <button type="submit" disabled={pending} className="min-h-11 text-caption font-medium text-navy underline underline-offset-4 disabled:opacity-60">
+      <Button type="submit" size="sm" icon={Copy} disabled={pending}>
         Duplicate
-      </button>
-      <button type="submit" name="plusWeek" value="1" disabled={pending} className="min-h-11 text-caption font-medium text-navy underline underline-offset-4 disabled:opacity-60">
+      </Button>
+      <Button type="submit" size="sm" icon={CopyPlus} name="plusWeek" value="1" disabled={pending}>
         Duplicate +1 week
-      </button>
-      {state.error ? <p className="text-caption text-black">{state.error}</p> : null}
+      </Button>
+      {state.error ? <p className="w-full text-ui-hint font-medium text-ui-danger">{state.error}</p> : null}
     </form>
+  );
+}
+
+/**
+ * The row menu on the Events list: Edit, Duplicate, Duplicate +1 week and Delete. Duplicate posts the same form as
+ * DuplicateButtons; Delete asks first, as the edit page does.
+ */
+export function EventRowActions({ id, title, duplicateAction, deleteAction }: { id: string; title: string; duplicateAction: Action; deleteAction: () => Promise<ActionState> }) {
+  const dup = useSaveForm(duplicateAction);
+  const del = useSaveForm(deleteAction as unknown as Action);
+  const dupForm = useRef<HTMLFormElement>(null);
+  const plusWeek = useRef<HTMLInputElement>(null);
+  const delForm = useRef<HTMLFormElement>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [seenAt, setSeenAt] = useState(del.state.at);
+  if (del.state.at !== seenAt) {
+    setSeenAt(del.state.at);
+    setConfirming(false);
+  }
+  const duplicate = (week: boolean) => {
+    if (plusWeek.current) plusWeek.current.value = week ? "1" : "";
+    dupForm.current?.requestSubmit();
+  };
+  const error = dup.state.error ? dup.state : del.state.error ? del.state : {};
+  return (
+    <>
+      <Menu
+        label={`Actions for ${title}`}
+        items={[
+          { label: "Edit", href: `/admin/events/${id}` },
+          { label: "Duplicate", onSelect: () => duplicate(false), disabled: dup.pending },
+          { label: "Duplicate +1 week", onSelect: () => duplicate(true), disabled: dup.pending },
+          { label: "Delete", onSelect: () => setConfirming(true), danger: true, disabled: del.pending },
+        ]}
+      />
+      <form ref={dupForm} action={dup.formAction} hidden>
+        <input type="hidden" name="id" value={id} />
+        <input ref={plusWeek} type="hidden" name="plusWeek" defaultValue="" />
+      </form>
+      <form ref={delForm} action={del.formAction} hidden />
+      <ConfirmDialog
+        open={confirming}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => delForm.current?.requestSubmit()}
+        pending={del.pending}
+        title="Delete event?"
+        description={`Delete “${title}”? You can undo this right after.`}
+        confirmLabel="Delete event"
+      />
+      <SaveToast state={error} />
+    </>
   );
 }

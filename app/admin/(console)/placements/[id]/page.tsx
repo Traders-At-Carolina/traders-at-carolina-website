@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { BackLink, UUID } from "@/components/admin/ListPage";
 import { DeleteButton, PlacementForm } from "@/components/admin/ListForms";
+import { UUID } from "@/components/admin/ListPage";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { getPlacement } from "@/lib/admin/lists-db";
 import { requirePage } from "@/lib/auth/admin";
 import { deletePlacementAction, updatePlacementAction } from "../actions";
@@ -14,9 +15,8 @@ export default async function EditPlacementPage({ params }: PageProps<"/admin/pl
   if (!row) notFound();
   return (
     <>
-      <BackLink href="/admin/placements" label="Placements" />
-      <h1 className="mt-2 text-h1">{row.firm}</h1>
-      <div className="mt-8">
+      <PageHeader title={row.firm} crumb={row.firm} />
+      <div className="max-w-2xl">
         <PlacementForm placement={row} action={updatePlacementAction.bind(null, row.id)} />
         <DeleteButton
           action={deletePlacementAction.bind(null, row.id)}

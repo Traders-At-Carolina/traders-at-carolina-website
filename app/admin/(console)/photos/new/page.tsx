@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { PhotoForm } from "@/components/admin/PhotoForm";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { requirePage } from "@/lib/auth/admin";
 import { createPhoto } from "../actions";
 
@@ -9,15 +9,8 @@ export default async function NewPhotoPage() {
   await requirePage();
   return (
     <>
-      <p>
-        <Link href="/admin/photos" className="link-underline text-caption text-navy">
-          Photos
-        </Link>
-      </p>
-      <h1 className="mt-2 text-h1">Add photo</h1>
-      <div className="mt-8">
-        <PhotoForm action={createPhoto} />
-      </div>
+      <PageHeader title="Add photo" crumb="Add photo" description="It goes into the library. Put it on Home or Membership from the Photos screen." />
+      <PhotoForm action={createPhoto} />
     </>
   );
 }

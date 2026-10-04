@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { BackLink, UUID } from "@/components/admin/ListPage";
+import { UUID } from "@/components/admin/ListPage";
 import { DeleteButton } from "@/components/admin/ListForms";
 import { DuplicateButtons, EventForm } from "@/components/admin/SeasonForms";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { getEvent } from "@/lib/admin/settings-db";
 import { requirePage } from "@/lib/auth/admin";
 import { deleteEventAction, duplicateEvent, updateEventAction } from "../actions";
@@ -15,12 +16,8 @@ export default async function EditEventPage({ params }: PageProps<"/admin/events
   if (!row) notFound();
   return (
     <>
-      <BackLink href="/admin/events" label="Events" />
-      <h1 className="mt-2 text-h1">{row.title}</h1>
-      <div className="mt-4">
-        <DuplicateButtons id={row.id} action={duplicateEvent} />
-      </div>
-      <div className="mt-6">
+      <PageHeader title={row.title} crumb={row.title} actions={<DuplicateButtons id={row.id} action={duplicateEvent} />} />
+      <div className="max-w-3xl">
         <EventForm event={row} action={updateEventAction.bind(null, row.id)} />
         <DeleteButton action={deleteEventAction.bind(null, row.id)} confirm={`Delete “${row.title}”? You can undo this right after.`} label="Delete event" />
       </div>

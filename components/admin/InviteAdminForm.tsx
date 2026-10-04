@@ -1,8 +1,11 @@
 "use client";
 
+import { UserPlus } from "lucide-react";
 import { useActionState } from "react";
-import { buttonClasses } from "@/components/Button";
 import type { ActionState } from "@/app/admin/(console)/admins/actions";
+import { Button } from "@/components/admin/ui/Button";
+import { controlClasses } from "@/components/admin/ui/Field";
+import { cx } from "@/components/admin/ui/cx";
 
 type InviteAdminFormProps = { action: (prev: ActionState, formData: FormData) => Promise<ActionState> };
 
@@ -10,11 +13,11 @@ type InviteAdminFormProps = { action: (prev: ActionState, formData: FormData) =>
 export function InviteAdminForm({ action }: InviteAdminFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
   return (
-    <form action={formAction} className="flex flex-col gap-3">
-      <label htmlFor="invite-email" className="text-caption font-medium text-ink-2">
+    <form action={formAction} className="flex flex-col gap-1.5">
+      <label htmlFor="invite-email" className="text-ui-label font-medium text-ui-text">
         Email address
       </label>
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <input
           id="invite-email"
           name="email"
@@ -22,13 +25,14 @@ export function InviteAdminForm({ action }: InviteAdminFormProps) {
           required
           autoComplete="off"
           aria-describedby="invite-status"
-          className="min-h-11 flex-1 border border-rule bg-white px-3 text-body focus:border-navy focus:outline-none"
+          placeholder="name@unc.edu"
+          className={cx(controlClasses, "h-9 flex-1")}
         />
-        <button type="submit" disabled={pending} className={buttonClasses({ className: "disabled:opacity-60" })}>
+        <Button type="submit" variant="primary" icon={UserPlus} pending={pending}>
           {pending ? "Sending…" : "Make admin"}
-        </button>
+        </Button>
       </div>
-      <p id="invite-status" role="status" className={`min-h-6 text-caption ${state.error ? "text-black" : "text-ink-2"}`}>
+      <p id="invite-status" role="status" className={cx("min-h-4 text-ui-hint", state.error ? "font-medium text-ui-danger" : "text-ui-text-2")}>
         {state.error ?? state.ok ?? ""}
       </p>
     </form>

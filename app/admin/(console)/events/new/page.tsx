@@ -1,5 +1,5 @@
-import { BackLink } from "@/components/admin/ListPage";
 import { EventForm } from "@/components/admin/SeasonForms";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { requirePage } from "@/lib/auth/admin";
 import { createEvent } from "../actions";
 
@@ -9,11 +9,8 @@ export default async function NewEventPage() {
   await requirePage();
   return (
     <>
-      <BackLink href="/admin/events" label="Events" />
-      <h1 className="mt-2 text-h1">Add event</h1>
-      <div className="mt-8">
-        <EventForm action={createEvent} />
-      </div>
+      <PageHeader title="Add event" crumb="Add event" description="Website events show on the site and the portal; portal events only after sign-in." />
+      <EventForm action={createEvent} />
     </>
   );
 }

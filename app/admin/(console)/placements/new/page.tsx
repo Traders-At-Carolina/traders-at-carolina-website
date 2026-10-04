@@ -1,5 +1,5 @@
-import { BackLink } from "@/components/admin/ListPage";
 import { PlacementForm } from "@/components/admin/ListForms";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { requirePage } from "@/lib/auth/admin";
 import { createPlacement } from "../actions";
 
@@ -9,11 +9,8 @@ export default async function NewPlacementPage() {
   await requirePage();
   return (
     <>
-      <BackLink href="/admin/placements" label="Placements" />
-      <h1 className="mt-2 text-h1">Add firm</h1>
-      <div className="mt-8">
-        <PlacementForm action={createPlacement} />
-      </div>
+      <PageHeader title="Add firm" crumb="Add firm" description="It feeds the Team firm list, the placement wall and officers' badges." />
+      <PlacementForm action={createPlacement} />
     </>
   );
 }

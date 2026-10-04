@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { BackLink, UUID } from "@/components/admin/ListPage";
 import { DeleteButton, SponsorForm } from "@/components/admin/ListForms";
+import { UUID } from "@/components/admin/ListPage";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { getSponsor } from "@/lib/admin/lists-db";
 import { requirePage } from "@/lib/auth/admin";
 import { deleteSponsorAction, updateSponsorAction } from "../actions";
@@ -14,12 +15,9 @@ export default async function EditSponsorPage({ params }: PageProps<"/admin/spon
   if (!row) notFound();
   return (
     <>
-      <BackLink href="/admin/sponsors" label="Sponsors" />
-      <h1 className="mt-2 text-h1">{row.name}</h1>
-      <div className="mt-8">
-        <SponsorForm sponsor={row} action={updateSponsorAction.bind(null, row.id)} />
-        <DeleteButton action={deleteSponsorAction.bind(null, row.id)} confirm={`Remove ${row.name} from About and Home? You can undo this right after.`} label="Remove sponsor" />
-      </div>
+      <PageHeader title={row.name} crumb={row.name} />
+      <SponsorForm sponsor={row} action={updateSponsorAction.bind(null, row.id)} />
+      <DeleteButton action={deleteSponsorAction.bind(null, row.id)} confirm={`Remove ${row.name} from About and Home? You can undo this right after.`} label="Remove sponsor" />
     </>
   );
 }
