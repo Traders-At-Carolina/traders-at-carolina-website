@@ -39,7 +39,7 @@ The console shares nothing visual with spec 00. It has no bone background, no Ge
 
 These are added to the existing `@theme` in `app/globals.css` under a `ui-` prefix.
 - The global `@theme` resets Tailwind's default colours, radii and shadows, so every console value must be declared here.
-- Tailwind v4 emits only the utilities that are used, and only admin files use `ui-*`. Public pages therefore ship no extra CSS.
+- Only admin files use `ui-*` utilities, so public pages render unchanged. The shared stylesheet still declares the `ui-` custom properties on `:root`; they are unused outside `/admin` and cost a few hundred bytes.
 
 | Token | Value | Use |
 |---|---|---|

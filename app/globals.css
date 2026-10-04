@@ -61,6 +61,59 @@
   --ease-soft: linear(0, 0.018, 0.062, 0.118, 0.189, 0.265, 0.342, 0.418, 0.49, 0.553, 0.615, 0.672, 0.722, 0.767, 0.806, 0.838, 0.868, 0.893, 0.914, 0.932, 0.947, 0.958, 0.968, 0.976, 0.983, 0.988, 0.992, 0.995, 0.998, 1);
 }
 
+/* Admin console tokens — docs/specs/11-admin-console.md §2. Used only under /admin, so public pages emit none of them. */
+@theme {
+  --color-ui-canvas: #f8fafc;
+  --color-ui-surface: #ffffff;
+  --color-ui-subtle: #f1f5f9;
+  --color-ui-border: #e2e8f0;
+  --color-ui-border-strong: #cbd5e1;
+  --color-ui-text: #0f172a;
+  --color-ui-text-2: #475569;
+  --color-ui-text-3: #64748b;
+  --color-ui-accent: #1d6fb8;
+  --color-ui-accent-hover: #185d9b;
+  --color-ui-accent-soft: #e8f1fa;
+  --color-ui-success: #15803d;
+  --color-ui-success-soft: #e9f7ef;
+  --color-ui-warning: #b45309;
+  --color-ui-warning-soft: #fdf3e4;
+  --color-ui-danger: #b91c1c;
+  --color-ui-danger-soft: #fdecec;
+
+  --radius-ui-sm: 6px;
+  --radius-ui-md: 8px;
+  --radius-ui-lg: 12px;
+  --radius-ui-full: 9999px;
+
+  --shadow-ui-card: 0 1px 2px rgb(15 23 42 / 0.06);
+  --shadow-ui-pop: 0 12px 32px -8px rgb(15 23 42 / 0.18), 0 2px 6px rgb(15 23 42 / 0.06);
+
+  /* Type roles (11 §2.2) */
+  --text-ui-title: 1.5rem;
+  --text-ui-title--line-height: 2rem;
+  --text-ui-title--letter-spacing: -0.01em;
+  --text-ui-section: 1rem;
+  --text-ui-section--line-height: 1.5rem;
+  --text-ui-base: 0.875rem;
+  --text-ui-base--line-height: 1.25rem;
+  --text-ui-label: 0.8125rem;
+  --text-ui-label--line-height: 1.125rem;
+  --text-ui-hint: 0.75rem;
+  --text-ui-hint--line-height: 1rem;
+  --text-ui-stat: 1.75rem;
+  --text-ui-stat--line-height: 2rem;
+
+  --animate-ui-pop: ui-pop 120ms ease-out;
+
+  @keyframes ui-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+}
+
 /* Browsers without linear() get the closest cubic-bezier equivalents. */
 @supports not (transition-timing-function: linear(0, 1)) {
   :root {
@@ -76,6 +129,8 @@
   --font-title: var(--font-chivo), "Arial Black", system-ui, sans-serif;
   /* Zetamac's own stack (arithmetic.zetamac.com), for the mental math sprint only (03 §3.7). */
   --font-zetamac: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  /* Admin console only (11 §2.2); app/admin/layout.tsx sets --font-inter. Keep in step with .admin-ui below. */
+  --font-ui: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 @layer base {
@@ -701,5 +756,43 @@ main:has(+ footer [data-cta-band]) > section:last-child {
     position: absolute;
     inset-inline: 0;
     inset-block: min(0px, calc((100% - 44px) / 2));
+  }
+}
+
+/* Admin console scope (11 §2.3): undoes the public base styles inside /admin only. */
+@layer base {
+  html:has(.admin-ui) {
+    background-color: var(--color-ui-canvas);
+  }
+
+  .admin-ui {
+    /* @theme inline doesn't emit --font-ui as a variable, so the stack is repeated here. */
+    font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: var(--text-ui-base);
+    line-height: var(--text-ui-base--line-height);
+    font-feature-settings: "cv11", "ss01";
+    background-color: var(--color-ui-canvas);
+    color: var(--color-ui-text);
+  }
+
+  .admin-ui :where(h1, h2, h3) {
+    font-family: inherit;
+    font-weight: 600;
+  }
+
+  .admin-ui :focus-visible {
+    outline: 2px solid var(--color-ui-accent);
+    outline-offset: 2px;
+  }
+
+  .admin-ui ::selection {
+    background-color: var(--color-ui-accent-soft);
+    color: var(--color-ui-text);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .admin-ui {
+      --animate-ui-pop: none;
+    }
   }
 }

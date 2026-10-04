@@ -1,5 +1,6 @@
 "use client";
 
+import { CircleCheck, TriangleAlert, X } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import type { ActionState } from "@/lib/admin/action";
 import { undoChange } from "@/lib/admin/undo-action";
@@ -20,30 +21,30 @@ export function SaveToast({ state }: { state: ActionState }) {
     return () => window.clearTimeout(timer);
   }, [current.at, current.error]);
 
+  const link = "inline-flex min-h-8 items-center rounded-ui-sm px-2 text-ui-base font-medium text-ui-accent hover:bg-ui-accent-soft disabled:opacity-60";
+
   return (
     <div aria-live="polite" className="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex justify-center md:justify-end">
       {visible ? (
-        <div
-          role="status"
-          className="pointer-events-auto flex max-w-xl flex-wrap items-center gap-x-4 gap-y-2 rounded-[0.625rem] border border-rule bg-black px-4 py-3 text-body text-bone shadow-[0_10px_30px_-12px_rgb(0_0_0/0.4)]"
-        >
-          <span>{current.error ?? current.ok}</span>
+        <div role="status" className="pointer-events-auto flex max-w-xl animate-ui-pop flex-wrap items-center gap-x-2 gap-y-1 rounded-ui-lg border border-ui-border bg-ui-surface py-2 pr-2 pl-4 text-ui-base text-ui-text shadow-ui-pop">
+          {current.error ? <TriangleAlert aria-hidden className="size-4 shrink-0 text-ui-danger" /> : <CircleCheck aria-hidden className="size-4 shrink-0 text-ui-success" />}
+          <span className="mr-2">{current.error ?? current.ok}</span>
           {current.ok && current.undoId && current === state ? (
             <form action={undo}>
               <input type="hidden" name="entryId" value={current.undoId} />
-              <button type="submit" disabled={undoing} className="min-h-11 font-semibold underline underline-offset-4 disabled:opacity-60">
+              <button type="submit" disabled={undoing} className={link}>
                 {undoing ? "Undoing…" : "Undo"}
               </button>
             </form>
           ) : null}
           {current.ok && current.viewHref ? (
-            <a href={current.viewHref} target="_blank" rel="noopener noreferrer" className="min-h-11 content-center font-semibold underline underline-offset-4">
+            <a href={current.viewHref} target="_blank" rel="noopener noreferrer" className={link}>
               View on site
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           ) : null}
-          <button type="button" onClick={() => setHiddenAt(current.at)} aria-label="Dismiss" className="ml-auto min-h-11 min-w-11 text-bone/80 hover:text-bone">
-            ✕
+          <button type="button" onClick={() => setHiddenAt(current.at)} aria-label="Dismiss" className="ml-auto inline-flex size-8 items-center justify-center rounded-ui-md text-ui-text-3 hover:bg-ui-subtle hover:text-ui-text">
+            <X aria-hidden className="size-4" />
           </button>
         </div>
       ) : null}
