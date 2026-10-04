@@ -97,7 +97,7 @@ export function AdminTopBar() {
             aria-label="Search"
             aria-haspopup="dialog"
             aria-keyshortcuts="Meta+K Control+K"
-            className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-on-chrome/75 hover:bg-ui-on-chrome/10 hover:text-ui-on-chrome lg:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-ui-full text-ui-on-chrome/75 hover:bg-ui-on-chrome/10 hover:text-ui-on-chrome lg:hidden"
           >
             <Search aria-hidden className="size-5" />
           </button>
@@ -114,7 +114,7 @@ export function AdminTopBar() {
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
             aria-haspopup="dialog"
-            className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-on-chrome/75 hover:bg-ui-on-chrome/10 hover:text-ui-on-chrome md:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-ui-full text-ui-on-chrome/75 hover:bg-ui-on-chrome/10 hover:text-ui-on-chrome md:hidden"
           >
             <MenuIcon aria-hidden className="size-5" />
           </button>
@@ -147,7 +147,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         <div className="flex h-full flex-col font-ui">
           <div className="flex h-14 items-center justify-between border-b border-ui-border px-4">
             <AdminMark />
-            <button type="button" onClick={onClose} aria-label="Close menu" className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-text-2 hover:bg-ui-subtle">
+            <button type="button" onClick={onClose} aria-label="Close menu" className="inline-flex size-9 items-center justify-center rounded-ui-full text-ui-text-2 hover:bg-ui-subtle">
               <X aria-hidden className="size-5" />
             </button>
           </div>

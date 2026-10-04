@@ -61,7 +61,7 @@ export function Dialog({ open, onClose, title, description, footer, size = "md",
                 </p>
               ) : null}
             </div>
-            <button type="button" onClick={onClose} aria-label="Close" className="-mt-1 -mr-1 inline-flex size-8 items-center justify-center rounded-ui-md text-ui-text-3 hover:bg-ui-subtle hover:text-ui-text">
+            <button type="button" onClick={onClose} aria-label="Close" className="-mt-1 -mr-1 inline-flex size-8 items-center justify-center rounded-ui-full text-ui-text-3 hover:bg-ui-subtle hover:text-ui-text">
               <X aria-hidden className="size-4" />
             </button>
           </div>

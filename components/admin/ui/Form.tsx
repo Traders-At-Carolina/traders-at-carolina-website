@@ -82,7 +82,7 @@ export function DeleteButton({ action, confirm: question, label }: { action: () 
 /** Up/down reorder buttons that work by keyboard (spec 06 §6.0). */
 export function MoveButtons({ action, fields, name, first, last }: { action: Action; fields: Record<string, string>; name: string; first: boolean; last: boolean }) {
   const [state, formAction, pending] = useActionState(action, {});
-  const btn = "inline-flex size-8 items-center justify-center rounded-ui-md text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text disabled:pointer-events-none disabled:opacity-30";
+  const btn = "inline-flex size-8 items-center justify-center rounded-ui-full text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text disabled:pointer-events-none disabled:opacity-30";
   return (
     <form action={formAction} className="flex items-center">
       {Object.entries(fields).map(([k, v]) => (

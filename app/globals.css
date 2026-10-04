@@ -86,17 +86,17 @@
   --color-ui-danger: #9b2c22;
   --color-ui-danger-soft: #f6e3df;
 
-  --radius-ui-sm: 2px;
-  --radius-ui-md: 2px;
-  --radius-ui-lg: 4px;
+  --radius-ui-sm: 6px;
+  --radius-ui-md: 8px;
+  --radius-ui-lg: 12px;
   --radius-ui-full: 9999px;
 
   --shadow-ui-card: 0 1px 2px rgb(42 42 40 / 0.06);
   --shadow-ui-pop: 0 12px 32px -8px rgb(42 42 40 / 0.2), 0 2px 6px rgb(42 42 40 / 0.06);
 
   /* Type roles (11 §2.2) */
-  --text-ui-title: 2rem;
-  --text-ui-title--line-height: 2.5rem;
+  --text-ui-title: 1.875rem;
+  --text-ui-title--line-height: 2.25rem;
   --text-ui-title--letter-spacing: -0.01em;
   --text-ui-section: 1rem;
   --text-ui-section--line-height: 1.5rem;
@@ -778,7 +778,12 @@ main:has(+ footer [data-cta-band]) > section:last-child {
     color: var(--color-ui-text);
   }
 
-  /* h1 keeps the global Georgia (page titles); smaller headings are UI labels. */
+  /* Page titles use Chivo, the Team page's heavy sans; smaller headings are UI labels (11 §2.2). */
+  .admin-ui :where(h1) {
+    font-family: var(--font-title);
+    font-weight: 700;
+  }
+
   .admin-ui :where(h2, h3) {
     font-family: inherit;
     font-weight: 600;

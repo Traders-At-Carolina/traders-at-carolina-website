@@ -19,7 +19,7 @@ const clerkAppearance = {
     colorSuccess: "#3d6b35",
     colorWarning: "#8a5a12",
     fontFamily: "var(--font-public-sans), system-ui, sans-serif",
-    borderRadius: "2px",
+    borderRadius: "8px",
   },
 };
 

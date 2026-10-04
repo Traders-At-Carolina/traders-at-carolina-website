@@ -206,7 +206,7 @@ export default async function AdminHome() {
             {ADMIN_SCREENS.map(({ href, label, description, icon: Icon }) => (
               <li key={href} className="border-t border-ui-border first:border-t-0 sm:nth-2:border-t-0 xl:nth-3:border-t-0">
                 <Link href={href} className="group flex h-full items-start gap-3 px-6 py-4 transition-colors duration-150 hover:bg-ui-canvas">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-ui-md bg-ui-accent-soft text-ui-accent">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-ui-full bg-ui-accent-soft text-ui-accent">
                     <Icon aria-hidden className="size-4" />
                   </span>
                   <span className="min-w-0">

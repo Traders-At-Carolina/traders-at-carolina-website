@@ -18,7 +18,7 @@ Turn `/admin` into a real product console that:
 | Decision | Choice |
 |---|---|
 | Scope | Redesign every existing screen, then finish spec 06 phases 7 and 8 |
-| Look | ~~Clean product SaaS: light slate canvas, white cards, Inter, 8–12px radii, soft shadows~~ **Revision 2:** the public brand (spec 00): bone canvas, white cards, navy accents, Public Sans with Georgia page titles, navy eyebrows, graph-paper canvas, 2–4px radii, a solid navy top bar, warm-tuned status colours |
+| Look | ~~Clean product SaaS: light slate canvas, white cards, Inter, 8–12px radii, soft shadows~~ **Revision 2:** the public brand (spec 00): bone canvas, white cards, navy accents, Public Sans with Chivo page titles, navy eyebrows, graph-paper canvas, 8–12px radii and circular icon buttons, a solid navy top bar, warm-tuned status colours |
 | Navigation | Top bar with five sections; the active section shows a second row of sub-tabs |
 | Extras | ⌘K command palette, game-score moderation, Overview health checks, "View on site" on every editor |
 
@@ -33,7 +33,7 @@ Turn `/admin` into a real product console that:
 
 ## 2. Design language
 
-*Revision 2 (2026-10-04).* The console now speaks the public brand (spec 00): bone canvas, white cards, navy accents, black type, Public Sans for UI and Georgia for page titles. The first build's slate/Inter/blue SaaS look is retired. Officers still know they're in the tool because of the solid navy top bar (§3.2), which the public site never uses as a header, and because the console keeps its dense product layout (cards, tables, sub-tabs) rather than editorial page sections.
+*Revision 2 (2026-10-04).* The console now speaks the public brand (spec 00): bone canvas, white cards, navy accents, black type, Public Sans for UI and Chivo for page titles. The first build's slate/Inter/blue SaaS look is retired. Officers still know they're in the tool because of the solid navy top bar (§3.2), which the public site never uses as a header, and because the console keeps its dense product layout (cards, tables, sub-tabs) rather than editorial page sections.
 
 ### 2.1 Tokens
 
@@ -60,7 +60,7 @@ These live in `app/globals.css` under a `ui-` prefix, so the console's component
 | `--color-ui-success` / `-soft` | `#3d6b35` / `#e8eee0` | — | Open, Live, Active, Saved (5.3:1 on soft) |
 | `--color-ui-warning` / `-soft` | `#8a5a12` / `#f5ecd8` | — | Scheduled, Pending, health warnings (5.0:1 on soft) |
 | `--color-ui-danger` / `-soft` | `#9b2c22` / `#f6e3df` | — | Delete, errors, Closed when overdue (6.1:1 on soft) |
-| `--radius-ui-sm` / `-md` / `-lg` / `-full` | 2px / 2px / 4px / 9999px | spec 00 is square-cornered | Pills and inputs / buttons / cards and dialogs / avatars and switches |
+| `--radius-ui-sm` / `-md` / `-lg` / `-full` | 6px / 8px / 12px / 9999px | softer than spec 00's square corners (rev 2.1) | Small chips / buttons and inputs / cards and dialogs / avatars, switches and every icon-only button or icon tile |
 | `--shadow-ui-card` | `0 1px 2px rgb(42 42 40 / 0.06)` | graphite tint | Cards |
 | `--shadow-ui-pop` | `0 12px 32px -8px rgb(42 42 40 / 0.2), 0 2px 6px rgb(42 42 40 / 0.06)` | graphite tint | Menus, dialogs, palette, toast |
 
@@ -69,14 +69,14 @@ These live in `app/globals.css` under a `ui-` prefix, so the console's component
 ### 2.2 Type
 
 - **Public Sans** (`--font-sans`, already loaded by the root layout) is the UI face: body, labels, buttons, tables, nav. No console-only font is loaded.
-- **Georgia** (`--font-display`, spec 00 §5.1) sets the page title (h1) only, weight 400.
+- **Chivo** (`--font-title`, the Team page's heavy sans) sets the page title (h1) only, weight 700. *(Rev 2.1; was Georgia.)*
 - **Eyebrow:** each page title sits under the section label in the public `eyebrow` style (navy, uppercase, 0.14em tracking).
-- Counts, tables, dates and IDs use `tabular-nums lining-nums` (the public `tabular` utility), because Georgia's figures are old-style.
+- Counts, tables, dates and IDs use `tabular-nums lining-nums` (the public `tabular` utility).
 
 | Role | Face | Size / line height | Weight |
 |---|---|---|---|
 | Eyebrow | Public Sans | 12 / 17, uppercase, 0.14em | 500 |
-| Page title (h1) | Georgia | 32 / 40, tracking −0.01em | 400 |
+| Page title (h1) | Chivo | 30 / 36, tracking −0.01em | 700 |
 | Section title (h2) | Public Sans | 16 / 24 | 600 |
 | Card title (h3) | Public Sans | 14 / 20 | 600 |
 | Body | Public Sans | 14 / 20 | 400 |
@@ -90,7 +90,7 @@ The public type scale (`text-h1`, `text-body` and the rest) is not used inside t
 
 The console shell renders inside `<div class="admin-ui">`. A small `@layer base` block in `globals.css` scoped to `.admin-ui`:
 - sets Public Sans at `ui-base` size, the bone canvas and `ui-text` colour;
-- keeps the global Georgia rule for h1, and sets h2–h3 back to Public Sans, weight 600;
+- sets h1 to Chivo 700, and h2–h3 back to Public Sans, weight 600;
 - sets the focus ring to `2px solid var(--color-ui-accent)` with a 2px offset, and to bone inside `.on-dark` (the top bar), as on the public site;
 - sets selection to navy with white text, as on the public site.
 
@@ -98,7 +98,7 @@ Nothing outside `.admin-ui` changes.
 
 ### 2.4 Clerk
 
-`ClerkProvider` in `app/admin/layout.tsx` gets `appearance.variables` from the §2.1 palette: `colorPrimary` navy, foreground black, muted foreground ink-2, `ui-border`, the status colours, `borderRadius` 2px and the font set to Public Sans. This makes `UserButton` and the sign-in and sign-up cards match.
+`ClerkProvider` in `app/admin/layout.tsx` gets `appearance.variables` from the §2.1 palette: `colorPrimary` navy, foreground black, muted foreground ink-2, `ui-border`, the status colours, `borderRadius` 8px and the font set to Public Sans. This makes `UserButton` and the sign-in and sign-up cards match.
 
 The sign-in and sign-up pages become a centred Clerk card on the bone canvas over a faint graph-paper grid (spec 00 §7.3), under the TAC Admin mark in its navy form (§3.2), with a "Back to the site" link.
 
@@ -196,7 +196,7 @@ The kit is hand-built. No shadcn or Radix is added, to stay consistent with the 
 | `Card`, `CardHeader`, `CardSection` | `ui-surface`, `ui-border`, `radius-ui-lg`, `shadow-ui-card`, 24px inner padding (revision 2: one step roomier). Table rows are 44px. The header has a title, description, and an actions slot. |
 | `StatTile` | Label, value, optional delta or pill, optional sparkline slot, optional link. |
 | `Badge`, `StatusPill` | A pill with a dot. Tones: neutral, accent, success, warning, danger. Status words come from one map: Open, Closed, Live, Scheduled, Expired, Pending, Approved, Declined, Active, Alumni, Inactive, Hidden, Pinned, Featured. |
-| `PageHeader` | Navy eyebrow with the section label ("Admin" on Overview), Georgia h1, a breadcrumb (screen › item) on sub-pages only, one-line description, an actions slot (such as "New event"), and "View on site ↗" when `screenFor(pathname).siteHref` is set. |
+| `PageHeader` | Navy eyebrow with the section label ("Admin" on Overview), Chivo h1, a breadcrumb (screen › item) on sub-pages only, one-line description, an actions slot (such as "New event"), and "View on site ↗" when `screenFor(pathname).siteHref` is set. |
 | `Tabs` | Links using `?tab=`, so they're bookmarkable and need no client state. Each tab can show a count. |
 | `DataTable` | A semantic `<table>` with a sticky header, row hover, and optional selection with a bulk-action bar. It has a row-actions `Menu`, and an `EmptyState` when there are no rows. Below 768px each row renders as a card. |
 | `Menu` | A button-triggered dropdown with keyboard support: arrows, Home/End, Esc, typeahead. |
