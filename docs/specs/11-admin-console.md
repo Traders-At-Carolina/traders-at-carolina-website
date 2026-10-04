@@ -1,6 +1,6 @@
 # Spec 11 — Admin Console
 
-**Status:** Built, awaiting review · **Date:** 2026-10-04 · **Route:** `/admin/**` · **Depends on:** [Spec 06](06-admin.md) (data, actions, phases 7–8), [Spec 09 §8](09-portal.md) · **Amends:** spec 06 §6.0 (sidebar) and §6.1 (Overview)
+**Status:** Built; revision 2 (brand re-skin) in progress · **Date:** 2026-10-04 · **Route:** `/admin/**` · **Depends on:** [Spec 06](06-admin.md) (data, actions, phases 7–8), [Spec 09 §8](09-portal.md) · **Amends:** spec 06 §6.0 (sidebar) and §6.1 (Overview)
 
 Spec 06 defines *what* the admin can do: data, saves, undo, access and the portal contract. This spec defines *how the console looks and is organised*, and adds four power features. Where spec 06 §6.0 describes the sidebar, this spec replaces it. Every other part of spec 06 still applies.
 
@@ -9,7 +9,7 @@ Spec 06 defines *what* the admin can do: data, saves, undo, access and the porta
 ## 1. Goal
 
 Turn `/admin` into a real product console that:
-- looks nothing like the public site, so officers can tell at a glance that they are in the tool and not on a page;
+- shares the public site's palette and type, but reads clearly as the tool (navy top bar, product layout) rather than a page;
 - puts every screen one or two clicks away from a top navbar;
 - lets admins change and oversee everything the site and portal show, including portal content (06 phase 7) and analytics (06 phase 8).
 
@@ -18,13 +18,13 @@ Turn `/admin` into a real product console that:
 | Decision | Choice |
 |---|---|
 | Scope | Redesign every existing screen, then finish spec 06 phases 7 and 8 |
-| Look | Clean product SaaS: light slate canvas, white cards, Inter, 8–12px radii, soft shadows |
+| Look | ~~Clean product SaaS: light slate canvas, white cards, Inter, 8–12px radii, soft shadows~~ **Revision 2:** the public brand (spec 00): bone canvas, white cards, navy accents, Public Sans with Georgia page titles, navy eyebrows, graph-paper canvas, 2–4px radii, a solid navy top bar, warm-tuned status colours |
 | Navigation | Top bar with five sections; the active section shows a second row of sub-tabs |
 | Extras | ⌘K command palette, game-score moderation, Overview health checks, "View on site" on every editor |
 
 ### Not in scope
 
-- Any change to the public site's look. Spec 00 is unchanged, and the public pages must render pixel-identical before and after.
+- Any change to the public site's look. Spec 00 is unchanged (the console borrows its tokens; it doesn't edit them), and the public pages must render pixel-identical before and after.
 - A dark mode. The tokens in §2 are named so a dark set can be added later without renaming anything.
 - New roles. There is still one `admin` role (06 §4.1).
 - Editing page copy. It stays in `content/*.ts` (06 §2).
@@ -33,68 +33,74 @@ Turn `/admin` into a real product console that:
 
 ## 2. Design language
 
-The console shares nothing visual with spec 00. It has no bone background, no Georgia headings, no graph paper, no eyebrows, no `link-underline` and no navy.
+*Revision 2 (2026-10-04).* The console now speaks the public brand (spec 00): bone canvas, white cards, navy accents, black type, Public Sans for UI and Georgia for page titles. The first build's slate/Inter/blue SaaS look is retired. Officers still know they're in the tool because of the solid navy top bar (§3.2), which the public site never uses as a header, and because the console keeps its dense product layout (cards, tables, sub-tabs) rather than editorial page sections.
 
 ### 2.1 Tokens
 
-These are added to the existing `@theme` in `app/globals.css` under a `ui-` prefix.
-- The global `@theme` resets Tailwind's default colours, radii and shadows, so every console value must be declared here.
-- Only admin files use `ui-*` utilities, so public pages render unchanged. The shared stylesheet still declares the `ui-` custom properties on `:root`; they are unused outside `/admin` and cost a few hundred bytes.
+These live in `app/globals.css` under a `ui-` prefix, so the console's components stay independent of the public ones and a value can drift from spec 00 without touching a public page.
+- The global `@theme` resets Tailwind's default colours, radii and shadows, so every console value is declared here.
+- Only admin files use `ui-*` utilities, so public pages render unchanged. The shared stylesheet still declares the `ui-` custom properties on `:root`; they are unused outside `/admin`.
+- Values are spec 00 tokens, flattened to solid colours where spec 00 uses transparency, so `/40`-style opacity modifiers keep working.
 
-| Token | Value | Use |
-|---|---|---|
-| `--color-ui-canvas` | `#f8fafc` | Page background |
-| `--color-ui-surface` | `#ffffff` | Cards, top bar, inputs |
-| `--color-ui-subtle` | `#f1f5f9` | Table headers, hovered rows, inactive pills |
-| `--color-ui-border` | `#e2e8f0` | Card and input borders, dividers |
-| `--color-ui-border-strong` | `#cbd5e1` | Hovered inputs, the active sub-tab outline |
-| `--color-ui-text` | `#0f172a` | Primary text |
-| `--color-ui-text-2` | `#475569` | Secondary text, labels |
-| `--color-ui-text-3` | `#64748b` | Hints, timestamps (4.8:1 on white, 4.5:1 on canvas) |
-| `--color-ui-accent` | `#1d6fb8` | Primary buttons, active tab, links, focus ring (5.2:1 on white) |
-| `--color-ui-accent-hover` | `#185d9b` | Hovered or pressed primary button |
-| `--color-ui-accent-soft` | `#e8f1fa` | Active sub-tab, selected rows, info banners |
-| `--color-ui-success` / `-soft` | `#15803d` / `#e9f7ef` | Open, Live, Active, Saved |
-| `--color-ui-warning` / `-soft` | `#b45309` / `#fdf3e4` | Scheduled, Pending, health warnings |
-| `--color-ui-danger` / `-soft` | `#b91c1c` / `#fdecec` | Delete, errors, Closed (when overdue) |
-| `--radius-ui-sm` / `-md` / `-lg` / `-full` | 6px / 8px / 12px / 9999px | Pills and inputs / buttons / cards and dialogs / avatars and switches |
-| `--shadow-ui-card` | `0 1px 2px rgb(15 23 42 / 0.06)` | Cards |
-| `--shadow-ui-pop` | `0 12px 32px -8px rgb(15 23 42 / 0.18), 0 2px 6px rgb(15 23 42 / 0.06)` | Menus, dialogs, palette, toast |
+| Token | Value | Spec 00 source | Use |
+|---|---|---|---|
+| `--color-ui-canvas` | `#ebeae4` | `bone` | Page background |
+| `--color-ui-surface` | `#ffffff` | `white` | Cards, sub-tab row, inputs, menus |
+| `--color-ui-subtle` | `#f4f3ee` | bone/white midpoint | Table headers, hovered rows, inactive pills |
+| `--color-ui-border` | `#d6d5cf` | `rule` (black 15%) flattened | Card and input borders, dividers |
+| `--color-ui-border-strong` | `#a3a29d` | `rule-strong` flattened | Hovered inputs and cards |
+| `--color-ui-text` | `#000000` | `black` | Primary text |
+| `--color-ui-text-2` | `#474644` | `ink-2` | Secondary text, labels (8.5:1 on subtle) |
+| `--color-ui-text-3` | `#636260` | `ink-3` | Hints, timestamps (5.05:1 on bone, 5.5:1 on subtle) |
+| `--color-ui-accent` | `#233265` | `navy` | Primary buttons, active tabs, links, focus ring |
+| `--color-ui-accent-hover` | `#1e2b56` | `navy-press` | Hovered or pressed primary button |
+| `--color-ui-accent-soft` | `#e9ebf1` | `wash` flattened | Selected rows, active mobile-menu item, info banners |
+| `--color-ui-chrome` / `-on-chrome` | `#233265` / `#ebeae4` | `navy` / `bone` | Top bar fill and text |
+| `--color-ui-chrome-rule` | `rgb(235 234 228 / 0.2)` | `rule-inverse` | Hairlines and outlines on the top bar |
+| `--color-ui-success` / `-soft` | `#3d6b35` / `#e8eee0` | — | Open, Live, Active, Saved (5.3:1 on soft) |
+| `--color-ui-warning` / `-soft` | `#8a5a12` / `#f5ecd8` | — | Scheduled, Pending, health warnings (5.0:1 on soft) |
+| `--color-ui-danger` / `-soft` | `#9b2c22` / `#f6e3df` | — | Delete, errors, Closed when overdue (6.1:1 on soft) |
+| `--radius-ui-sm` / `-md` / `-lg` / `-full` | 2px / 2px / 4px / 9999px | spec 00 is square-cornered | Pills and inputs / buttons / cards and dialogs / avatars and switches |
+| `--shadow-ui-card` | `0 1px 2px rgb(42 42 40 / 0.06)` | graphite tint | Cards |
+| `--shadow-ui-pop` | `0 12px 32px -8px rgb(42 42 40 / 0.2), 0 2px 6px rgb(42 42 40 / 0.06)` | graphite tint | Menus, dialogs, palette, toast |
 
-**Status colours always come with a label or an icon.** Colour is never the only signal.
+**Status colours are an admin-only exception to spec 00 §3** (no red/green). They are warm-tuned (olive, ochre, brick) to sit on bone, are used only for status — never for up/down data — and always come with a label or an icon. Analytics deltas use ink and an arrow, not green/red.
 
 ### 2.2 Type
 
-- **Inter** is loaded via `next/font/google` in `app/admin/layout.tsx` as `--font-ui`. It is used for everything in the console.
-- Counts, tables, dates and IDs use tabular numerals (`font-variant-numeric: tabular-nums`).
+- **Public Sans** (`--font-sans`, already loaded by the root layout) is the UI face: body, labels, buttons, tables, nav. No console-only font is loaded.
+- **Georgia** (`--font-display`, spec 00 §5.1) sets the page title (h1) only, weight 400.
+- **Eyebrow:** each page title sits under the section label in the public `eyebrow` style (navy, uppercase, 0.14em tracking).
+- Counts, tables, dates and IDs use `tabular-nums lining-nums` (the public `tabular` utility), because Georgia's figures are old-style.
 
-| Role | Size / line height | Weight |
-|---|---|---|
-| Page title (h1) | 24 / 32, tracking −0.01em | 600 |
-| Section title (h2) | 16 / 24 | 600 |
-| Card title (h3) | 14 / 20 | 600 |
-| Body | 14 / 20 | 400 |
-| Label | 13 / 18 | 500 |
-| Hint, caption | 12 / 16 | 400 |
-| Stat value | 28 / 32, tabular | 600 |
+| Role | Face | Size / line height | Weight |
+|---|---|---|---|
+| Eyebrow | Public Sans | 12 / 17, uppercase, 0.14em | 500 |
+| Page title (h1) | Georgia | 32 / 40, tracking −0.01em | 400 |
+| Section title (h2) | Public Sans | 16 / 24 | 600 |
+| Card title (h3) | Public Sans | 14 / 20 | 600 |
+| Body | Public Sans | 14 / 20 | 400 |
+| Label | Public Sans | 13 / 18 | 500 |
+| Hint, caption | Public Sans | 12 / 16 | 400 |
+| Stat value | Public Sans | 28 / 32, tabular | 600 |
 
-The public type scale (`text-h1`, `text-body` and the rest) is not used inside the console. The console uses plain Tailwind size utilities with these values, set through `ui-` text tokens.
+The public type scale (`text-h1`, `text-body` and the rest) is not used inside the console; the console keeps its own `ui-` text tokens, sized for a working tool.
 
 ### 2.3 Scope wrapper
 
 The console shell renders inside `<div class="admin-ui">`. A small `@layer base` block in `globals.css` scoped to `.admin-ui`:
-- sets `font-family: var(--font-ui)`, the canvas background and `ui-text` colour;
-- overrides the global h1–h3 rule (which sets Georgia, weight 400) back to Inter, weight 600;
-- sets the focus ring to `2px solid var(--color-ui-accent)` with a 2px offset;
-- sets selection to `ui-accent-soft` with `ui-text`.
+- sets Public Sans at `ui-base` size, the bone canvas and `ui-text` colour;
+- keeps the global Georgia rule for h1, and sets h2–h3 back to Public Sans, weight 600;
+- sets the focus ring to `2px solid var(--color-ui-accent)` with a 2px offset, and to bone inside `.on-dark` (the top bar), as on the public site;
+- sets selection to navy with white text, as on the public site.
 
 Nothing outside `.admin-ui` changes.
 
 ### 2.4 Clerk
 
-`ClerkProvider` in `app/admin/layout.tsx` gets `appearance.variables`: `colorPrimary` set to `ui-accent`, `borderRadius` 8px, and the font set to `--font-ui`. This makes `UserButton` and the sign-in and sign-up cards match.
+`ClerkProvider` in `app/admin/layout.tsx` gets `appearance.variables` from the §2.1 palette: `colorPrimary` navy, foreground black, muted foreground ink-2, `ui-border`, the status colours, `borderRadius` 2px and the font set to Public Sans. This makes `UserButton` and the sign-in and sign-up cards match.
 
-The sign-in and sign-up pages become a centred Clerk card on the canvas, under the TAC Admin mark (§3.2), with a "Back to the site" link.
+The sign-in and sign-up pages become a centred Clerk card on the bone canvas over a faint graph-paper grid (spec 00 §7.3), under the navy club logo and a Georgia "Admin" title (§3.2), with a "Back to the site" link.
 
 ### 2.5 Motion
 
@@ -141,13 +147,13 @@ Spec 06 §6.0 put Events under "Events & portal". It moves to **Website**, becau
 ### 3.2 Top bar
 
 `components/admin/AdminTopBar.tsx` (client):
-- Sticky, 56px tall, on `ui-surface` with a bottom border.
-- **Left:** the TAC Admin mark, linking to `/admin`. It is a 28px rounded `ui-accent` square with "TAC" in white, followed by "Admin" in `ui-text-2`.
+- Sticky, 56px tall, solid `ui-chrome` (navy) with `ui-on-chrome` (bone) text. It carries `.on-dark`, so focus rings inside it are bone (§2.3). *(Revision 2; was white.)*
+- **Left:** the TAC Admin mark, linking to `/admin`: the club logo (`public/brand/logo-bone.svg`, 28px tall), then "Admin" in Public Sans 600.
 - **Centre:** the five section links.
-  - The active one, found with `sectionFor(usePathname())`, gets `ui-text` and a 2px `ui-accent` underline flush with the bar's bottom edge, plus `aria-current="page"`.
-  - Inactive links use `ui-text-2`, turning to `ui-text` on hover.
+  - The active one, found with `sectionFor(usePathname())`, is full bone with a 2px bone underline flush with the bar's bottom edge, plus `aria-current="page"`.
+  - Inactive links are bone at 75% (5.8:1 or better on navy), turning full bone on hover.
 - **Right:**
-  - a search button that reads "Search… ⌘K", or "Ctrl K" off Mac, and opens the palette (§5.1);
+  - a search button that reads "Search… ⌘K", or "Ctrl K" off Mac, and opens the palette (§5.1). It is a bone/10 field with a `ui-chrome-rule` outline;
   - "View site ↗", which opens `/` in a new tab;
   - Clerk `UserButton`.
 
@@ -170,6 +176,7 @@ Spec 06 §6.0 put Events under "Events & portal". It moves to **Website**, becau
 - `<main id="main">` is `max-w-7xl`, with 24px padding on mobile and 32px on desktop.
 - A skip link goes to `#main`.
 - Every page starts with `PageHeader` (§4).
+- **Graph paper (revision 2):** one `aria-hidden` layer with the public `graph-paper` utility (spec 00 §7.3) sits behind the top of `<main>`. Its mask fades it out below the page header, so it never runs behind tables or forms.
 - `MarkInternalBrowser` stays in the shell.
 - **Auth stays per page.** The layout never checks access; every page calls `requirePage()` first (06 §4.3).
 
@@ -186,10 +193,10 @@ The kit is hand-built. No shadcn or Radix is added, to stay consistent with the 
 | `Input`, `Textarea`, `Select`, `Checkbox` | 36px tall, `ui-border`, `radius-ui-md`. The focus ring is `ui-accent`. |
 | `Switch` | A `role="switch"` button bound to a hidden input. Used for booleans: pinned, featured, visible, show on wall, the access settings. |
 | `DateTimeInput` | `datetime-local`, labelled "Eastern time", keeping the Eastern ISO strings from 06 §5. |
-| `Card`, `CardHeader`, `CardSection` | `ui-surface`, `ui-border`, `radius-ui-lg`, `shadow-ui-card`. The header has a title, description, and an actions slot. |
+| `Card`, `CardHeader`, `CardSection` | `ui-surface`, `ui-border`, `radius-ui-lg`, `shadow-ui-card`, 24px inner padding (revision 2: one step roomier). Table rows are 44px. The header has a title, description, and an actions slot. |
 | `StatTile` | Label, value, optional delta or pill, optional sparkline slot, optional link. |
 | `Badge`, `StatusPill` | A pill with a dot. Tones: neutral, accent, success, warning, danger. Status words come from one map: Open, Closed, Live, Scheduled, Expired, Pending, Approved, Declined, Active, Alumni, Inactive, Hidden, Pinned, Featured. |
-| `PageHeader` | Breadcrumb (section › screen › item), h1, one-line description, an actions slot (such as "New event"), and "View on site ↗" when `screenFor(pathname).siteHref` is set. |
+| `PageHeader` | Navy eyebrow with the section label ("Admin" on Overview), Georgia h1, a breadcrumb (screen › item) on sub-pages only, one-line description, an actions slot (such as "New event"), and "View on site ↗" when `screenFor(pathname).siteHref` is set. |
 | `Tabs` | Links using `?tab=`, so they're bookmarkable and need no client state. Each tab can show a count. |
 | `DataTable` | A semantic `<table>` with a sticky header, row hover, and optional selection with a bulk-action bar. It has a row-actions `Menu`, and an `EmptyState` when there are no rows. Below 768px each row renders as a card. |
 | `Menu` | A button-triggered dropdown with keyboard support: arrows, Home/End, Esc, typeahead. |
@@ -342,6 +349,7 @@ Each phase is its own plan and PR, implemented only when asked. Spec 06 phases 7
 | C | Spec 06 phase 7: Announcements, Resources (private Blob and `/portal/files/[id]`), Portal settings and links, migration `0006` | Built (branch claude/admin-page-ui-design-cf692e) |
 | D | Overview dashboard (§5.2), health checks (§5.3), game moderation (§5.4), ⌘K palette (§5.1) | Built (branch claude/admin-page-ui-design-cf692e) |
 | E | Spec 06 phase 8: `/admin/analytics`, the Overview visitors row, and the footer analytics notice | Built (branch claude/admin-page-ui-design-cf692e) |
+| R2 | Revision 2 brand re-skin (§2, §3.2, §3.5, §4): `ui-*` tokens re-pointed at spec 00, Public Sans and Georgia titles replace Inter, navy top bar with the logo, eyebrows, graph paper, Clerk appearance, roomier cards and rows | In progress (branch claude/admin-page-ui-revision-501cff) |
 
 **Setup for phase E:** add `POSTHOG_PERSONAL_API_KEY` (read-only scope) and `POSTHOG_PROJECT_ID` to Vercel and `.env.local`.
 
@@ -359,6 +367,7 @@ Each phase is its own plan and PR, implemented only when asked. Spec 06 phases 7
 - [ ] Each health check links to the screen that fixes it, and one failing check doesn't hide the others.
 - [ ] Deleting a game score or contact can be undone from the toast and from History.
 - [ ] Text and controls meet WCAG AA contrast, focus is always visible, and status is never shown by colour alone.
+- [ ] (R2) The console uses only spec 00 colours plus the three warm status hues; no slate, Inter or `#1d6fb8` remains, and analytics deltas never use green/red.
 - [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` and `pnpm build` pass.
 
 ---
