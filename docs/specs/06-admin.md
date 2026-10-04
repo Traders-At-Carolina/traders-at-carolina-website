@@ -544,8 +544,8 @@ Each phase is its own implementation plan and PR. A phase is implemented only wh
 | 4 | **Members.** Roster, bulk add with optional invitations, requests, all accounts, CSV export. Fills in the `lib/members/resolve.ts` stub that spec 09 creates. | Done (PR #37) |
 | 5 | **Website lists.** Sponsors → Placements → Officers (visible flag, academic year) → Tracks, each with its public page cut over. | Done (PR #38) |
 | 6 | **Recruiting, season and events.** The `settings` and `events` tables, the recruiting cut-over, Home "Upcoming" from events, member-count modes, the 5-minute backstop, the games `DeadlineSwitch` fix. Replaces the interim `portalEvents` and `recruitingTimeline` bodies. | Done (PR #39) |
-| 7 | **Portal content.** Resources (private Blob store and the file route), Announcements, Portal settings and links. Replaces the remaining interim bodies in `lib/data/portal.ts`. Can run alongside spec 09. | Delivered as spec 11 phase C |
-| 8 | **Analytics dashboard** and the Overview visitor metrics. | Delivered as spec 11 phase E |
+| 7 | **Portal content.** Resources (private Blob store and the file route), Announcements, Portal settings and links. Replaces the remaining interim bodies in `lib/data/portal.ts`. Can run alongside spec 09. | Built as spec 11 phase C |
+| 8 | **Analytics dashboard** and the Overview visitor metrics. | Built as spec 11 phase E |
 
 Members (phase 4) come right after the framework because the portal depends on them. Phase 5's placements work assumes the PlacementWall branch has merged (it has).
 

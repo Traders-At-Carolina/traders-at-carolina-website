@@ -1,6 +1,6 @@
 # Spec 11 — Admin Console
 
-**Status:** For review · **Date:** 2026-10-04 · **Route:** `/admin/**` · **Depends on:** [Spec 06](06-admin.md) (data, actions, phases 7–8), [Spec 09 §8](09-portal.md) · **Amends:** spec 06 §6.0 (sidebar) and §6.1 (Overview)
+**Status:** Built, awaiting review · **Date:** 2026-10-04 · **Route:** `/admin/**` · **Depends on:** [Spec 06](06-admin.md) (data, actions, phases 7–8), [Spec 09 §8](09-portal.md) · **Amends:** spec 06 §6.0 (sidebar) and §6.1 (Overview)
 
 Spec 06 defines *what* the admin can do: data, saves, undo, access and the portal contract. This spec defines *how the console looks and is organised*, and adds four power features. Where spec 06 §6.0 describes the sidebar, this spec replaces it. Every other part of spec 06 still applies.
 
@@ -337,11 +337,11 @@ Each phase is its own plan and PR, implemented only when asked. Spec 06 phases 7
 
 | Phase | Ships | Status |
 |---|---|---|
-| A | Tokens, Inter, `.admin-ui`, Clerk appearance, `nav.ts`, top bar, sub-tabs, mobile sheet, UI kit, sign-in pages, Overview re-skinned on its current data | |
-| B | Every existing screen re-skinned on the kit (§6), plus "View on site" (§5.5). Can split into B1 Club, B2 Website, B3 Insights. | |
-| C | Spec 06 phase 7: Announcements, Resources (private Blob and `/portal/files/[id]`), Portal settings and links, migration `0006` | |
-| D | Overview dashboard (§5.2), health checks (§5.3), game moderation (§5.4), ⌘K palette (§5.1) | |
-| E | Spec 06 phase 8: `/admin/analytics`, the Overview visitors row, and the footer analytics notice | |
+| A | Tokens, Inter, `.admin-ui`, Clerk appearance, `nav.ts`, top bar, sub-tabs, mobile sheet, UI kit, sign-in pages, Overview re-skinned on its current data | Built (branch claude/admin-page-ui-design-cf692e) |
+| B | Every existing screen re-skinned on the kit (§6), plus "View on site" (§5.5). Can split into B1 Club, B2 Website, B3 Insights. | Built (branch claude/admin-page-ui-design-cf692e) |
+| C | Spec 06 phase 7: Announcements, Resources (private Blob and `/portal/files/[id]`), Portal settings and links, migration `0006` | Built (branch claude/admin-page-ui-design-cf692e) |
+| D | Overview dashboard (§5.2), health checks (§5.3), game moderation (§5.4), ⌘K palette (§5.1) | Built (branch claude/admin-page-ui-design-cf692e) |
+| E | Spec 06 phase 8: `/admin/analytics`, the Overview visitors row, and the footer analytics notice | Built (branch claude/admin-page-ui-design-cf692e) |
 
 **Setup for phase E:** add `POSTHOG_PERSONAL_API_KEY` (read-only scope) and `POSTHOG_PROJECT_ID` to Vercel and `.env.local`.
 
