@@ -130,8 +130,8 @@ Membership lives in the `members` table, not in Clerk metadata. There is one sou
 ### 4.2 Sign-in
 
 - **Admins** sign in at `/admin/sign-in`. `/admin/sign-up` is an ordinary sign-up page (sign-up is public). A new account is not an admin until another admin grants the role (§6.4).
-- **Requirement:** the Clerk session token must be customised with `{"metadata":"{{user.public_metadata}}"}`. Without it nobody is an admin. If a signed-in user reaches `/admin` and the claim is missing entirely, the 404 is replaced by a notice that names this setting.
-- **First admin.** Bootstrapped by hand in the Clerk dashboard. After that, admins add each other (§6.4).
+- **Who is an admin.** A signed-in user whose live Clerk `publicMetadata.role` is `admin`, or whose verified email is listed in the `ADMIN_EMAILS` env var (comma-separated). The check reads the Clerk user on each request, so no session token customisation is needed.
+- **First admin.** Put their email in `ADMIN_EMAILS`. After that, admins add each other (§6.4).
 
 ### 4.3 Enforcement
 
@@ -556,8 +556,7 @@ Members (phase 4) come right after the framework because the portal depends on t
 - [ ] Link the Vercel project, and add the Clerk, Neon and PostHog integrations, a public Blob store and a private Blob store.
 - [ ] **Clerk**
   - [ ] Keep sign-up mode **Public** (games and portal need it).
-  - [ ] Add `{"metadata":"{{user.public_metadata}}"}` to the session token. Without it nobody is an admin.
-  - [ ] Make the first admin by hand: set `{"role":"admin"}` in their public metadata.
+  - [ ] Set `ADMIN_EMAILS` (comma-separated) to the first admin's email. Later admins are granted from the Admins screen.
 - [ ] **A separate database per environment.** Site content lives in Neon, so an edit made against a shared database reaches the live site. Today Production, Preview and Development share one branch.
   - [ ] **Production** uses the main Neon branch, and nothing else does.
   - [ ] **Preview:** turn on "create a branch for each preview deployment" in the Neon Vercel integration. Each preview gets a copy of production's data. Edits there never reach the live site. Stale branches are deleted automatically.

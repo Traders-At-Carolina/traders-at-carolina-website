@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("next/cache", () => ({ updateTag: vi.fn(), revalidatePath: vi.fn(), unstable_cache: (fn: unknown) => fn }));
 vi.mock("next/navigation", () => ({ notFound: vi.fn(), redirect: vi.fn() }));
 vi.mock("@clerk/nextjs/server", () => ({
-  auth: async () => ({ userId: "admin_1", sessionClaims: { metadata: { role: "admin" } } }),
-  currentUser: async () => ({ primaryEmailAddress: { emailAddress: "officer@unc.edu" } }),
+  auth: async () => ({ userId: "admin_1" }),
+  currentUser: async () => ({ publicMetadata: { role: "admin" }, emailAddresses: [], primaryEmailAddress: { emailAddress: "officer@unc.edu" } }),
 }));
 const recordAudit = vi.hoisted(() => vi.fn(async () => 5));
 vi.mock("@/lib/admin/audit", () => ({ recordAudit }));

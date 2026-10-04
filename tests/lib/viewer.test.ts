@@ -16,7 +16,7 @@ vi.mock("next/navigation", () => ({ redirect: (url: string) => redirect(url) }))
 
 const { PORTAL_SIGN_IN_HREF, requireViewer } = await import("@/lib/auth/viewer");
 
-const signedIn = (metadata: Record<string, unknown> = {}) => ({ userId: "user_1", sessionClaims: { metadata } });
+const signedIn = () => ({ userId: "user_1" });
 const email = (emailAddress: string, status: string | null) => ({ emailAddress, verification: status ? { status } : null });
 
 beforeEach(() => {
@@ -27,7 +27,7 @@ beforeEach(() => {
 
 describe("requireViewer", () => {
   it("sends signed-out visitors to sign-in, which returns them to the portal", async () => {
-    auth.mockResolvedValue({ userId: null, sessionClaims: null });
+    auth.mockResolvedValue({ userId: null });
     await expect(requireViewer()).rejects.toThrow("NEXT_REDIRECT");
     expect(redirect).toHaveBeenCalledWith("/account/sign-in?redirect_url=%2Fportal");
     expect(PORTAL_SIGN_IN_HREF).toBe("/account/sign-in?redirect_url=%2Fportal");
@@ -56,12 +56,14 @@ describe("requireViewer", () => {
   });
 
   it("counts admins as members whether or not they're on the roster", async () => {
-    auth.mockResolvedValue(signedIn({ role: "admin" }));
+    auth.mockResolvedValue(signedIn());
+    currentUser.mockResolvedValue({ firstName: "Ada", publicMetadata: { role: "admin" }, emailAddresses: [email("ada@unc.edu", "verified")] });
     expect(await requireViewer()).toMatchObject({ isMember: true, isAdmin: true });
   });
 
   it("never reads membership from Clerk metadata", async () => {
-    auth.mockResolvedValue(signedIn({ role: "member" }));
+    auth.mockResolvedValue(signedIn());
+    currentUser.mockResolvedValue({ firstName: "Ada", publicMetadata: { role: "member" }, emailAddresses: [email("ada@unc.edu", "verified")] });
     expect(await requireViewer()).toMatchObject({ isMember: false, isAdmin: false });
   });
 

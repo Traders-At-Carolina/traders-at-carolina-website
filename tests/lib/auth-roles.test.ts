@@ -1,17 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { isAdminClaims } from "@/lib/auth/roles";
+import { adminEmails, isAdminAccount } from "@/lib/auth/roles";
 
-describe("isAdminClaims", () => {
-  it("accepts a session whose public metadata carries the admin role", () => {
-    expect(isAdminClaims({ metadata: { role: "admin" } })).toBe(true);
+const email = (emailAddress: string, status = "verified") => ({ emailAddress, verification: { status } });
+
+describe("adminEmails", () => {
+  it("splits, trims and lowercases the env value", () => {
+    expect(adminEmails(" A@unc.edu, b@UNC.edu ,,")).toEqual(["a@unc.edu", "b@unc.edu"]);
+    expect(adminEmails(undefined)).toEqual([]);
+  });
+});
+
+describe("isAdminAccount", () => {
+  it("accepts the admin role in public metadata", () => {
+    expect(isAdminAccount({ publicMetadata: { role: "admin" }, emailAddresses: [] }, [])).toBe(true);
   });
 
-  it("rejects missing claims, missing metadata and other roles", () => {
-    expect(isAdminClaims(null)).toBe(false);
-    expect(isAdminClaims(undefined)).toBe(false);
-    expect(isAdminClaims({})).toBe(false);
-    expect(isAdminClaims({ metadata: {} })).toBe(false);
-    expect(isAdminClaims({ metadata: { role: "member" } })).toBe(false);
-    expect(isAdminClaims({ metadata: "admin" })).toBe(false);
+  it("accepts a verified email on the allowlist, ignoring case", () => {
+    expect(isAdminAccount({ publicMetadata: {}, emailAddresses: [email("Me@UNC.edu")] }, ["me@unc.edu"])).toBe(true);
+  });
+
+  it("rejects unverified allowlisted emails, other roles and strangers", () => {
+    expect(isAdminAccount({ publicMetadata: {}, emailAddresses: [email("me@unc.edu", "unverified")] }, ["me@unc.edu"])).toBe(false);
+    expect(isAdminAccount({ publicMetadata: { role: "member" }, emailAddresses: [email("x@unc.edu")] }, ["me@unc.edu"])).toBe(false);
+    expect(isAdminAccount({ publicMetadata: null, emailAddresses: [] }, [])).toBe(false);
   });
 });
