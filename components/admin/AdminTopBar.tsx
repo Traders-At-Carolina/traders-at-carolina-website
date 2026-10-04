@@ -1,11 +1,12 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
-import { ArrowUpRight, Menu as MenuIcon, X } from "lucide-react";
+import { ArrowUpRight, Menu as MenuIcon, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ADMIN_SECTIONS, screenFor, sectionFor, sectionHref } from "@/lib/admin/nav";
+import { CommandPalette } from "./CommandPalette";
 import { cx } from "./ui/cx";
 import { useModal } from "./ui/Dialog";
 
@@ -21,11 +22,29 @@ export function AdminMark() {
   );
 }
 
+type NavigatorWithUAData = Navigator & { userAgentData?: { platform?: string } };
+
+const noSubscribe = () => () => {};
+
+/** True on Apple platforms, false elsewhere, null on the server and during hydration (so the markup matches). */
+function useIsMac(): boolean | null {
+  return useSyncExternalStore(
+    noSubscribe,
+    () => {
+      const nav = navigator as NavigatorWithUAData;
+      return /mac|iphone|ipad|ipod/i.test(nav.userAgentData?.platform || nav.platform || nav.userAgent || "");
+    },
+    () => null,
+  );
+}
+
 /** Sticky top bar with the five sections, View site and the account menu (spec 11 §3.2, §3.4). */
 export function AdminTopBar() {
   const pathname = usePathname();
   const active = sectionFor(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const isMac = useIsMac();
 
   return (
     <header className="sticky top-0 z-30 border-b border-ui-border bg-ui-surface">
@@ -56,6 +75,31 @@ export function AdminTopBar() {
           </ul>
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            aria-haspopup="dialog"
+            aria-keyshortcuts="Meta+K Control+K"
+            className="hidden h-8 w-56 items-center gap-2 rounded-ui-md border border-ui-border bg-ui-surface pr-1.5 pl-2.5 text-ui-label text-ui-text-3 transition-colors duration-150 hover:border-ui-border-strong hover:text-ui-text-2 lg:inline-flex"
+          >
+            <Search aria-hidden className="size-4" />
+            <span>Search…</span>
+            {isMac !== null ? (
+              <kbd aria-hidden className="ml-auto rounded-ui-sm border border-ui-border bg-ui-subtle px-1.5 font-ui text-ui-hint font-medium text-ui-text-3">
+                {isMac ? "⌘K" : "Ctrl K"}
+              </kbd>
+            ) : null}
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            aria-label="Search"
+            aria-haspopup="dialog"
+            aria-keyshortcuts="Meta+K Control+K"
+            className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-text-2 hover:bg-ui-subtle hover:text-ui-text lg:hidden"
+          >
+            <Search aria-hidden className="size-5" />
+          </button>
           <a href="/" target="_blank" rel="noopener noreferrer" className="hidden h-8 items-center gap-1 rounded-ui-md px-2.5 text-ui-label font-medium text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text sm:inline-flex">
             View site
             <ArrowUpRight aria-hidden className="size-4" />
@@ -76,6 +120,7 @@ export function AdminTopBar() {
         </div>
       </div>
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </header>
   );
 }

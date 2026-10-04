@@ -16,6 +16,7 @@ import type { ImageAsset } from "@/content/types";
 import type { ActionState } from "@/lib/admin/action";
 import type { PhotoSnapshot } from "@/lib/admin/photos";
 import { useUnsavedChanges } from "@/lib/admin/use-unsaved-changes";
+import { MIN_PHOTO_WIDTH } from "@/lib/thresholds";
 
 type Action = (prev: ActionState, formData: FormData) => Promise<ActionState>;
 
@@ -103,7 +104,7 @@ export function PhotoForm({ photo, action, deleteAction, placements = [] }: Phot
           </Card>
         </form>
 
-        <PreviewPanel note={image && image.width < 1200 ? `This photo is ${image.width}px wide and may look soft on large screens.` : undefined}>
+        <PreviewPanel note={image && image.width < MIN_PHOTO_WIDTH ? `This photo is ${image.width}px wide and may look soft on large screens.` : undefined}>
           <figure className="bg-ui-surface p-3">
             <div className={`relative overflow-hidden rounded-ui-md bg-ui-subtle ${ratio === "4:5" ? "aspect-[4/5]" : "aspect-[3/2]"}`}>
               {image ? (

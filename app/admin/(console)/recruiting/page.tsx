@@ -4,8 +4,8 @@ import { MemberCountForm, RecruitingForm } from "@/components/admin/SeasonForms"
 import { StatusPill } from "@/components/admin/ui/Badge";
 import { Card, CardHeader, CardSection } from "@/components/admin/ui/Card";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
-import { getApplicationState } from "@/lib/applications";
 import { getSeasonSetting } from "@/lib/admin/lists-db";
+import { recruitingStatus } from "@/lib/admin/recruiting-status";
 import { requirePage } from "@/lib/auth/admin";
 import { getRecruiting } from "@/lib/data/public";
 import { parseEasternDateTime } from "@/lib/eastern-time";
@@ -39,19 +39,8 @@ export default async function RecruitingPage() {
     getSeasonSetting(),
     db().select({ n: count() }).from(members).where(eq(members.status, "active")),
   ]);
-  const state = getApplicationState(new Date(), recruiting);
-  const status =
-    state.status === "open"
-      ? state.deadline
-        ? `Open · closes ${when.format(state.deadline)} ET`
-        : "Open · no deadline set"
-      : state.nextOpen
-        ? `Closed · ${recruiting.mode === "scheduled" ? "opens automatically" : "next opens"} ${when.format(state.nextOpen)} ET`
-        : "Closed";
+  const { pill, label, detail } = recruitingStatus(new Date(), recruiting);
   const count_ = season.memberCount;
-  const pill = state.status === "open" ? "open" : state.nextOpen && recruiting.mode === "scheduled" ? "scheduled" : "closed";
-  const label = status.split(" · ")[0];
-  const detail = status.includes(" · ") ? status.slice(status.indexOf(" · ") + 3) : undefined;
   const interviews = recruiting.interviewWindow ? [fmtDay(recruiting.interviewWindow.start), fmtDay(recruiting.interviewWindow.end)].filter(Boolean).join(" – ") : undefined;
   const dates: Array<[string, string | undefined]> = [
     ["Cycle", recruiting.cycleLabel],
@@ -68,7 +57,7 @@ export default async function RecruitingPage() {
           <CardHeader title="Status right now" description="Changes show within a few seconds; scheduled openings and deadlines take effect within 5 minutes on their own." />
           <CardSection>
             <div className="flex flex-wrap items-center gap-3">
-              <StatusPill status={pill}>{pill === "scheduled" ? "Scheduled" : label}</StatusPill>
+              <StatusPill status={pill}>{label}</StatusPill>
               {detail ? <p className="text-ui-section font-semibold text-ui-text">{detail}</p> : null}
             </div>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 lg:grid-cols-5">

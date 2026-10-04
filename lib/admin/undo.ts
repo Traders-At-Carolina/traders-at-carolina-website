@@ -3,6 +3,7 @@ import { db } from "@/lib/db/client";
 import { photos } from "@/lib/db/schema";
 import { type ActionState, type Actor, FormError, publish } from "@/lib/admin/action";
 import { type AuditRow, getEntry, latestEntryId, recordAudit } from "@/lib/admin/audit";
+import { GAME_UNDO_HANDLERS } from "@/lib/admin/games-undo";
 import { LIST_UNDO_HANDLERS } from "@/lib/admin/lists-undo";
 import { MEMBER_UNDO_HANDLERS } from "@/lib/admin/members-undo";
 import { photoSnapshot, type PhotoSnapshot, type SlotPage } from "@/lib/admin/photos";
@@ -63,7 +64,7 @@ const slotsHandler: Handler = {
   },
 };
 
-export const UNDO_HANDLERS: Record<string, Handler> = { photo: photoHandler, "photo-slots": slotsHandler, ...MEMBER_UNDO_HANDLERS, ...LIST_UNDO_HANDLERS };
+export const UNDO_HANDLERS: Record<string, Handler> = { photo: photoHandler, "photo-slots": slotsHandler, ...MEMBER_UNDO_HANDLERS, ...LIST_UNDO_HANDLERS, ...GAME_UNDO_HANDLERS };
 
 export function canUndoEntity(entity: string): boolean {
   return entity in UNDO_HANDLERS;

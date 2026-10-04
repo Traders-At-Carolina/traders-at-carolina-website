@@ -14,6 +14,7 @@ import { Switch } from "@/components/admin/ui/Switch";
 import type { ImageAsset, Person } from "@/content/types";
 import type { ActionState } from "@/lib/admin/action";
 import { useSaveForm } from "@/lib/admin/use-save-form";
+import { MIN_HEADSHOT_WIDTH } from "@/lib/thresholds";
 
 // DeleteButton and MoveButtons moved into the console kit; re-exported so existing imports keep working.
 export { DeleteButton, MoveButtons } from "@/components/admin/ui/Form";
@@ -193,7 +194,7 @@ export function OfficerForm({ officer, companies, action }: { officer?: OfficerV
         <CardSection title="Photo">
           <div className="grid gap-5">
             <ImageUpload name="headshot" folder="headshots" value={headshot} onChange={(h) => (setHeadshot(h), markDirty())} label="Headshot" error={err.headshot} />
-            {headshot && headshot.width < 600 ? <Banner tone="warning">This headshot is {headshot.width}px wide and will look soft on sharp screens; 600px or more is best.</Banner> : null}
+            {headshot && headshot.width < MIN_HEADSHOT_WIDTH ? <Banner tone="warning">This headshot is {headshot.width}px wide and will look soft on sharp screens; {MIN_HEADSHOT_WIDTH}px or more is best.</Banner> : null}
             <Field label="Headshot alt text" error={err.alt}>
               <Input name="alt" defaultValue={officer?.alt ?? ""} placeholder="Portrait of Jane Doe" />
             </Field>
