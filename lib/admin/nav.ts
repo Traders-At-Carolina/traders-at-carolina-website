@@ -85,7 +85,7 @@ const ALL_SECTIONS: readonly AdminSection[] = [
 ];
 
 /** Phases that have shipped. Add "C" or "E" here when that phase lands. */
-const SHIPPED_PHASES: ReadonlySet<string> = new Set<string>();
+const SHIPPED_PHASES: ReadonlySet<string> = new Set<string>(["C", "E"]);
 
 export const ADMIN_SECTIONS: readonly AdminSection[] = ALL_SECTIONS.map((section) => ({
   ...section,

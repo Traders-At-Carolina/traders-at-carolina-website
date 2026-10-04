@@ -17,7 +17,7 @@ import { useSaveForm } from "@/lib/admin/use-save-form";
 type Action = (p: ActionState, f: FormData) => Promise<ActionState>;
 
 /** A radio choice styled as a selectable row; the kit has no radio group yet. */
-function RadioOption({ name, value, checked, onChange, children }: { name: string; value: string; checked: boolean; onChange: () => void; children: ReactNode }) {
+export function RadioOption({ name, value, checked, onChange, children }: { name: string; value: string; checked: boolean; onChange: () => void; children: ReactNode }) {
   return (
     <label className="flex min-h-9 cursor-pointer flex-wrap items-center gap-2.5 rounded-ui-md border border-ui-border bg-ui-surface px-3 py-2 text-ui-base text-ui-text transition-colors duration-150 hover:border-ui-border-strong has-[:checked]:border-ui-accent has-[:checked]:bg-ui-accent-soft">
       <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="size-4 shrink-0 accent-ui-accent" />
@@ -26,7 +26,7 @@ function RadioOption({ name, value, checked, onChange, children }: { name: strin
   );
 }
 
-function Legend({ children }: { children: ReactNode }) {
+export function Legend({ children }: { children: ReactNode }) {
   return <legend className="text-ui-label font-medium text-ui-text">{children}</legend>;
 }
 

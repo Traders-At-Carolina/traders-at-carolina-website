@@ -59,7 +59,7 @@ describe("recruitingTimeline", () => {
 describe("portalLinks", () => {
   const env = { INTERNSHIP_TRACKER_URL: " https://docs.google.com/spreadsheets/d/abc " };
 
-  it("gives members the internship tracker from the environment until phase 7", async () => {
+  it("gives members the internship tracker from the environment until an admin adds links (offline here)", async () => {
     expect(await portalLinks("member", env)).toEqual([
       expect.objectContaining({ id: "internship-tracker", label: "Internship tracker", url: "https://docs.google.com/spreadsheets/d/abc" }),
     ]);
@@ -82,8 +82,8 @@ describe("access requests (spec 06 phase 4)", () => {
   });
 });
 
-describe("the rest, empty until spec 06 phase 7", () => {
-  it("has no resources or announcements", async () => {
+describe("without a database (local development)", () => {
+  it("has no resources or announcements; phase 7 content is covered in portal-content.test.ts", async () => {
     expect(await portalResources("member")).toEqual({ learning: [], "interview-prep": [], recruiting: [], other: [] });
     expect(await portalAnnouncements("member")).toEqual([]);
   });

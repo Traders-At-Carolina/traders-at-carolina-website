@@ -11,13 +11,14 @@ import { changedFields } from "@/lib/admin/diff";
 import { GAME_AREAS } from "@/lib/admin/games-undo";
 import { LIST_AREAS } from "@/lib/admin/lists-undo";
 import { MEMBER_AREAS } from "@/lib/admin/members-undo";
+import { PORTAL_AREAS } from "@/lib/admin/portal-undo";
 import { canUndoEntity } from "@/lib/admin/undo";
 import { requirePage } from "@/lib/auth/admin";
 
 export const metadata = { title: "History" };
 
 const when = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "America/New_York" });
-const AREA: Record<string, string> = { photo: "Photos", "photo-slots": "Photo slots", admin: "Admins", ...MEMBER_AREAS, ...LIST_AREAS, ...GAME_AREAS };
+const AREA: Record<string, string> = { photo: "Photos", "photo-slots": "Photo slots", admin: "Admins", ...MEMBER_AREAS, ...LIST_AREAS, ...GAME_AREAS, ...PORTAL_AREAS };
 
 const show = (v: unknown) => (v === undefined || v === null ? "—" : typeof v === "string" ? v : JSON.stringify(v));
 

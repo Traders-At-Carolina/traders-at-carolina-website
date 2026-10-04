@@ -41,10 +41,16 @@ describe("admin nav map", () => {
     expect(screenFor("/admin/photosx")).toBeUndefined();
   });
 
-  it("hides screens from unshipped phases, and sections left empty", () => {
+  it("shows every shipped section and screen", () => {
     const labels = ADMIN_SECTIONS.flatMap((s) => s.screens.map((x) => x.label));
-    expect(labels).not.toContain("Analytics");
-    expect(ADMIN_SECTIONS.map((s) => s.label)).toEqual(["Overview", "Club", "Website", "Insights"]);
+    expect(labels).toContain("Analytics");
+    expect(ADMIN_SECTIONS.map((s) => s.label)).toEqual(["Overview", "Club", "Website", "Portal", "Insights"]);
+  });
+
+  it("shows the Portal section once phase C ships", () => {
+    const portal = ADMIN_SECTIONS.find((s) => s.id === "portal");
+    expect(portal?.screens.map((s) => s.label)).toEqual(["Announcements", "Resources", "Portal settings"]);
+    expect(sectionFor("/admin/resources/abc").label).toBe("Portal");
   });
 });
 

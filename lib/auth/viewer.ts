@@ -10,17 +10,27 @@ export const PORTAL_SIGN_IN_HREF = `/account/sign-in?redirect_url=${encodeURICom
 export type Viewer = { userId: string; firstName: string | null; isMember: boolean; isAdmin: boolean };
 
 /**
+ * The signed-in viewer, or null when signed out. For route handlers that answer signed-out requests themselves (the
+ * portal file route); pages use requireViewer().
+ */
+export async function getViewer(): Promise<Viewer | null> {
+  const { userId } = await auth();
+  if (!userId) return null;
+  const user = await currentUser();
+  if (!user) return null;
+  const isAdmin = isAdminAccount(user);
+  const verifiedEmails = user.emailAddresses.filter((e) => e.verification?.status === "verified").map((e) => e.emailAddress);
+  const membership = await getMembership({ id: userId, verifiedEmails });
+  return { userId, firstName: user.firstName?.trim() || null, isMember: isAdmin || membership !== null, isAdmin };
+}
+
+/**
  * Gate for /portal: signed-out visitors go to sign-in and come back. Admins are checked like requirePage();
  * membership comes from the roster by verified email (spec 06 §8), never from Clerk metadata.
  * Pages and server actions call this themselves; layouts never check auth (Next 16 authentication guide).
  */
 export async function requireViewer(): Promise<Viewer> {
-  const { userId } = await auth();
-  if (!userId) redirect(PORTAL_SIGN_IN_HREF);
-  const user = await currentUser();
-  if (!user) redirect(PORTAL_SIGN_IN_HREF);
-  const isAdmin = isAdminAccount(user);
-  const verifiedEmails = user.emailAddresses.filter((e) => e.verification?.status === "verified").map((e) => e.emailAddress);
-  const membership = await getMembership({ id: userId, verifiedEmails });
-  return { userId, firstName: user.firstName?.trim() || null, isMember: isAdmin || membership !== null, isAdmin };
+  const viewer = await getViewer();
+  if (!viewer) redirect(PORTAL_SIGN_IN_HREF);
+  return viewer;
 }

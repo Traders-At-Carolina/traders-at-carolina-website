@@ -42,3 +42,19 @@ export function parseEasternDateTime(iso: string): Date {
   utc = wallAsUtc - easternOffsetMinutes(new Date(utc)) * 60_000;
   return new Date(utc);
 }
+
+const localFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/New_York",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** The reverse of parseEasternDateTime: an instant as "YYYY-MM-DDTHH:mm" Eastern wall-clock time, for datetime-local inputs. */
+export function toEasternLocal(at: Date): string {
+  const part = (type: Intl.DateTimeFormatPartTypes) => localFormatter.formatToParts(at).find((p) => p.type === type)?.value ?? "00";
+  return `${part("year")}-${part("month")}-${part("day")}T${part("hour")}:${part("minute")}`;
+}
