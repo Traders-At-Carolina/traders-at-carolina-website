@@ -1,6 +1,8 @@
 import { count } from "drizzle-orm";
 import { ArrowRight, CircleCheck, History, Inbox, TriangleAlert } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
+import { LiveTile, NotConnectedBanner, OverviewVisitorTiles, TileSkeleton } from "@/components/admin/analytics/sections";
 import { UndoButton } from "@/components/admin/UndoButton";
 import { Badge, StatusPill } from "@/components/admin/ui/Badge";
 import { ButtonLink } from "@/components/admin/ui/Button";
@@ -11,6 +13,7 @@ import { latestIdsFor, recentChanges } from "@/lib/admin/audit";
 import { healthChecks } from "@/lib/admin/health";
 import { pendingRequestCount } from "@/lib/admin/members-db";
 import { ADMIN_SCREENS } from "@/lib/admin/nav";
+import { posthogEnv } from "@/lib/analytics/query";
 import { recruitingStatus } from "@/lib/admin/recruiting-status";
 import { listEvents } from "@/lib/admin/settings-db";
 import { canUndoEntity } from "@/lib/admin/undo";
@@ -55,7 +58,7 @@ async function nextEvent(now: Date) {
   return { event: rows.find((e) => parseEasternDateTime(e.startsAt).getTime() >= now.getTime()) ?? null };
 }
 
-/** Overview (spec 06 §6.1, spec 11 §5.2). Each block loads on its own and says so if it can't; phase E adds the visitor numbers. */
+/** Overview (spec 06 §6.1, spec 11 §5.2). Each block loads on its own and says so if it can't; the visitors row streams in on its own (phase E). */
 export default async function AdminHome() {
   await requirePage();
   const now = new Date();
@@ -97,6 +100,28 @@ export default async function AdminHome() {
           href={upcoming ? `/admin/events/${upcoming.id}` : "/admin/events"}
         />
       </section>
+
+      {posthogEnv() ? (
+        <section aria-label="Visitors" className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <Suspense fallback={<TileSkeleton />}>
+            <LiveTile href="/admin/analytics" />
+          </Suspense>
+          <Suspense
+            fallback={
+              <>
+                <TileSkeleton />
+                <TileSkeleton />
+              </>
+            }
+          >
+            <OverviewVisitorTiles />
+          </Suspense>
+        </section>
+      ) : (
+        <section aria-label="Visitors" className="mb-6">
+          <NotConnectedBanner />
+        </section>
+      )}
 
       <div className="mb-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <Card aria-labelledby="attention" className="self-start">
