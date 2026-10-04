@@ -45,8 +45,8 @@ export const TICKS = {
 } as const;
 
 /**
- * `facing` is the outward direction of the label's axis: the label is shown while the camera is on that side and
- * fades out as the axis turns away, so far-side numbers never float over the surface during the spin.
+ * `facing` is the outward direction of the label's axis. Labels are currently shown from every angle, so it is unused
+ * by the renderer.
  */
 export type AxisLabel = { text: string; at: Vec3; kind: "tick" | "title"; facing: Vec3 };
 

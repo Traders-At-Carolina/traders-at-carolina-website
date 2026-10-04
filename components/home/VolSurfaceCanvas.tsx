@@ -278,24 +278,18 @@ function HoverTooltip({ params, hover }: { params: VolParams; hover: { k: number
 
 const LABELS = AXIS_LABELS;
 
-/** Projects each label's 3D anchor to the canvas, moves its span there, and fades it as its axis turns away. */
+/** Projects each label's 3D anchor to the canvas, and moves its span there. Labels stay visible from every angle. */
 function LabelTracker({ spans }: { spans: RefObject<(HTMLSpanElement | null)[]> }) {
   const points = useMemo(() => LABELS.map(({ at }) => new THREE.Vector3(...at)), []);
-  const facings = useMemo(() => LABELS.map(({ facing }) => new THREE.Vector3(...facing)), []);
-  const target = useMemo(() => new THREE.Vector3(...CAMERA.target), []);
   const v = useMemo(() => new THREE.Vector3(), []);
-  const toCamera = useMemo(() => new THREE.Vector3(), []);
   useFrame(({ camera, size }) => {
-    toCamera.copy(camera.position).sub(target).setY(0).normalize();
     points.forEach((p, i) => {
       const el = spans.current[i];
       if (!el) return;
       v.copy(p).project(camera);
       el.style.transform = `translate(${((v.x + 1) / 2) * size.width}px, ${((1 - v.y) / 2) * size.height}px) translate(-50%, -50%)`;
-      // Fully shown while the axis faces the camera (cos > 0.3), gone once it is edge-on or behind.
-      const opacity = Math.min(1, Math.max(0, (toCamera.dot(facings[i]) - 0.05) / 0.25));
-      el.style.opacity = String(opacity);
-      el.style.visibility = v.z < 1 && opacity > 0 ? "visible" : "hidden";
+      // Always shown, whichever way the axis faces; only hidden if the anchor is behind the camera.
+      el.style.visibility = v.z < 1 ? "visible" : "hidden";
     });
   });
   return null;
@@ -425,6 +419,7 @@ export default function VolSurfaceCanvas({ params, animate, label, onInteractSta
   const wrapper = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<{ k: number; T: number; x: number; y: number; flip: boolean } | null>(null);
   const hovering = useRef(false);
+  const [inside, setInside] = useState(false);
 
   // Hovering pauses the spin (like a drag) so the details hold still; it resumes 1.5s after the pointer leaves.
   const onHover = useCallback(
@@ -462,6 +457,8 @@ export default function VolSurfaceCanvas({ params, animate, label, onInteractSta
       aria-label={`${label} Use the left and right arrow keys to rotate.`}
       tabIndex={0}
       onKeyDown={onKeyDown}
+      onPointerEnter={() => setInside(true)}
+      onPointerLeave={() => setInside(false)}
       className="absolute inset-0 cursor-grab active:cursor-grabbing"
     >
       <Canvas
@@ -496,6 +493,12 @@ export default function VolSurfaceCanvas({ params, animate, label, onInteractSta
           {text}
         </span>
       ))}
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none absolute top-2 left-2 text-caption font-medium text-navy transition-opacity duration-200 motion-reduce:transition-none ${inside ? "opacity-100" : "opacity-0"}`}
+      >
+        Implied Vol. Graph
+      </span>
       {hover ? <HoverTooltip params={params} hover={hover} /> : null}
     </div>
   );

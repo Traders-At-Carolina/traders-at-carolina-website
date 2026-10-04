@@ -11,8 +11,8 @@ type PersonCardProps = {
 };
 
 /**
- * The placement company's mark on a fixed white square tile in the headshot's bottom-left corner, so every logo,
- * wide or square, shows at the same size. Mouse users see it on hover; touch screens
+ * The placement company's transparent-background mark drawn straight onto the headshot's bottom-left corner, in a
+ * fixed box so every logo, wide or square, shows at the same size. Mouse users see it on hover; touch screens
  * (no hover) always show it.
  * Decorative: the placement line under the name already names the company.
  */
@@ -20,9 +20,9 @@ function CompanyBadge({ company }: { company: CompanyMark }) {
   return (
     <span
       aria-hidden="true"
-      className="absolute bottom-2 left-2 flex size-10 translate-y-1 items-center justify-center rounded-md bg-white p-1.5 shadow-sm opacity-0 transition duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
+      className="absolute bottom-2 left-2 flex h-10 w-14 translate-y-1 items-center justify-start opacity-0 transition duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
     >
-      <Image src={company.logo} alt="" sizes="28px" className="size-full object-contain" />
+      <Image src={company.logo} alt="" sizes="56px" className="size-full object-contain object-left drop-shadow-[0_1px_3px_rgb(0_0_0/0.55)]" />
     </span>
   );
 }

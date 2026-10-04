@@ -130,8 +130,8 @@ export function VolSurfaceFigure({ caption, className = "" }: VolSurfaceFigurePr
   const animateCamera = idle && !reducedMotion && inView && pageVisible;
 
   return (
-    <figure className={className}>
-      <div ref={box} className="relative h-[300px] md:h-[420px] lg:h-[clamp(380px,58vh,600px)]">
+    <figure className={`flex flex-col ${className}`}>
+      <div ref={box} className="relative h-[300px] md:h-[420px] lg:-mx-6 lg:-mt-14 lg:h-auto lg:min-h-[380px] lg:flex-1">
         {nearViewport ? (
           <VolSurfaceCanvas
             params={params}

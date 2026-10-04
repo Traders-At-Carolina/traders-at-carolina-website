@@ -1,5 +1,5 @@
 import type { CompanyMark, TeamContent } from "@/content/types";
-import awsLogo from "@/public/images/companies/aws-on-light.png";
+import awsLogo from "@/public/images/companies/aws.png";
 import citadelLogo from "@/public/images/companies/citadel.png";
 import infragridLogo from "@/public/images/companies/infragrid.png";
 import estherYu from "@/public/images/team/esther-yu.jpg";
@@ -24,11 +24,11 @@ import viktoryaHunanyan from "@/public/images/team/viktorya-hunanyan.jpg";
  * - group: "exec" | "co-president" | "director" (shown in that order on /team; "track-lead" is reserved for /membership links and is not shown).
  * - classYear and major are optional; the meta line under the name shows whatever is set.
  * - track ("trading" | "research" | "development"): set only to link a person from /membership "Led by".
- * - company: the placement company's icon (public/images/companies), shown on a white square tile on the headshot on hover; any aspect ratio fits the tile.
+ * - company: the placement company's icon (public/images/companies), transparent background, drawn directly on the headshot on hover; any aspect ratio fits the box.
  * - placement: one line, only with the person's consent: a past or incoming role ("Previously at Citadel") or a notable result.
  */
 const citadel: CompanyMark = { name: "Citadel", logo: citadelLogo };
-// Dark-text version: the logo sits on a white tile, where the white-text aws.png would disappear.
+// White-text version: the logo sits straight on the photo, not on a white tile.
 const aws: CompanyMark = { name: "AWS", logo: awsLogo };
 const infragrid: CompanyMark = { name: "Infragrid", logo: infragridLogo };
 
