@@ -131,7 +131,7 @@ export default async function AdminHome() {
               Checks are unavailable right now.
             </Banner>
           ) : issues.length === 0 ? (
-            <div className="flex items-center gap-3 px-5 py-6">
+            <div className="flex items-center gap-3 px-6 py-6">
               <CircleCheck aria-hidden className="size-5 text-ui-success" />
               <p className="text-ui-base text-ui-text">All clear. Nothing needs fixing.</p>
             </div>
@@ -139,7 +139,7 @@ export default async function AdminHome() {
             <ul className="divide-y divide-ui-border">
               {issues.map((issue) => (
                 <li key={issue.id}>
-                  <Link href={issue.href} className="group flex items-start gap-3 px-5 py-3 transition-colors duration-150 hover:bg-ui-canvas">
+                  <Link href={issue.href} className="group flex items-start gap-3 px-6 py-3 transition-colors duration-150 hover:bg-ui-canvas">
                     <TriangleAlert aria-hidden className={`mt-0.5 size-4 shrink-0 ${issue.tone === "danger" ? "text-ui-danger" : "text-ui-warning"}`} />
                     <span className="flex-1 text-ui-base text-ui-text">{issue.message}</span>
                     <span className="flex shrink-0 items-center gap-1 text-ui-label font-medium text-ui-accent">
@@ -175,7 +175,7 @@ export default async function AdminHome() {
               {changes.map((c) => {
                 const who = c.actorEmail ?? c.actorId;
                 return (
-                  <li key={c.id} className="flex items-start gap-3 px-5 py-3">
+                  <li key={c.id} className="flex items-start gap-3 px-6 py-3">
                     <span aria-hidden className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-ui-full bg-ui-subtle text-ui-hint font-semibold text-ui-text-2 uppercase">
                       {who.charAt(0)}
                     </span>
@@ -205,8 +205,8 @@ export default async function AdminHome() {
           <ul className="grid sm:grid-cols-2 xl:grid-cols-3">
             {ADMIN_SCREENS.map(({ href, label, description, icon: Icon }) => (
               <li key={href} className="border-t border-ui-border first:border-t-0 sm:nth-2:border-t-0 xl:nth-3:border-t-0">
-                <Link href={href} className="group flex h-full items-start gap-3 px-5 py-4 transition-colors duration-150 hover:bg-ui-canvas">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-ui-md bg-ui-accent-soft text-ui-accent">
+                <Link href={href} className="group flex h-full items-start gap-3 px-6 py-4 transition-colors duration-150 hover:bg-ui-canvas">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-ui-full bg-ui-accent-soft text-ui-accent">
                     <Icon aria-hidden className="size-4" />
                   </span>
                   <span className="min-w-0">

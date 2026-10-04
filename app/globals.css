@@ -61,37 +61,42 @@
   --ease-soft: linear(0, 0.018, 0.062, 0.118, 0.189, 0.265, 0.342, 0.418, 0.49, 0.553, 0.615, 0.672, 0.722, 0.767, 0.806, 0.838, 0.868, 0.893, 0.914, 0.932, 0.947, 0.958, 0.968, 0.976, 0.983, 0.988, 0.992, 0.995, 0.998, 1);
 }
 
-/* Admin console tokens — docs/specs/11-admin-console.md §2. Used only under /admin, so public pages emit none of them. */
+/* Admin console tokens — docs/specs/11-admin-console.md §2 (rev 2): spec 00's palette, flattened to solid colours so
+   opacity modifiers work. Used only under /admin, so public pages emit none of them. */
 @theme {
-  --color-ui-canvas: #f8fafc;
+  --color-ui-canvas: #ebeae4; /* bone */
   --color-ui-surface: #ffffff;
-  --color-ui-subtle: #f1f5f9;
-  --color-ui-border: #e2e8f0;
-  --color-ui-border-strong: #cbd5e1;
-  --color-ui-text: #0f172a;
-  --color-ui-text-2: #475569;
-  --color-ui-text-3: #64748b;
-  --color-ui-accent: #1d6fb8;
-  --color-ui-accent-hover: #185d9b;
-  --color-ui-accent-soft: #e8f1fa;
-  --color-ui-success: #15803d;
-  --color-ui-success-soft: #e9f7ef;
-  --color-ui-warning: #b45309;
-  --color-ui-warning-soft: #fdf3e4;
-  --color-ui-danger: #b91c1c;
-  --color-ui-danger-soft: #fdecec;
+  --color-ui-subtle: #f4f3ee;
+  --color-ui-border: #d6d5cf; /* rule */
+  --color-ui-border-strong: #a3a29d; /* rule-strong */
+  --color-ui-text: #000000;
+  --color-ui-text-2: #474644; /* ink-2 */
+  --color-ui-text-3: #636260; /* ink-3 */
+  --color-ui-accent: #233265; /* navy */
+  --color-ui-accent-hover: #1e2b56; /* navy-press */
+  --color-ui-accent-soft: #e9ebf1; /* wash */
+  --color-ui-chrome: #233265;
+  --color-ui-on-chrome: #ebeae4;
+  --color-ui-chrome-rule: rgb(235 234 228 / 0.2); /* rule-inverse */
+  /* Status only, never up/down data (11 §2.1): warm-tuned so they sit on bone. */
+  --color-ui-success: #3d6b35;
+  --color-ui-success-soft: #e8eee0;
+  --color-ui-warning: #8a5a12;
+  --color-ui-warning-soft: #f5ecd8;
+  --color-ui-danger: #9b2c22;
+  --color-ui-danger-soft: #f6e3df;
 
   --radius-ui-sm: 6px;
   --radius-ui-md: 8px;
   --radius-ui-lg: 12px;
   --radius-ui-full: 9999px;
 
-  --shadow-ui-card: 0 1px 2px rgb(15 23 42 / 0.06);
-  --shadow-ui-pop: 0 12px 32px -8px rgb(15 23 42 / 0.18), 0 2px 6px rgb(15 23 42 / 0.06);
+  --shadow-ui-card: 0 1px 2px rgb(42 42 40 / 0.06);
+  --shadow-ui-pop: 0 12px 32px -8px rgb(42 42 40 / 0.2), 0 2px 6px rgb(42 42 40 / 0.06);
 
   /* Type roles (11 §2.2) */
-  --text-ui-title: 1.5rem;
-  --text-ui-title--line-height: 2rem;
+  --text-ui-title: 1.875rem;
+  --text-ui-title--line-height: 2.25rem;
   --text-ui-title--letter-spacing: -0.01em;
   --text-ui-section: 1rem;
   --text-ui-section--line-height: 1.5rem;
@@ -129,8 +134,8 @@
   --font-title: var(--font-chivo), "Arial Black", system-ui, sans-serif;
   /* Zetamac's own stack (arithmetic.zetamac.com), for the mental math sprint only (03 §3.7). */
   --font-zetamac: "Helvetica Neue", Arial, Helvetica, sans-serif;
-  /* Admin console only (11 §2.2); app/admin/layout.tsx sets --font-inter. Keep in step with .admin-ui below. */
-  --font-ui: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Admin console UI face (11 §2.2): the public sans. */
+  --font-ui: var(--font-public-sans), system-ui, sans-serif;
 }
 
 @layer base {
@@ -766,16 +771,20 @@ main:has(+ footer [data-cta-band]) > section:last-child {
   }
 
   .admin-ui {
-    /* @theme inline doesn't emit --font-ui as a variable, so the stack is repeated here. */
-    font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: var(--font-sans);
     font-size: var(--text-ui-base);
     line-height: var(--text-ui-base--line-height);
-    font-feature-settings: "cv11", "ss01";
     background-color: var(--color-ui-canvas);
     color: var(--color-ui-text);
   }
 
-  .admin-ui :where(h1, h2, h3) {
+  /* Page titles use Chivo, the Team page's heavy sans; smaller headings are UI labels (11 §2.2). */
+  .admin-ui :where(h1) {
+    font-family: var(--font-title);
+    font-weight: 700;
+  }
+
+  .admin-ui :where(h2, h3) {
     font-family: inherit;
     font-weight: 600;
   }
@@ -785,9 +794,8 @@ main:has(+ footer [data-cta-band]) > section:last-child {
     outline-offset: 2px;
   }
 
-  .admin-ui ::selection {
-    background-color: var(--color-ui-accent-soft);
-    color: var(--color-ui-text);
+  .admin-ui .on-dark :focus-visible {
+    outline-color: var(--color-ui-on-chrome);
   }
 
   @media (prefers-reduced-motion: reduce) {

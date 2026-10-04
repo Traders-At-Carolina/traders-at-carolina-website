@@ -56,7 +56,7 @@ export default async function OfficersPage({ searchParams }: PageProps<"/admin/o
               <CardHeader id={`tier-${group}`} title={label} description={group === "track-lead" ? "Linked from Membership, not shown on Team." : undefined} />
               <ul className="divide-y divide-ui-border">
                 {tier.map((p, i) => (
-                  <li key={p.id} className="relative flex items-center gap-3 px-5 py-2.5 transition-colors duration-150 hover:bg-ui-subtle">
+                  <li key={p.id} className="relative flex items-center gap-3 px-6 py-2.5 transition-colors duration-150 hover:bg-ui-subtle">
                     {p.headshot ? (
                       <Image src={p.headshot} alt="" width={36} height={36} className="size-9 shrink-0 rounded-ui-full object-cover" />
                     ) : (

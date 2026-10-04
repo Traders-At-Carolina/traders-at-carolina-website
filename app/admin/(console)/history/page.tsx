@@ -43,7 +43,7 @@ export default async function HistoryPage({ searchParams }: PageProps<"/admin/hi
       <PageHeader title="History" description="Every change to the site and to admin access. Undo works on the latest change to each item." />
 
       <Card>
-        <form aria-label="Filter history" className="grid gap-3 border-b border-ui-border px-5 py-4 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end">
+        <form aria-label="Filter history" className="grid gap-3 border-b border-ui-border px-6 py-4 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end">
           <Field label="Person">
             <Select name="actor" defaultValue={filter.actor ?? ""}>
               <option value="">Everyone</option>
@@ -82,7 +82,7 @@ export default async function HistoryPage({ searchParams }: PageProps<"/admin/hi
               const undoable = canUndoEntity(r.entity) && Boolean(r.entityId) && latest.has(r.id) && (r.before != null || r.after != null);
               const who = r.actorEmail ?? r.actorId;
               return (
-                <li key={r.id} className="flex items-start gap-3 px-5 py-3">
+                <li key={r.id} className="flex items-start gap-3 px-6 py-3">
                   <span aria-hidden className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-ui-full bg-ui-subtle text-ui-hint font-semibold text-ui-text-2 uppercase">
                     {(who ?? "?").charAt(0)}
                   </span>

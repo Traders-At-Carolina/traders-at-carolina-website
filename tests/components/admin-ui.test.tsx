@@ -99,6 +99,19 @@ describe("PageHeader", () => {
     expect(screen.getByRole("link", { name: /View on site/ })).toHaveAttribute("href", "/team");
   });
 
+  it("puts the section label in the eyebrow and skips the breadcrumb on a screen's own page", () => {
+    path.current = "/admin/officers";
+    render(<PageHeader title="Officers" />);
+    expect(screen.getByText("Club")).toHaveClass("eyebrow");
+    expect(screen.queryByRole("navigation", { name: "Breadcrumb" })).not.toBeInTheDocument();
+  });
+
+  it("reads Admin in the eyebrow on Overview", () => {
+    path.current = "/admin";
+    render(<PageHeader title="Overview" />);
+    expect(screen.getByText("Admin")).toHaveClass("eyebrow");
+  });
+
   it("hides View on site when asked", () => {
     path.current = "/admin/officers";
     render(<PageHeader title="Officers" siteHref={false} />);

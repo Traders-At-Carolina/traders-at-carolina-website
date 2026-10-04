@@ -65,7 +65,7 @@ export function RosterTable({ rows, action, classYear }: { rows: RosterRow[]; ac
       <div
         role="group"
         aria-label="Bulk actions"
-        className={cx("flex flex-wrap items-center gap-2 border-b border-ui-border px-5 py-3 transition-colors duration-150", selected.size ? "bg-ui-accent-soft" : "bg-ui-canvas")}
+        className={cx("flex flex-wrap items-center gap-2 border-b border-ui-border px-6 py-3 transition-colors duration-150", selected.size ? "bg-ui-accent-soft" : "bg-ui-canvas")}
       >
         <p className={cx("mr-auto text-ui-label", selected.size ? "font-medium text-ui-accent" : "text-ui-text-2")} aria-live="polite">
           {selected.size ? `${selected.size} selected` : "Select members for bulk actions"}
@@ -117,7 +117,7 @@ export function RosterTable({ rows, action, classYear }: { rows: RosterRow[]; ac
         ) : null}
       </div>
       {state.error ? (
-        <p role="alert" className="border-b border-ui-border px-5 py-3 text-ui-base font-medium text-ui-danger">
+        <p role="alert" className="border-b border-ui-border px-6 py-3 text-ui-base font-medium text-ui-danger">
           {state.error}
         </p>
       ) : null}

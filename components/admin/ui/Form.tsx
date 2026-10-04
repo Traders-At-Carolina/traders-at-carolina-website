@@ -19,7 +19,7 @@ type Action = (p: ActionState, f: FormData) => Promise<ActionState>;
  */
 export function FormFooter({ pending, dirty = false, submitLabel = "Save", cancelHref, error, children }: { pending: boolean; dirty?: boolean; submitLabel?: string; cancelHref?: string; error?: string; children?: ReactNode }) {
   return (
-    <div className="sticky bottom-0 z-10 rounded-b-ui-lg border-t border-ui-border bg-ui-surface/95 px-5 py-3 backdrop-blur">
+    <div className="sticky bottom-0 z-10 rounded-b-ui-lg border-t border-ui-border bg-ui-surface/95 px-6 py-3 backdrop-blur">
       {error ? (
         <p role="alert" className="mb-3 text-ui-base font-medium text-ui-danger">
           {error}
@@ -64,7 +64,7 @@ export function DeleteButton({ action, confirm: question, label }: { action: () 
     setOpen(false);
   }
   return (
-    <form ref={form} action={formAction} className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-ui-lg border border-ui-danger/25 bg-ui-surface px-5 py-4 shadow-ui-card">
+    <form ref={form} action={formAction} className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-ui-lg border border-ui-danger/25 bg-ui-surface px-6 py-4 shadow-ui-card">
       <div>
         <p className="text-ui-base font-medium text-ui-text">{label}</p>
         <p className="mt-0.5 text-ui-label text-ui-text-2">You can undo this right after.</p>
@@ -82,7 +82,7 @@ export function DeleteButton({ action, confirm: question, label }: { action: () 
 /** Up/down reorder buttons that work by keyboard (spec 06 §6.0). */
 export function MoveButtons({ action, fields, name, first, last }: { action: Action; fields: Record<string, string>; name: string; first: boolean; last: boolean }) {
   const [state, formAction, pending] = useActionState(action, {});
-  const btn = "inline-flex size-8 items-center justify-center rounded-ui-md text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text disabled:pointer-events-none disabled:opacity-30";
+  const btn = "inline-flex size-8 items-center justify-center rounded-ui-full text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text disabled:pointer-events-none disabled:opacity-30";
   return (
     <form action={formAction} className="flex items-center">
       {Object.entries(fields).map(([k, v]) => (

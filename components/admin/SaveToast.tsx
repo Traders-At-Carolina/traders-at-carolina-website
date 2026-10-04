@@ -43,7 +43,7 @@ export function SaveToast({ state }: { state: ActionState }) {
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           ) : null}
-          <button type="button" onClick={() => setHiddenAt(current.at)} aria-label="Dismiss" className="ml-auto inline-flex size-8 items-center justify-center rounded-ui-md text-ui-text-3 hover:bg-ui-subtle hover:text-ui-text">
+          <button type="button" onClick={() => setHiddenAt(current.at)} aria-label="Dismiss" className="ml-auto inline-flex size-8 items-center justify-center rounded-ui-full text-ui-text-3 hover:bg-ui-subtle hover:text-ui-text">
             <X aria-hidden className="size-4" />
           </button>
         </div>

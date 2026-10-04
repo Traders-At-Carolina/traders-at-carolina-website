@@ -91,7 +91,7 @@ export function AddMembersForm({ preview, add }: { preview: Action; add: Action 
           </fieldset>
           <Checkbox name="invite" label="Email them a sign-up link" hint="People who already have an account are skipped." className="mt-5" />
         </CardSection>
-        <div className="flex flex-wrap items-center justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-canvas px-5 py-3">
+        <div className="flex flex-wrap items-center justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-canvas px-6 py-3">
           {state.error ? (
             <p role="alert" className="mr-auto text-ui-base font-medium text-ui-danger">
               {state.error}
@@ -154,7 +154,7 @@ export function AddMembersForm({ preview, add }: { preview: Action; add: Action 
             <EmptyState icon={ListChecks} title="The list is empty" description="Paste at least one email above." />
           )
         ) : null}
-        <div className="flex flex-wrap items-center justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-canvas px-5 py-3">
+        <div className="flex flex-wrap items-center justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-canvas px-6 py-3">
           <Button type="submit" variant="primary" icon={UserPlus} formAction={addAction} pending={adding} disabled={!shown || shown.add.length === 0}>
             {adding ? "Adding…" : shown ? `Add ${shown.add.length}` : "Add"}
           </Button>

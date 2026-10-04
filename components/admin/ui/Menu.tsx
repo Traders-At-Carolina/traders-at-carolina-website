@@ -86,7 +86,7 @@ export function Menu({ label, items, trigger, align = "end" }: { label: string; 
             setOpen(true);
           }
         }}
-        className="inline-flex size-8 items-center justify-center rounded-ui-md text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text"
+        className="inline-flex size-8 items-center justify-center rounded-ui-full text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text"
       >
         {trigger ?? <Ellipsis aria-hidden className="size-4" />}
       </button>

@@ -34,14 +34,14 @@ export default async function PortalSettingsPage() {
             actions={<PortalLinkDialog action={createPortalLink} trigger="add" />}
           />
           {trackerFromEnv ? (
-            <div className="px-5 pt-4">
+            <div className="px-6 pt-4">
               <Banner tone="info">Until you add a link here, members see the internship tracker from the INTERNSHIP_TRACKER_URL setting. Adding any link replaces it.</Banner>
             </div>
           ) : null}
           {links.length ? (
             <ul className="divide-y divide-ui-border">
               {links.map((l, i) => (
-                <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+                <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-ui-base font-medium text-ui-text">{l.label}</p>
                     <p className="truncate text-ui-hint text-ui-text-3">{l.description ?? l.url}</p>

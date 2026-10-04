@@ -22,13 +22,13 @@ export function TBody({ className, ...props }: ComponentProps<"tbody">) {
 }
 
 export function TR({ className, ...props }: ComponentProps<"tr">) {
-  return <tr className={cx("transition-colors duration-150 [tbody>&]:hover:bg-ui-canvas", className)} {...props} />;
+  return <tr className={cx("transition-colors duration-150 [tbody>&]:hover:bg-ui-subtle", className)} {...props} />;
 }
 
 export function TH({ className, ...props }: ComponentProps<"th">) {
-  return <th scope="col" className={cx("h-10 border-b border-ui-border px-4 font-medium whitespace-nowrap first:pl-5 last:pr-5", className)} {...props} />;
+  return <th scope="col" className={cx("h-11 border-b border-ui-border px-4 font-medium whitespace-nowrap first:pl-6 last:pr-6", className)} {...props} />;
 }
 
 export function TD({ className, ...props }: ComponentProps<"td">) {
-  return <td className={cx("px-4 py-3 align-middle text-ui-text first:pl-5 last:pr-5", className)} {...props} />;
+  return <td className={cx("px-4 py-3.5 align-middle text-ui-text first:pl-6 last:pr-6", className)} {...props} />;
 }

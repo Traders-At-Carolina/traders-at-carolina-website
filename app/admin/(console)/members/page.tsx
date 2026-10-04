@@ -67,7 +67,7 @@ export default async function MembersPage({ searchParams }: PageProps<"/admin/me
 
       {tab === "roster" ? (
         <Card>
-          <form aria-label="Filter the roster" className="grid gap-3 border-b border-ui-border px-5 py-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto] lg:items-end">
+          <form aria-label="Filter the roster" className="grid gap-3 border-b border-ui-border px-6 py-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto] lg:items-end">
             <Field label="Search" className="sm:col-span-2 lg:col-span-1">
               <Input name="q" defaultValue={filter.q ?? ""} placeholder="Name or email" />
             </Field>
@@ -121,7 +121,7 @@ export default async function MembersPage({ searchParams }: PageProps<"/admin/me
         ) : (
           <ul className="flex flex-col gap-3">
             {requests.map((r) => (
-              <Card as="li" key={r.id} className="flex flex-col justify-between gap-4 px-5 py-4 sm:flex-row sm:items-start">
+              <Card as="li" key={r.id} className="flex flex-col justify-between gap-4 px-6 py-4 sm:flex-row sm:items-start">
                 <div className="min-w-0">
                   <p className="text-ui-base font-medium text-ui-text">{r.name}</p>
                   <p className="mt-0.5 text-ui-hint text-ui-text-3">

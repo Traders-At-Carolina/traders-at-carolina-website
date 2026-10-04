@@ -73,7 +73,7 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/admin/
                       const at = group.indexOf(r);
                       const Icon = KIND_ICONS[r.kind];
                       return (
-                        <li key={r.id} className="relative flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3 transition-colors duration-150 hover:bg-ui-subtle">
+                        <li key={r.id} className="relative flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3 transition-colors duration-150 hover:bg-ui-subtle">
                           <span className="flex w-28 shrink-0 items-center gap-2 text-ui-label text-ui-text-2">
                             <Icon aria-hidden className="size-4 text-ui-text-3" />
                             {KIND_LABELS[r.kind]}
@@ -99,7 +99,7 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/admin/
                     })}
                   </ul>
                 ) : (
-                  <p className="px-5 py-4 text-ui-label text-ui-text-3">Nothing here yet.</p>
+                  <p className="px-6 py-4 text-ui-label text-ui-text-3">Nothing here yet.</p>
                 )}
               </Card>
             );
