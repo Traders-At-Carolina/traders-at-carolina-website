@@ -1,10 +1,20 @@
+import { isAdminUser } from "@/lib/admin/admins";
+
+type AccountLike = {
+  publicMetadata?: Record<string, unknown> | null;
+  emailAddresses: { emailAddress: string; verification?: { status?: string | null } | null }[];
+};
+
+/** Lowercased emails from the comma-separated ADMIN_EMAILS env var. */
+export function adminEmails(raw: string | undefined = process.env.ADMIN_EMAILS): string[] {
+  return (raw ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+}
+
 /**
- * True when Clerk session claims carry `metadata.role === "admin"`. The claim comes from the session token
- * customization `{"metadata":"{{user.public_metadata}}"}`; invitations set `publicMetadata.role` (spec 06 §4).
+ * Admin = a Clerk user with `publicMetadata.role === "admin"` (what the Admins screen grants) or a verified email listed
+ * in ADMIN_EMAILS (how the first admin gets in). Read from the live user, so no session token setup is needed.
  */
-export function isAdminClaims(claims: unknown): boolean {
-  if (!claims || typeof claims !== "object") return false;
-  const metadata = (claims as { metadata?: unknown }).metadata;
-  if (!metadata || typeof metadata !== "object") return false;
-  return (metadata as { role?: unknown }).role === "admin";
+export function isAdminAccount(user: AccountLike, allowlist: string[] = adminEmails()): boolean {
+  if (isAdminUser(user.publicMetadata)) return true;
+  return user.emailAddresses.some((e) => e.verification?.status === "verified" && allowlist.includes(e.emailAddress.toLowerCase()));
 }

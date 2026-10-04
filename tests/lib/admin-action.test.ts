@@ -5,8 +5,8 @@ const session = vi.hoisted(() => ({ admin: true }));
 const updateTag = vi.hoisted(() => vi.fn());
 vi.mock("next/cache", () => ({ updateTag, revalidatePath: vi.fn() }));
 vi.mock("@clerk/nextjs/server", () => ({
-  auth: async () => (session.admin ? { userId: "user_1", sessionClaims: { metadata: { role: "admin" } } } : { userId: null, sessionClaims: null }),
-  currentUser: async () => ({ primaryEmailAddress: { emailAddress: "admin@example.com" } }),
+  auth: async () => ({ userId: session.admin ? "user_1" : null }),
+  currentUser: async () => (session.admin ? { publicMetadata: { role: "admin" }, emailAddresses: [], primaryEmailAddress: { emailAddress: "admin@example.com" } } : null),
 }));
 vi.mock("next/navigation", () => ({ notFound: vi.fn(), redirect: vi.fn() }));
 

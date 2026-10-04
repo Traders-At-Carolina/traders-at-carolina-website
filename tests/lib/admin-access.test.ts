@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const session = vi.hoisted(() => ({ current: { userId: null as string | null, sessionClaims: null as unknown } }));
-vi.mock("@clerk/nextjs/server", () => ({ auth: async () => session.current }));
+const session = vi.hoisted(() => ({ userId: null as string | null, user: null as unknown }));
+vi.mock("@clerk/nextjs/server", () => ({ auth: async () => ({ userId: session.userId }), currentUser: async () => session.user }));
 vi.mock("next/navigation", () => ({ notFound: vi.fn(), redirect: vi.fn() }));
 
 import { AdminAccessError, requireAdmin } from "@/lib/auth/admin";
@@ -10,17 +10,20 @@ import { uploadTokenOptions } from "@/lib/admin/upload-policy";
 
 describe("requireAdmin", () => {
   beforeEach(() => {
-    session.current = { userId: null, sessionClaims: null };
+    session.userId = null;
+    session.user = null;
   });
 
   it("rejects signed-out callers and signed-in non-admins", async () => {
     await expect(requireAdmin()).rejects.toBeInstanceOf(AdminAccessError);
-    session.current = { userId: "user_1", sessionClaims: { metadata: {} } };
+    session.userId = "user_1";
+    session.user = { publicMetadata: {}, emailAddresses: [] };
     await expect(requireAdmin()).rejects.toBeInstanceOf(AdminAccessError);
   });
 
   it("returns the admin's user id", async () => {
-    session.current = { userId: "user_1", sessionClaims: { metadata: { role: "admin" } } };
+    session.userId = "user_1";
+    session.user = { publicMetadata: { role: "admin" }, emailAddresses: [] };
     await expect(requireAdmin()).resolves.toEqual({ userId: "user_1" });
   });
 });

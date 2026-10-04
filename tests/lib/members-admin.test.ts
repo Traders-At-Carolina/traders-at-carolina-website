@@ -7,8 +7,8 @@ vi.mock("next/headers", () => ({ headers: async () => new Headers({ host: "local
 vi.mock("next/navigation", () => ({ notFound: vi.fn(), redirect: vi.fn() }));
 const invitations = vi.hoisted(() => ({ createInvitation: vi.fn(async () => ({ id: "inv_1" })) }));
 vi.mock("@clerk/nextjs/server", () => ({
-  auth: async () => (session.admin ? { userId: "admin_1", sessionClaims: { metadata: { role: "admin" } } } : { userId: null, sessionClaims: null }),
-  currentUser: async () => ({ primaryEmailAddress: { emailAddress: "officer@unc.edu" } }),
+  auth: async () => ({ userId: session.admin ? "admin_1" : null }),
+  currentUser: async () => (session.admin ? { publicMetadata: { role: "admin" }, emailAddresses: [], primaryEmailAddress: { emailAddress: "officer@unc.edu" } } : null),
   clerkClient: async () => ({ invitations }),
 }));
 
