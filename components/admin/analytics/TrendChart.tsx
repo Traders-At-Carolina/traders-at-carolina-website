@@ -26,7 +26,7 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
   const peak = Math.max(...points.map((p) => p.pageviews), 0);
 
   return (
-    <div className="px-5 py-4">
+    <div className="px-6 py-4">
       <ul className="mb-3 flex flex-wrap gap-4 text-ui-label text-ui-text-2">
         <li className="flex items-center gap-2">
           <span aria-hidden className="h-0.5 w-4 rounded-ui-full bg-ui-accent" />

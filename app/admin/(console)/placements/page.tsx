@@ -20,7 +20,7 @@ export const metadata = { title: "Placements" };
 /** One firm row: logo cell and name linking to its editor (the whole row is clickable), plus optional trailing controls. */
 function FirmRow({ id, firm, logo, children }: { id: string; firm: string; logo: ImageAsset | null; children?: ReactNode }) {
   return (
-    <li className="relative flex items-center gap-4 px-5 py-2.5 transition-colors duration-150 hover:bg-ui-subtle">
+    <li className="relative flex items-center gap-4 px-6 py-2.5 transition-colors duration-150 hover:bg-ui-subtle">
       <span className="flex w-32 shrink-0 items-center text-ui-text-2">{logo ? <SponsorMark logo={logo} height={20} /> : <span className="text-ui-hint text-ui-text-3">No logo</span>}</span>
       <Link href={`/admin/placements/${id}`} className="min-w-0 flex-1 truncate text-ui-base font-medium text-ui-text after:absolute after:inset-0 hover:text-ui-accent">
         {firm}

@@ -50,7 +50,7 @@ export function Dialog({ open, onClose, title, description, footer, size = "md",
     >
       {open ? (
         <div className="font-ui">
-          <div className="flex items-start justify-between gap-4 px-5 pt-5">
+          <div className="flex items-start justify-between gap-4 px-6 pt-5">
             <div>
               <h2 id={titleId} className="text-ui-section font-semibold">
                 {title}
@@ -65,8 +65,8 @@ export function Dialog({ open, onClose, title, description, footer, size = "md",
               <X aria-hidden className="size-4" />
             </button>
           </div>
-          {children ? <div className="px-5 pt-4">{children}</div> : null}
-          <div className="mt-5 flex flex-wrap justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-canvas px-5 py-3">{footer}</div>
+          {children ? <div className="px-6 pt-4">{children}</div> : null}
+          <div className="mt-5 flex flex-wrap justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-canvas px-6 py-3">{footer}</div>
         </div>
       ) : null}
     </dialog>

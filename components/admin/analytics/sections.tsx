@@ -52,7 +52,7 @@ const failedValue = (failure: QueryFailure) => muted(failure.reason === "not-con
 
 export function TileSkeleton() {
   return (
-    <div className="rounded-ui-lg border border-ui-border bg-ui-surface p-5 shadow-ui-card">
+    <div className="rounded-ui-lg border border-ui-border bg-ui-surface p-6 shadow-ui-card">
       <Skeleton className="h-4 w-24" />
       <Skeleton className="mt-3 h-8 w-20" />
       <Skeleton className="mt-2 h-4 w-28" />
@@ -133,7 +133,7 @@ function SectionCard({ id, title, description, children }: { id: string; title: 
 export function CardSkeleton({ id, title, rows = 5, chart = false }: { id: string; title: string; rows?: number; chart?: boolean }) {
   return (
     <SectionCard id={id} title={title}>
-      <div className="space-y-3 px-5 py-4" aria-busy>
+      <div className="space-y-3 px-6 py-4" aria-busy>
         {chart ? <Skeleton className="h-44 w-full" /> : Array.from({ length: rows }, (_, i) => <Skeleton key={i} className="h-5 w-full" />)}
         <span className="sr-only">Loading…</span>
       </div>

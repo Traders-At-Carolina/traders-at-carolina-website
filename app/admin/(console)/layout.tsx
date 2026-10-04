@@ -15,7 +15,9 @@ export default function ConsoleLayout({ children }: LayoutProps<"/admin">) {
       </a>
       <AdminTopBar />
       <AdminSubNav />
-      <main id="main" className="mx-auto w-full max-w-7xl min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8">
+      <main id="main" className="relative isolate mx-auto w-full max-w-7xl min-w-0 flex-1 px-4 py-6 md:px-8 md:py-10">
+        {/* Graph paper behind the page header only; its mask fades it out before the content (spec 11 §3.5). */}
+        <div aria-hidden className="graph-paper pointer-events-none absolute inset-x-0 top-0 -z-10 h-72" />
         {children}
       </main>
     </>

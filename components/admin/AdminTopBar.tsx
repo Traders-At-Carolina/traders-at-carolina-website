@@ -2,22 +2,22 @@
 
 import { UserButton } from "@clerk/nextjs";
 import { ArrowUpRight, Menu as MenuIcon, Search, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { MARK_HEIGHT, MARK_WIDTH } from "@/components/Wordmark";
 import { ADMIN_SECTIONS, screenFor, sectionFor, sectionHref } from "@/lib/admin/nav";
 import { CommandPalette } from "./CommandPalette";
 import { cx } from "./ui/cx";
 import { useModal } from "./ui/Dialog";
 
-/** The TAC Admin mark (spec 11 §3.2). */
-export function AdminMark() {
+/** The club logo beside "Admin" (spec 11 §3.2): the bone mark on the navy bar, the navy mark on light surfaces. */
+export function AdminMark({ tone = "default" }: { tone?: "default" | "inverse" }) {
   return (
-    <span className="flex items-center gap-2">
-      <span aria-hidden className="flex size-7 items-center justify-center rounded-ui-md bg-ui-accent text-[0.625rem] font-bold tracking-wide text-white">
-        TAC
-      </span>
-      <span className="text-ui-base font-semibold text-ui-text">Admin</span>
+    <span className="flex items-center gap-2.5">
+      <Image src={tone === "inverse" ? "/brand/logo-bone.svg" : "/brand/logo.svg"} alt="" width={MARK_WIDTH} height={MARK_HEIGHT} className="h-7 w-auto" />
+      <span className={cx("text-ui-section font-semibold", tone === "inverse" ? "text-ui-on-chrome" : "text-ui-text")}>Admin</span>
     </span>
   );
 }
@@ -47,10 +47,11 @@ export function AdminTopBar() {
   const isMac = useIsMac();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-ui-border bg-ui-surface">
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 md:px-8">
+    <header className="sticky top-0 z-30 bg-ui-chrome text-ui-on-chrome">
+      {/* `on-dark` sits on the bar row only: the menu sheet and palette below are light surfaces. */}
+      <div className="on-dark mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 md:px-8">
         <Link href="/admin" aria-label="Admin overview" className="shrink-0 rounded-ui-md">
-          <AdminMark />
+          <AdminMark tone="inverse" />
         </Link>
         <nav aria-label="Sections" className="hidden h-full md:block">
           <ul className="flex h-full items-stretch gap-1">
@@ -63,8 +64,8 @@ export function AdminTopBar() {
                     aria-current={current ? "page" : undefined}
                     className={cx(
                       "relative flex items-center px-3 text-ui-base font-medium transition-colors duration-150",
-                      "after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:rounded-ui-full after:transition-colors",
-                      current ? "text-ui-text after:bg-ui-accent" : "text-ui-text-2 after:bg-transparent hover:text-ui-text",
+                      "after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:transition-colors",
+                      current ? "text-ui-on-chrome after:bg-ui-on-chrome" : "text-ui-on-chrome/75 after:bg-transparent hover:text-ui-on-chrome",
                     )}
                   >
                     {section.label}
@@ -80,12 +81,12 @@ export function AdminTopBar() {
             onClick={() => setPaletteOpen(true)}
             aria-haspopup="dialog"
             aria-keyshortcuts="Meta+K Control+K"
-            className="hidden h-8 w-56 items-center gap-2 rounded-ui-md border border-ui-border bg-ui-surface pr-1.5 pl-2.5 text-ui-label text-ui-text-3 transition-colors duration-150 hover:border-ui-border-strong hover:text-ui-text-2 lg:inline-flex"
+            className="hidden h-8 w-56 items-center gap-2 rounded-ui-md border border-ui-chrome-rule bg-ui-on-chrome/10 pr-1.5 pl-2.5 text-ui-label text-ui-on-chrome/75 transition-colors duration-150 hover:bg-ui-on-chrome/15 hover:text-ui-on-chrome lg:inline-flex"
           >
             <Search aria-hidden className="size-4" />
             <span>Search…</span>
             {isMac !== null ? (
-              <kbd aria-hidden className="ml-auto rounded-ui-sm border border-ui-border bg-ui-subtle px-1.5 font-ui text-ui-hint font-medium text-ui-text-3">
+              <kbd aria-hidden className="ml-auto rounded-ui-sm border border-ui-chrome-rule px-1.5 font-ui text-ui-hint font-medium text-ui-on-chrome/75">
                 {isMac ? "⌘K" : "Ctrl K"}
               </kbd>
             ) : null}
@@ -96,11 +97,11 @@ export function AdminTopBar() {
             aria-label="Search"
             aria-haspopup="dialog"
             aria-keyshortcuts="Meta+K Control+K"
-            className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-text-2 hover:bg-ui-subtle hover:text-ui-text lg:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-on-chrome/75 hover:bg-ui-on-chrome/10 hover:text-ui-on-chrome lg:hidden"
           >
             <Search aria-hidden className="size-5" />
           </button>
-          <a href="/" target="_blank" rel="noopener noreferrer" className="hidden h-8 items-center gap-1 rounded-ui-md px-2.5 text-ui-label font-medium text-ui-text-2 transition-colors hover:bg-ui-subtle hover:text-ui-text sm:inline-flex">
+          <a href="/" target="_blank" rel="noopener noreferrer" className="hidden h-8 items-center gap-1 rounded-ui-md px-2.5 text-ui-label font-medium text-ui-on-chrome/75 transition-colors hover:bg-ui-on-chrome/10 hover:text-ui-on-chrome sm:inline-flex">
             View site
             <ArrowUpRight aria-hidden className="size-4" />
             <span className="sr-only">(opens in a new tab)</span>
@@ -113,7 +114,7 @@ export function AdminTopBar() {
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
             aria-haspopup="dialog"
-            className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-text-2 hover:bg-ui-subtle hover:text-ui-text md:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-ui-md text-ui-on-chrome/75 hover:bg-ui-on-chrome/10 hover:text-ui-on-chrome md:hidden"
           >
             <MenuIcon aria-hidden className="size-5" />
           </button>

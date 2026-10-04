@@ -74,7 +74,7 @@ export function MemberForm({ member, action, remove }: { member: MemberSnapshot;
           <FormFooter pending={pending} dirty={dirty} submitLabel="Save" cancelHref="/admin/members" error={state.error} />
         </Card>
       </form>
-      <form ref={removeForm} action={removeAction} className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-ui-lg border border-ui-danger/25 bg-ui-surface px-5 py-4 shadow-ui-card">
+      <form ref={removeForm} action={removeAction} className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-ui-lg border border-ui-danger/25 bg-ui-surface px-6 py-4 shadow-ui-card">
         <div>
           <p className="text-ui-base font-medium text-ui-text">Remove from roster</p>
           <p className="mt-0.5 text-ui-label text-ui-text-2">They lose member access; their account stays. You can undo this right after.</p>

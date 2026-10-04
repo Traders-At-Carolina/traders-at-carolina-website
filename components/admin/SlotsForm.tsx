@@ -98,7 +98,7 @@ export function SlotsForm({ page, title, hint, notice, slotLabels, options, slot
             })}
           </div>
         </CardSection>
-        <div className="flex flex-wrap items-center justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-surface px-5 py-3">
+        <div className="flex flex-wrap items-center justify-end gap-2 rounded-b-ui-lg border-t border-ui-border bg-ui-surface px-6 py-3">
           {state.error ? (
             <p role="alert" className="mr-auto text-ui-base font-medium text-ui-danger">
               {state.error}

@@ -81,7 +81,7 @@ export default async function PhotosPage({ searchParams }: PageProps<"/admin/pho
               }
             />
           ) : (
-            <ul className="grid grid-cols-2 gap-4 p-5 md:grid-cols-3 xl:grid-cols-4">
+            <ul className="grid grid-cols-2 gap-4 p-6 md:grid-cols-3 xl:grid-cols-4">
               {library.map((p) => {
                 const where = [p.homeOrder ? `Home ${p.homeOrder}` : null, p.membershipOrder ? `Membership ${p.membershipOrder}` : null].filter((w): w is string => w !== null);
                 return (

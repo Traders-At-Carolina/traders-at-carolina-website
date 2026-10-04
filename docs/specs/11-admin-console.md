@@ -1,6 +1,6 @@
 # Spec 11 — Admin Console
 
-**Status:** Built; revision 2 (brand re-skin) in progress · **Date:** 2026-10-04 · **Route:** `/admin/**` · **Depends on:** [Spec 06](06-admin.md) (data, actions, phases 7–8), [Spec 09 §8](09-portal.md) · **Amends:** spec 06 §6.0 (sidebar) and §6.1 (Overview)
+**Status:** Built; revision 2 (brand re-skin) built · **Date:** 2026-10-04 · **Route:** `/admin/**` · **Depends on:** [Spec 06](06-admin.md) (data, actions, phases 7–8), [Spec 09 §8](09-portal.md) · **Amends:** spec 06 §6.0 (sidebar) and §6.1 (Overview)
 
 Spec 06 defines *what* the admin can do: data, saves, undo, access and the portal contract. This spec defines *how the console looks and is organised*, and adds four power features. Where spec 06 §6.0 describes the sidebar, this spec replaces it. Every other part of spec 06 still applies.
 
@@ -100,7 +100,7 @@ Nothing outside `.admin-ui` changes.
 
 `ClerkProvider` in `app/admin/layout.tsx` gets `appearance.variables` from the §2.1 palette: `colorPrimary` navy, foreground black, muted foreground ink-2, `ui-border`, the status colours, `borderRadius` 2px and the font set to Public Sans. This makes `UserButton` and the sign-in and sign-up cards match.
 
-The sign-in and sign-up pages become a centred Clerk card on the bone canvas over a faint graph-paper grid (spec 00 §7.3), under the navy club logo and a Georgia "Admin" title (§3.2), with a "Back to the site" link.
+The sign-in and sign-up pages become a centred Clerk card on the bone canvas over a faint graph-paper grid (spec 00 §7.3), under the TAC Admin mark in its navy form (§3.2), with a "Back to the site" link.
 
 ### 2.5 Motion
 
@@ -349,7 +349,7 @@ Each phase is its own plan and PR, implemented only when asked. Spec 06 phases 7
 | C | Spec 06 phase 7: Announcements, Resources (private Blob and `/portal/files/[id]`), Portal settings and links, migration `0006` | Built (branch claude/admin-page-ui-design-cf692e) |
 | D | Overview dashboard (§5.2), health checks (§5.3), game moderation (§5.4), ⌘K palette (§5.1) | Built (branch claude/admin-page-ui-design-cf692e) |
 | E | Spec 06 phase 8: `/admin/analytics`, the Overview visitors row, and the footer analytics notice | Built (branch claude/admin-page-ui-design-cf692e) |
-| R2 | Revision 2 brand re-skin (§2, §3.2, §3.5, §4): `ui-*` tokens re-pointed at spec 00, Public Sans and Georgia titles replace Inter, navy top bar with the logo, eyebrows, graph paper, Clerk appearance, roomier cards and rows | In progress (branch claude/admin-page-ui-revision-501cff) |
+| R2 | Revision 2 brand re-skin (§2, §3.2, §3.5, §4): `ui-*` tokens re-pointed at spec 00, Public Sans and Georgia titles replace Inter, navy top bar with the logo, eyebrows, graph paper, Clerk appearance, roomier cards and rows | Built (branch claude/admin-page-ui-revision-501cff) |
 
 **Setup for phase E:** add `POSTHOG_PERSONAL_API_KEY` (read-only scope) and `POSTHOG_PROJECT_ID` to Vercel and `.env.local`.
 
