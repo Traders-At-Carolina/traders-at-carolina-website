@@ -47,7 +47,7 @@ describe("HomePage", () => {
     render(<HomePage home={base} recruiting={closed} now={now} />);
     expect(screen.queryByText("By the numbers title")).not.toBeInTheDocument();
     expect(screen.queryByText("Inside title")).not.toBeInTheDocument();
-    expect(eyebrows()).toEqual(["§ 01 — UNC's Premier Quantitative Finance Club", "§ 02 — What we do"]);
+    expect(eyebrows()).toEqual(["§ 01 — UNC's Premier Quantitative Finance Club", "§ 02 — What we do", "§ 03 — Prep resources"]);
   });
 
   it("keeps numbering sequential when stats are hidden but photos show", () => {
@@ -55,7 +55,8 @@ describe("HomePage", () => {
     expect(eyebrows()).toEqual([
       "§ 01 — UNC's Premier Quantitative Finance Club",
       "§ 02 — What we do",
-      "§ 03 — Inside the club",
+      "§ 03 — Prep resources",
+      "§ 04 — Inside the club",
     ]);
   });
 
@@ -71,7 +72,7 @@ describe("HomePage", () => {
     render(<HomePage home={{ ...base, stats: { foundedYear: 2023 } }} recruiting={closed} sponsors={[{ name: "Jane Street" }]} now={now} />);
     const section = screen.getByRole("region", { name: "Founded in 2023." });
     expect(within(section).getByRole("heading", { level: 2, name: "Founded in 2023." })).toBeInTheDocument();
-    expect(within(section).getByText("§ 03 — At a glance")).toBeInTheDocument();
+    expect(within(section).getByText("§ 04 — At a glance")).toBeInTheDocument();
     // Only the sponsor is listed; there is no stat row.
     expect(within(section).getAllByRole("listitem")).toHaveLength(1);
     expect(screen.queryByText("By the numbers title")).not.toBeInTheDocument();
@@ -80,8 +81,8 @@ describe("HomePage", () => {
   it("keeps the officer-written heading once there are two or more stats", () => {
     render(<HomePage home={{ ...base, stats: { members: 120, foundedYear: 2019 } }} recruiting={closed} now={now} />);
     const section = screen.getByRole("region", { name: "By the numbers title" });
-    expect(within(section).getByText("§ 03 — By the numbers")).toBeInTheDocument();
-    expect(within(section).queryByText("§ 03 — At a glance")).not.toBeInTheDocument();
+    expect(within(section).getByText("§ 04 — By the numbers")).toBeInTheDocument();
+    expect(within(section).queryByText("§ 04 — At a glance")).not.toBeInTheDocument();
   });
 
   it("links the hero button to the form when applications are open", () => {

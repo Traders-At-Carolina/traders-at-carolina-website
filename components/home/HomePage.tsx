@@ -5,6 +5,7 @@ import { Hero, HeroActions } from "@/components/home/Hero";
 import { InsideTheClub } from "@/components/home/InsideTheClub";
 import { IntroOverlay } from "@/components/home/IntroOverlay";
 import { Pillars } from "@/components/home/Pillars";
+import { PrepResources } from "@/components/home/PrepResources";
 import type { StatItem } from "@/components/Stat";
 import type { ClubEvent, HomeContent, Partner, Recruiting } from "@/content/types";
 import { getApplicationState, type ApplicationState } from "@/lib/applications";
@@ -23,7 +24,7 @@ type HomePageProps = {
   now: Date;
 };
 
-type SectionKey = "hero" | "pillars" | "numbers" | "inside";
+type SectionKey = "hero" | "pillars" | "prep" | "numbers" | "inside";
 
 /**
  * Composes the Home page (spec 01 §2). Sections without real content are omitted and numbering stays sequential.
@@ -52,7 +53,7 @@ export function HomePage({ home, recruiting, sponsors = [], events = [], now }: 
   const showInside = home.photos.length >= HOME_INSIDE_MIN_PHOTOS;
   const upcoming = nextFeaturedEvent(events, now);
 
-  const keys: SectionKey[] = ["hero", "pillars"];
+  const keys: SectionKey[] = ["hero", "pillars", "prep"];
   if (showNumbers) keys.push("numbers");
   if (showInside) keys.push("inside");
   const n = numberSections(keys);
@@ -62,6 +63,7 @@ export function HomePage({ home, recruiting, sponsors = [], events = [], now }: 
       <IntroOverlay />
       <Hero hero={home.hero} index={n.hero} actions={<div aria-live="polite">{live((c) => <HeroActions apply={c.hero} />)}</div>} />
       <Pillars index={n.pillars} title={home.headings.pillars} pillars={home.pillars} />
+      <PrepResources index={n.prep} />
       {showNumbers ? <ByTheNumbers index={n.numbers} title={home.headings.numbers} stats={stats} sponsors={sponsors} /> : null}
       {showInside ? (
         <InsideTheClub index={n.inside} title={home.headings.inside} photos={home.photos} upcoming={upcoming} />
