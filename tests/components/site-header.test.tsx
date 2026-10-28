@@ -374,3 +374,58 @@ describe("SiteHeaderClient sliding highlight", () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe("SiteHeaderClient logo tuck", () => {
+  const tuck = () => banner().style.getPropertyValue("--logo-tuck");
+  const scrollTo = (y: number) =>
+    act(() => {
+      window.scrollY = y;
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+  /** jsdom has no layout: put the float point 480px down the page under an 80px header. */
+  function stubFloatPoint(top = 480) {
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(80);
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      const y = this.hasAttribute("data-nav-float-point") ? top - window.scrollY : 0;
+      return { top: y } as DOMRect;
+    });
+  }
+
+  it("puts the header's name in a track that can slide behind the mark", () => {
+    renderHeader();
+    expect(banner().querySelector("[data-wordmark-track] .wordmark-name")).toHaveTextContent("Traders at Carolina");
+  });
+
+  it("starts untucked at the top of the page", () => {
+    stubFloatPoint();
+    renderHeader();
+    expect(tuck()).toBe("0.000");
+  });
+
+  it("scrubs with scroll and finishes tucked where the bar floats", () => {
+    stubFloatPoint(480);
+    renderHeader();
+    scrollTo(200);
+    expect(tuck()).toBe("0.500");
+    scrollTo(400);
+    expect(tuck()).toBe("1.000");
+    scrollTo(1200);
+    expect(tuck()).toBe("1.000");
+    scrollTo(0);
+    expect(tuck()).toBe("0.000");
+  });
+
+  it("tucks over a short fixed distance on pages without a hero", () => {
+    renderHeader({ withHero: false });
+    scrollTo(60);
+    expect(tuck()).toBe("0.500");
+  });
+
+  it("never moves the name under reduced motion", () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduce"), media: query }));
+    renderHeader();
+    scrollTo(400);
+    expect(tuck()).toBe("");
+  });
+});

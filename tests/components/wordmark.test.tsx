@@ -30,4 +30,17 @@ describe("Wordmark", () => {
     const { container } = render(<Wordmark size="lg" />);
     expect(container.querySelector("img")).toHaveClass("h-11");
   });
+
+  it("keeps the name in a plain span unless asked to tuck", () => {
+    const { container } = render(<Wordmark />);
+    expect(container.querySelector("[data-wordmark-track]")).toBeNull();
+  });
+
+  it("clips the name in a track beside the mark when tucking, keeping the link's name", () => {
+    const { container } = render(<Wordmark tuck />);
+    const track = container.querySelector("[data-wordmark-track]");
+    expect(track).toHaveClass("wordmark-track", "max-[359px]:hidden");
+    expect(track?.querySelector(".wordmark-name")).toHaveTextContent("Traders at Carolina");
+    expect(screen.getByRole("link", { name: "Traders at Carolina, home" })).toHaveClass("group");
+  });
 });
