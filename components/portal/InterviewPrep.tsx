@@ -14,6 +14,13 @@ type InterviewPrepProps = {
   trackNames?: Partial<Record<TrackId, string>>;
 };
 
+/** Public club tool, so it lives in code rather than the admin's resources. */
+const COUNTDOWN = {
+  title: "Countdown",
+  description: "Timed mental math and estimation drills to practise thinking quickly out loud.",
+  href: "https://tac-countdown-2eum.vercel.app/",
+};
+
 const COLUMN = "flex flex-col py-10 first:pt-0 last:pb-0 lg:px-8 lg:py-0 lg:first:pl-0 lg:last:pr-0";
 
 /**
@@ -63,12 +70,20 @@ export function InterviewPrep({ index, title, prep, resources = [], trackNames =
             </ol>
           </div>
         </div>
-        {resources.length > 0 ? (
-          <div className="mt-12 border-t border-rule pt-8 md:mt-16">
-            <h3 className="text-h3">Practice material</h3>
-            <ResourceList resources={resources} trackNames={trackNames} className="mt-4" />
-          </div>
-        ) : null}
+        <div className="mt-12 border-t border-rule pt-8 md:mt-16">
+          <h3 className="text-h3">Practice material</h3>
+          <a
+            href={COUNTDOWN.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="on-dark surface-graphite mt-4 block max-w-prose border border-rule p-6 md:p-8"
+          >
+            <span className="text-h3">{COUNTDOWN.title} <span aria-hidden="true">↗</span></span>
+            <span className="mt-2 block text-body">{COUNTDOWN.description}</span>
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+          {resources.length > 0 ? <ResourceList resources={resources} trackNames={trackNames} className="mt-8" /> : null}
+        </div>
       </Reveal>
     </Section>
   );
